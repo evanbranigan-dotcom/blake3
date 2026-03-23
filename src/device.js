@@ -1,4 +1,11 @@
-import { IPHONE_MODELS } from './data.js'
+import { IPHONE_MODELS, ANDROID_MODELS } from './data.js'
+
+// Extract device model from Android Chrome user agent
+// Format: "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/..."
+function parseAndroidModel(ua) {
+  const match = ua.match(/Android\s[\d.]+;\s*(.+?)(?:\s*Build\/|\))/)
+  return match ? match[1].trim() : null
+}
 
 export function detectDevice() {
   const ua = navigator.userAgent
@@ -53,8 +60,28 @@ export function detectDevice() {
     result.chip = navigator.platform === 'MacIntel' ? 'Intel / Apple Silicon' : 'Apple Silicon'
     result.shaHW = true
   } else if (isAndroid) {
-    result.deviceLabel = 'Android device'
-    result.shaHW = false // can't confirm
+    const androidModel = parseAndroidModel(ua)
+    const match = androidModel ? ANDROID_MODELS[androidModel] : null
+    const memory = navigator.deviceMemory // Chrome-only, RAM in GB
+
+    if (match) {
+      const displayName = match.marketing || androidModel
+      result.model = androidModel
+      result.chip = match.chip
+      result.shaHW = match.shaHW
+      result.deviceLabel = displayName
+      result.isAndroid = true
+    } else {
+      // Unrecognized model — still show what we know
+      result.model = androidModel || 'Unknown Android'
+      result.deviceLabel = androidModel || 'Android device'
+      result.shaHW = false // can't confirm without chip identification
+      result.isAndroid = true
+    }
+
+    if (memory) {
+      result.memory = memory
+    }
   } else {
     result.deviceLabel = 'Desktop / Other'
     result.shaHW = false
@@ -68,19 +95,42 @@ export function renderDeviceCard(device) {
   if (!section) return
 
   const coreText = device.cores !== 'unknown' ? `${device.cores} cores` : ''
-  const shaText = device.shaHW ? 'SHA-2 hardware acceleration' : 'No SHA-2 hardware acceleration'
+  const shaText = device.shaHW
+    ? 'SHA-2 hardware acceleration'
+    : device.isAndroid && !device.chip
+      ? 'SHA-2 hardware acceleration unknown'
+      : 'No SHA-2 hardware acceleration'
+  const shaClass = device.shaHW
+    ? 'sha-yes'
+    : device.isAndroid && !device.chip
+      ? 'sha-unknown'
+      : 'sha-no'
   const altModels = device.modelAlt ? `<span class="device-alt">(or ${device.modelAlt.join(', ')})</span>` : ''
+  const memoryText = device.memory ? `<span class="spec-memory">${device.memory} GB RAM</span>` : ''
+  const isMobile = device.isIPhone || device.isAndroid
+  const icon = isMobile ? '📱' : '💻'
+
+  // Detection method note
+  let detectionNote
+  if (device.isAndroid && device.chip) {
+    detectionNote = `Detected via user agent model identifier`
+  } else if (device.isAndroid) {
+    detectionNote = `Model: ${device.model || 'not exposed'} — chip not in database yet`
+  } else {
+    detectionNote = `Detected via screen dimensions ${device.raw.width}x${device.raw.height}@${device.raw.dpr}x`
+  }
 
   section.innerHTML = `
     <div class="device-card">
-      <div class="device-icon">${device.isIPhone ? '📱' : '💻'}</div>
+      <div class="device-icon">${icon}</div>
       <h3 class="device-name">${device.deviceLabel} ${altModels}</h3>
       <div class="device-specs">
         ${device.chip ? `<span class="spec-chip">${device.chip}</span>` : ''}
         ${coreText ? `<span class="spec-cores">${coreText}</span>` : ''}
-        <span class="spec-sha ${device.shaHW ? 'sha-yes' : 'sha-no'}">${shaText}</span>
+        ${memoryText}
+        <span class="spec-sha ${shaClass}">${shaText}</span>
       </div>
-      <p class="device-note">Detected via screen dimensions ${device.raw.width}x${device.raw.height}@${device.raw.dpr}x</p>
+      <p class="device-note">${detectionNote}</p>
     </div>
   `
 }

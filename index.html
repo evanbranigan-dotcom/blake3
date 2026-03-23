@@ -115,6 +115,218 @@
     </div>
   </section>
 
+  <!-- Section 2b: SHA-256 Weaknesses -->
+  <section id="weaknesses" class="section">
+    <div class="container">
+      <h2 class="section-title">Six reasons SHA-256 shows its age</h2>
+      <p class="weaknesses-intro">SHA-256 hasn't been "broken" — no one has found collisions. But its <em>architecture</em> has known structural weaknesses that modern hash functions were specifically designed to eliminate.</p>
+
+      <div class="weaknesses-grid">
+
+        <!-- 1. Length Extension -->
+        <div class="weakness-card">
+          <div class="weakness-header">
+            <span class="weakness-number">01</span>
+            <span class="weakness-severity severity-high">Exploitable</span>
+          </div>
+          <h3>Length extension attacks</h3>
+          <p class="weakness-desc">If you know <code>SHA-256(message)</code> and the message length, you can compute <code>SHA-256(message + attacker_data)</code> without knowing the original message.</p>
+          <div class="weakness-diagram">
+            <div class="ext-attack">
+              <div class="ext-row">
+                <span class="ext-block ext-known">Secret msg</span>
+                <span class="ext-arrow"></span>
+                <span class="ext-block ext-hash">H(msg)</span>
+                <span class="ext-label-known">Known to attacker</span>
+              </div>
+              <div class="ext-row">
+                <span class="ext-block ext-known">Secret msg</span>
+                <span class="ext-block ext-pad">pad</span>
+                <span class="ext-block ext-evil">Evil data</span>
+                <span class="ext-arrow"></span>
+                <span class="ext-block ext-hash">H(forged)</span>
+              </div>
+            </div>
+          </div>
+          <p class="weakness-real">Real-world exploits: Flickr API (2009), early AWS signature schemes, countless custom MAC constructions using <code>SHA-256(key || msg)</code>.</p>
+          <div class="weakness-fix">
+            <span class="fix-badge">BLAKE3</span> Uses a finalization flag that seals the output. Structurally immune — no state leaks through the hash.
+          </div>
+        </div>
+
+        <!-- 2. Merkle-Damgard -->
+        <div class="weakness-card">
+          <div class="weakness-header">
+            <span class="weakness-number">02</span>
+            <span class="weakness-severity severity-med">Theoretical</span>
+          </div>
+          <h3>Merkle-Damgard weaknesses</h3>
+          <p class="weakness-desc">SHA-256's underlying construction has multiple proven theoretical vulnerabilities beyond length extension.</p>
+          <div class="weakness-diagram">
+            <div class="md-chain">
+              <div class="md-step">
+                <span class="md-block">IV</span>
+                <span class="md-arrow"></span>
+                <span class="md-block">f</span>
+                <span class="md-arrow"></span>
+                <span class="md-block">f</span>
+                <span class="md-arrow"></span>
+                <span class="md-block md-out">H</span>
+              </div>
+              <div class="md-labels">
+                <span class="md-vuln">Multicollisions (Joux '04)</span>
+                <span class="md-vuln">Herding attacks</span>
+                <span class="md-vuln">Long-msg 2nd preimage</span>
+              </div>
+            </div>
+          </div>
+          <p class="weakness-real">Joux showed finding 2<sup>k</sup> collisions costs only k times more than finding one pair — far less than expected for an ideal hash.</p>
+          <div class="weakness-fix">
+            <span class="fix-badge">BLAKE3</span> Built on a Merkle tree, not a Merkle-Damgard chain. Each node is independent — the construction itself eliminates these classes of attacks.
+          </div>
+        </div>
+
+        <!-- 3. Sequential -->
+        <div class="weakness-card">
+          <div class="weakness-header">
+            <span class="weakness-number">03</span>
+            <span class="weakness-severity severity-perf">Performance</span>
+          </div>
+          <h3>Sequential-only processing</h3>
+          <p class="weakness-desc">Every block depends on the output of the previous block. One core, always — no matter how many your device has.</p>
+          <div class="weakness-diagram">
+            <div class="seq-vs-par">
+              <div class="seq-row">
+                <span class="seq-label">SHA-256</span>
+                <div class="seq-blocks">
+                  <span class="seq-block sha-b">1</span>
+                  <span class="seq-wait"></span>
+                  <span class="seq-block sha-b">2</span>
+                  <span class="seq-wait"></span>
+                  <span class="seq-block sha-b">3</span>
+                  <span class="seq-wait"></span>
+                  <span class="seq-block sha-b">4</span>
+                </div>
+                <span class="seq-time">4 units</span>
+              </div>
+              <div class="seq-row">
+                <span class="seq-label">BLAKE3</span>
+                <div class="seq-blocks">
+                  <span class="seq-block b3-b">1</span>
+                  <span class="seq-block b3-b">2</span>
+                  <span class="seq-block b3-b">3</span>
+                  <span class="seq-block b3-b">4</span>
+                </div>
+                <span class="seq-time">1 unit</span>
+              </div>
+            </div>
+          </div>
+          <p class="weakness-real">Your phone has 6 cores. Your laptop has 8-16. SHA-256 uses exactly one of them. The rest sit idle.</p>
+          <div class="weakness-fix">
+            <span class="fix-badge">BLAKE3</span> Tree structure means all chunks process simultaneously. More cores = proportionally faster. Linearly.
+          </div>
+        </div>
+
+        <!-- 4. No Domain Separation -->
+        <div class="weakness-card">
+          <div class="weakness-header">
+            <span class="weakness-number">04</span>
+            <span class="weakness-severity severity-high">Exploitable</span>
+          </div>
+          <h3>No built-in domain separation</h3>
+          <p class="weakness-desc">SHA-256 uses the same algorithm regardless of purpose. A hash used as a MAC, KDF, or PRF all look identical — making misuse easy and dangerous.</p>
+          <div class="weakness-diagram">
+            <div class="domain-demo">
+              <div class="domain-row">
+                <span class="domain-use">MAC</span>
+                <span class="domain-arrow"></span>
+                <span class="domain-fn">SHA-256</span>
+              </div>
+              <div class="domain-row">
+                <span class="domain-use">KDF</span>
+                <span class="domain-arrow"></span>
+                <span class="domain-fn">SHA-256</span>
+              </div>
+              <div class="domain-row">
+                <span class="domain-use">PRF</span>
+                <span class="domain-arrow"></span>
+                <span class="domain-fn">SHA-256</span>
+              </div>
+              <span class="domain-warning">Same function. No isolation.</span>
+            </div>
+          </div>
+          <p class="weakness-real">Using <code>SHA-256(key || message)</code> as a MAC? Broken by length extension. HMAC-SHA-256 works but is a workaround — two nested hashes because the primitive can't do it alone.</p>
+          <div class="weakness-fix">
+            <span class="fix-badge">BLAKE3</span> Built-in keyed hashing, KDF, and PRF modes with domain separation flags. One primitive, safe in every context.
+          </div>
+        </div>
+
+        <!-- 5. Quantum -->
+        <div class="weakness-card">
+          <div class="weakness-header">
+            <span class="weakness-number">05</span>
+            <span class="weakness-severity severity-future">Future risk</span>
+          </div>
+          <h3>Quantum vulnerability</h3>
+          <p class="weakness-desc">Grover's algorithm halves the effective security of any hash function. SHA-256 drops from 256-bit to 128-bit preimage resistance against a quantum computer.</p>
+          <div class="weakness-diagram">
+            <div class="quantum-bars">
+              <div class="q-row">
+                <span class="q-label">Today</span>
+                <div class="q-bar q-full">256-bit</div>
+              </div>
+              <div class="q-row">
+                <span class="q-label">Post-quantum</span>
+                <div class="q-bar q-half">128-bit</div>
+              </div>
+            </div>
+          </div>
+          <p class="weakness-real">128-bit is still strong — but it's half what you thought you were paying for. And quantum computing timelines keep accelerating.</p>
+          <div class="weakness-fix">
+            <span class="fix-badge">BLAKE3</span> Also 256-bit (same quantum reduction), but its faster speed means you can affordably use longer outputs when post-quantum margins matter.
+          </div>
+        </div>
+
+        <!-- 6. No Verified Streaming -->
+        <div class="weakness-card">
+          <div class="weakness-header">
+            <span class="weakness-number">06</span>
+            <span class="weakness-severity severity-perf">Performance</span>
+          </div>
+          <h3>No verified streaming</h3>
+          <p class="weakness-desc">With SHA-256, you must download the entire file before verifying integrity. If it's corrupted or tampered with, you don't know until the end.</p>
+          <div class="weakness-diagram">
+            <div class="stream-demo">
+              <div class="stream-row">
+                <span class="stream-label">SHA-256</span>
+                <div class="stream-blocks">
+                  <span class="stream-chunk s-wait">chunk</span>
+                  <span class="stream-chunk s-wait">chunk</span>
+                  <span class="stream-chunk s-wait">chunk</span>
+                  <span class="stream-chunk s-check">verify</span>
+                </div>
+              </div>
+              <div class="stream-row">
+                <span class="stream-label">BLAKE3</span>
+                <div class="stream-blocks">
+                  <span class="stream-chunk s-ok">verify</span>
+                  <span class="stream-chunk s-ok">verify</span>
+                  <span class="stream-chunk s-ok">verify</span>
+                  <span class="stream-chunk s-ok">verify</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="weakness-real">Downloading a 2 GB file over a flaky connection? SHA-256 makes you wait until byte 2,147,483,648 to tell you byte 7 was corrupted.</p>
+          <div class="weakness-fix">
+            <span class="fix-badge">BLAKE3</span> Tree structure enables verified streaming — verify each chunk independently as it arrives. Reject bad data immediately.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- Section 3: Your Device -->
   <section id="device" class="section">
     <div class="container">

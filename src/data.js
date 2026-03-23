@@ -112,6 +112,69 @@ export const IPHONE_MODELS = {
   '375x667@2_16e': null, // same as SE — see core count logic
 }
 
+// Android model detection lookup table
+// Key: model string extracted from user agent (e.g., "Pixel 8 Pro", "SM-S928B")
+// Android Chrome UA format: "... Android 14; Pixel 8 Pro) ..."
+// We match against both marketing names and model numbers
+export const ANDROID_MODELS = {
+  // Google Pixel — Tensor chips
+  'Pixel 9 Pro XL':   { chip: 'Tensor G4', shaHW: true },
+  'Pixel 9 Pro':      { chip: 'Tensor G4', shaHW: true },
+  'Pixel 9':          { chip: 'Tensor G4', shaHW: true },
+  'Pixel 8a':         { chip: 'Tensor G3', shaHW: true },
+  'Pixel 8 Pro':      { chip: 'Tensor G3', shaHW: true },
+  'Pixel 8':          { chip: 'Tensor G3', shaHW: true },
+  'Pixel 7a':         { chip: 'Tensor G2', shaHW: true },
+  'Pixel 7 Pro':      { chip: 'Tensor G2', shaHW: true },
+  'Pixel 7':          { chip: 'Tensor G2', shaHW: true },
+  'Pixel 6a':         { chip: 'Tensor',    shaHW: true },
+  'Pixel 6 Pro':      { chip: 'Tensor',    shaHW: true },
+  'Pixel 6':          { chip: 'Tensor',    shaHW: true },
+
+  // Samsung Galaxy S series — Snapdragon (US/global variants)
+  'SM-S928B': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy S24 Ultra' },
+  'SM-S928U': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy S24 Ultra' },
+  'SM-S926B': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy S24+' },
+  'SM-S926U': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy S24+' },
+  'SM-S921B': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy S24' },
+  'SM-S921U': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy S24' },
+  'SM-S918B': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Galaxy S23 Ultra' },
+  'SM-S918U': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Galaxy S23 Ultra' },
+  'SM-S916B': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Galaxy S23+' },
+  'SM-S911B': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Galaxy S23' },
+  'SM-S908B': { chip: 'Snapdragon 8 Gen 1', shaHW: true, marketing: 'Galaxy S22 Ultra' },
+  'SM-S908U': { chip: 'Snapdragon 8 Gen 1', shaHW: true, marketing: 'Galaxy S22 Ultra' },
+  'SM-S906B': { chip: 'Snapdragon 8 Gen 1', shaHW: true, marketing: 'Galaxy S22+' },
+  'SM-S901B': { chip: 'Snapdragon 8 Gen 1', shaHW: true, marketing: 'Galaxy S22' },
+
+  // Samsung Galaxy S — marketing name fallbacks (some UAs use these)
+  'Galaxy S24 Ultra':  { chip: 'Snapdragon 8 Gen 3', shaHW: true },
+  'Galaxy S24+':       { chip: 'Snapdragon 8 Gen 3', shaHW: true },
+  'Galaxy S24':        { chip: 'Snapdragon 8 Gen 3', shaHW: true },
+  'Galaxy S23 Ultra':  { chip: 'Snapdragon 8 Gen 2', shaHW: true },
+  'Galaxy S23+':       { chip: 'Snapdragon 8 Gen 2', shaHW: true },
+  'Galaxy S23':        { chip: 'Snapdragon 8 Gen 2', shaHW: true },
+
+  // Samsung Galaxy Z Fold/Flip
+  'SM-F956B': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy Z Fold6' },
+  'SM-F741B': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Galaxy Z Flip6' },
+  'SM-F946B': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Galaxy Z Fold5' },
+  'SM-F731B': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Galaxy Z Flip5' },
+
+  // Samsung Galaxy A series (mid-range)
+  'SM-A556B': { chip: 'Exynos 1480', shaHW: true, marketing: 'Galaxy A55' },
+  'SM-A546B': { chip: 'Exynos 1380', shaHW: true, marketing: 'Galaxy A54' },
+  'SM-A356B': { chip: 'Exynos 1480', shaHW: true, marketing: 'Galaxy A35' },
+
+  // OnePlus
+  'CPH2581': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'OnePlus 12' },
+  'CPH2449': { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'OnePlus 11' },
+
+  // Xiaomi
+  '2311DRK48C': { chip: 'Snapdragon 8 Gen 3', shaHW: true, marketing: 'Xiaomi 14' },
+  '2210132G':   { chip: 'Snapdragon 8 Gen 2', shaHW: true, marketing: 'Xiaomi 13' },
+}
+
 // Chip details for the verdict section
 export const CHIP_INFO = {
   A11: { year: 2017, nm: '10nm', shaAccel: 'ARMv8.2 Crypto Extensions' },

@@ -169,9 +169,16 @@ export function renderVerdict(results, device) {
   const blake3Faster = hasCryptoResults ? blake3VsSha256Crypto > 1 : true
   const numWorkers = results[0]?.algorithms.blake3parallel?.workers || '?'
 
-  const deviceNote = device.isIPhone
-    ? `Your ${device.deviceLabel} has <strong>${device.chip}</strong> with dedicated SHA-2 hardware acceleration — giving SHA-256 every possible advantage.`
-    : `Your ${device.deviceLabel} was used for this test.`
+  let deviceNote
+  if (device.isIPhone && device.chip) {
+    deviceNote = `Your ${device.deviceLabel} has <strong>${device.chip}</strong> with dedicated SHA-2 hardware acceleration — giving SHA-256 every possible advantage.`
+  } else if (device.isAndroid && device.chip) {
+    deviceNote = `Your ${device.deviceLabel} has <strong>${device.chip}</strong>${device.shaHW ? ' with SHA-2 hardware acceleration via ARMv8 Crypto Extensions' : ''}.`
+  } else if (device.isAndroid) {
+    deviceNote = `Your ${device.deviceLabel} (${device.cores} cores${device.memory ? `, ${device.memory} GB RAM` : ''}) was used for this test.`
+  } else {
+    deviceNote = `Your ${device.deviceLabel} was used for this test.`
+  }
 
   const noHttpsNote = !hasCryptoResults
     ? `<p class="verdict-note">Note: Hardware-accelerated SHA-256 (Web Crypto API) requires HTTPS. Deploy to Vercel to see the full comparison.</p>`

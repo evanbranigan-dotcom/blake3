@@ -336,6 +336,514 @@ body {
   opacity: 0.8;
 }
 
+/* ── Weaknesses Section ── */
+.weaknesses-intro {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+.weaknesses-intro em {
+  color: var(--text);
+  font-style: italic;
+}
+
+.weaknesses-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.weakness-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  border-left: 3px solid var(--sha256);
+}
+
+.weakness-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.weakness-number {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-family: 'SF Mono', ui-monospace, monospace;
+  letter-spacing: 0.05em;
+}
+
+.weakness-severity {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.severity-high {
+  background: rgba(255, 68, 68, 0.15);
+  color: #ff6666;
+}
+
+.severity-med {
+  background: rgba(255, 136, 0, 0.12);
+  color: var(--sha256);
+}
+
+.severity-perf {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-dim);
+}
+
+.severity-future {
+  background: rgba(68, 136, 255, 0.12);
+  color: var(--webcrypto);
+}
+
+.weakness-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.weakness-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.weakness-desc code {
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: var(--sha256);
+}
+
+.weakness-real {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.weakness-real code {
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--sha256);
+  font-style: normal;
+}
+
+.weakness-fix {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: rgba(0, 255, 136, 0.04);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 255, 136, 0.1);
+}
+
+.fix-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blake3);
+  background: rgba(0, 255, 136, 0.12);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Weakness Diagrams — shared */
+.weakness-diagram {
+  margin: 12px 0 16px;
+  padding: 14px;
+  background: var(--bg-card-alt);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* Diagram: Length Extension */
+.ext-attack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ext-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ext-block {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  flex-shrink: 0;
+}
+
+.ext-known {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.ext-hash {
+  background: rgba(255, 136, 0, 0.15);
+  color: var(--sha256);
+  border: 1px solid var(--sha256-dim);
+}
+
+.ext-pad {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px dashed var(--text-muted);
+}
+
+.ext-evil {
+  background: rgba(255, 68, 68, 0.15);
+  color: #ff6666;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+}
+
+.ext-label-known {
+  font-size: 0.6rem;
+  color: var(--sha256);
+  font-style: italic;
+  margin-left: 4px;
+}
+
+.ext-arrow {
+  width: 16px;
+  height: 2px;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ext-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  border: 4px solid transparent;
+  border-left: 4px solid var(--text-muted);
+}
+
+/* Diagram: Merkle-Damgard */
+.md-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.md-step {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.md-block {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  background: rgba(255, 136, 0, 0.1);
+  border: 1px solid var(--sha256-dim);
+  color: var(--sha256);
+  flex-shrink: 0;
+}
+
+.md-block.md-out {
+  background: rgba(255, 136, 0, 0.2);
+  font-weight: 700;
+}
+
+.md-arrow {
+  width: 16px;
+  height: 2px;
+  background: var(--sha256-dim);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.md-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  border: 4px solid transparent;
+  border-left: 4px solid var(--sha256-dim);
+}
+
+.md-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.md-vuln {
+  font-size: 0.6rem;
+  color: #ff6666;
+  background: rgba(255, 68, 68, 0.08);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Diagram: Sequential vs Parallel */
+.seq-vs-par {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.seq-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seq-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 54px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.seq-blocks {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.seq-block {
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.sha-b {
+  background: rgba(255, 136, 0, 0.15);
+  color: var(--sha256);
+  border: 1px solid var(--sha256-dim);
+}
+
+.b3-b {
+  background: rgba(0, 255, 136, 0.12);
+  color: var(--blake3);
+  border: 1px solid var(--blake3-dim);
+}
+
+.seq-wait {
+  width: 12px;
+  height: 2px;
+  background: var(--sha256-dim);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.seq-wait::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  border: 3px solid transparent;
+  border-left: 3px solid var(--sha256-dim);
+}
+
+.seq-time {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: 'SF Mono', ui-monospace, monospace;
+  flex-shrink: 0;
+}
+
+/* Diagram: Domain Separation */
+.domain-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.domain-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.domain-use {
+  font-size: 0.7rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  color: var(--text-dim);
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.domain-arrow {
+  width: 20px;
+  height: 2px;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.domain-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  border: 4px solid transparent;
+  border-left: 4px solid var(--text-muted);
+}
+
+.domain-fn {
+  font-size: 0.7rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  padding: 3px 10px;
+  background: rgba(255, 136, 0, 0.12);
+  border: 1px solid var(--sha256-dim);
+  border-radius: 4px;
+  color: var(--sha256);
+}
+
+.domain-warning {
+  font-size: 0.6rem;
+  color: #ff6666;
+  font-style: italic;
+  margin-top: 4px;
+  padding-left: 66px;
+}
+
+/* Diagram: Quantum */
+.quantum-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.q-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.q-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.q-bar {
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'SF Mono', ui-monospace, monospace;
+}
+
+.q-full {
+  width: 100%;
+  background: rgba(68, 136, 255, 0.15);
+  border: 1px solid rgba(68, 136, 255, 0.3);
+  color: var(--webcrypto);
+}
+
+.q-half {
+  width: 50%;
+  background: rgba(255, 136, 0, 0.15);
+  border: 1px solid var(--sha256-dim);
+  color: var(--sha256);
+}
+
+/* Diagram: Verified Streaming */
+.stream-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stream-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stream-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 54px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.stream-blocks {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.stream-chunk {
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 0.62rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}
+
+.s-wait {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+}
+
+.s-check {
+  background: rgba(255, 136, 0, 0.15);
+  border: 1px solid var(--sha256-dim);
+  color: var(--sha256);
+}
+
+.s-ok {
+  background: rgba(0, 255, 136, 0.12);
+  border: 1px solid var(--blake3-dim);
+  color: var(--blake3);
+}
+
 /* ── Device Card ── */
 .device-card {
   background: var(--bg-card);
@@ -399,6 +907,16 @@ body {
 .spec-sha.sha-no {
   background: rgba(255, 136, 0, 0.1);
   color: var(--sha256);
+}
+
+.spec-sha.sha-unknown {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text-dim);
+}
+
+.spec-memory {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
 }
 
 .device-note {
