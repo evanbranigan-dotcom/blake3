@@ -17,6 +17,52 @@ function formatTime(ms) {
   return `${ms.toFixed(0)} ms`
 }
 
+function renderInsight(sizeResult) {
+  const algos = sizeResult.algorithms
+  const b3 = algos.blake3.throughputMBps
+  const b3p = algos.blake3parallel?.throughputMBps || 0
+  const sw = algos.sha256wasm.throughputMBps
+  const hw = algos.sha256crypto?.throughputMBps || 0
+
+  const bytes = sizeResult.bytes
+  const isSmall = bytes <= 102400  // 100KB or less
+  const isMedium = bytes === 1048576
+  const isLarge = bytes >= 10485760
+
+  let text = ''
+
+  if (isSmall && hw > b3) {
+    text = `<strong>SHA-256 (HW) wins at ${sizeResult.label}</strong> — Apple's dedicated SHA-2 silicon has near-zero per-op overhead, which dominates at small sizes. BLAKE3's WASM implementation pays a fixed cost per call that matters more when the data is tiny.`
+  } else if (isSmall && b3 > hw) {
+    text = `<strong>BLAKE3 leads even at ${sizeResult.label}</strong> — impressive given SHA-256 has dedicated hardware.`
+  }
+
+  if (b3p > 0 && b3p < b3 && isSmall) {
+    text += ` <strong>Multi-core is slower here</strong> — splitting ${sizeResult.label} across Web Workers costs more in message-passing overhead than it saves. Parallelism pays off at larger sizes.`
+  } else if (b3p > 0 && b3p < b3 && !isSmall) {
+    text += ` Multi-core overhead still outweighs the benefit at this size.`
+  }
+
+  if (isMedium && b3 > sw) {
+    const ratio = (b3 / sw).toFixed(1)
+    text += text ? ' ' : ''
+    text += `BLAKE3 is ${ratio}x faster than SHA-256 in a fair software-vs-software comparison.`
+  }
+
+  if (isLarge && b3p > hw) {
+    text += text ? ' ' : ''
+    text += `<strong>Multi-core BLAKE3 overtakes hardware SHA-256</strong> — this is the parallelism advantage in action. SHA-256 is structurally sequential and can never scale this way.`
+  } else if (isLarge && b3p > b3) {
+    const speedup = (b3p / b3).toFixed(1)
+    text += text ? ' ' : ''
+    text += `Multi-core BLAKE3 achieves ${speedup}x over single-threaded — the tree-hashing architecture paying off at scale.`
+  }
+
+  if (!text) return ''
+
+  return `<div class="result-insight">${text}</div>`
+}
+
 export function renderResults(results) {
   const container = document.getElementById('results-container')
   if (!container) return
@@ -67,6 +113,9 @@ export function renderResults(results) {
       }
       html += `</div>`
     }
+
+    // Contextual insight for this size
+    html += renderInsight(sizeResult)
 
     html += `</div>`
   }
