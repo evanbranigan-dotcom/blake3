@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>BLAKE3 vs SHA-256 — The Hash Function Your Phone Deserves</title>
+  <meta name="description" content="Run a real benchmark on your device. See how BLAKE3 compares to SHA-256 — the hash function designed in 2001 that's still everywhere.">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Section 1: Hero -->
+  <section id="hero" class="section">
+    <div class="container">
+      <p class="hero-eyebrow">A live benchmark experiment</p>
+      <h1 class="hero-title">Is your phone using a hash function from <span class="highlight-year">2001</span>?</h1>
+      <p class="hero-sub">SHA-256 is everywhere — passwords, certificates, blockchains, file verification. It was designed before the first iPhone existed. There's a faster, more secure alternative. Let's prove it.</p>
+      <div class="scroll-hint">
+        <span>Scroll to learn more</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: The Story -->
+  <section id="story" class="section">
+    <div class="container">
+      <h2 class="section-title">Two algorithms. Two eras.</h2>
+
+      <div class="story-grid">
+        <div class="story-card story-sha256">
+          <div class="story-year">2001</div>
+          <h3>SHA-256</h3>
+          <p class="story-origin">Designed by the NSA. Published by NIST. Built for an era of single-core processors.</p>
+          <div class="architecture-diagram">
+            <div class="arch-label">Sequential chain</div>
+            <div class="chain">
+              <div class="chain-block">Block 1</div>
+              <div class="chain-arrow"></div>
+              <div class="chain-block">Block 2</div>
+              <div class="chain-arrow"></div>
+              <div class="chain-block">Block 3</div>
+              <div class="chain-arrow"></div>
+              <div class="chain-block">Block 4</div>
+            </div>
+            <p class="arch-note">Each block must wait for the previous one. One core, no matter how many you have.</p>
+          </div>
+          <ul class="story-traits">
+            <li>Sequential — can't parallelize</li>
+            <li>Needs hardware acceleration to stay fast</li>
+            <li>Vulnerable to length extension attacks</li>
+            <li>25 years old, showing its age</li>
+          </ul>
+        </div>
+
+        <div class="story-card story-blake3">
+          <div class="story-year">2020</div>
+          <h3>BLAKE3</h3>
+          <p class="story-origin">Designed by cryptographers Jack O'Connor, Jean-Philippe Aumasson, Samuel Neves, and Zooko Wilcox-O'Hearn. Built for the modern era.</p>
+          <div class="architecture-diagram">
+            <div class="arch-label">Parallel tree</div>
+            <div class="tree">
+              <div class="tree-row">
+                <div class="tree-node root">Root</div>
+              </div>
+              <div class="tree-row">
+                <div class="tree-node">Node</div>
+                <div class="tree-node">Node</div>
+              </div>
+              <div class="tree-row">
+                <div class="tree-node leaf">B1</div>
+                <div class="tree-node leaf">B2</div>
+                <div class="tree-node leaf">B3</div>
+                <div class="tree-node leaf">B4</div>
+              </div>
+            </div>
+            <p class="arch-note">All blocks processed simultaneously. More cores = more speed. Linearly.</p>
+          </div>
+          <ul class="story-traits">
+            <li>Parallel — scales with every core</li>
+            <li>Fast in pure software, no hardware needed</li>
+            <li>Immune to length extension attacks</li>
+            <li>Supports verified streaming</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Your Device -->
+  <section id="device" class="section">
+    <div class="container">
+      <h2 class="section-title">Your device</h2>
+      <div id="device-info">
+        <div class="device-card loading">
+          <p>Detecting...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: The Benchmark -->
+  <section id="benchmark" class="section">
+    <div class="container">
+      <h2 class="section-title">The benchmark</h2>
+      <p class="benchmark-intro">Three tests, four data sizes. BLAKE3 in pure WebAssembly vs. SHA-256 in WebAssembly (fair fight) vs. SHA-256 through your browser's hardware-accelerated Web Crypto API (home advantage).</p>
+
+      <div id="benchmark-controls">
+        <button id="run-btn" class="run-button">
+          <span class="run-text">Run benchmark on this device</span>
+        </button>
+      </div>
+
+      <div id="benchmark-progress" class="hidden">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-label" id="progress-label">Preparing...</p>
+      </div>
+
+      <div id="results-container"></div>
+    </div>
+  </section>
+
+  <!-- Section 5: The Verdict -->
+  <section id="verdict" class="section">
+    <div class="container">
+      <h2 class="section-title">The verdict</h2>
+      <div id="verdict-content">
+        <p class="verdict-placeholder">Run the benchmark to see your results.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built to advocate for better cryptography. <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener">BLAKE3</a> is open source.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

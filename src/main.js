@@ -1,0 +1,66 @@
+import { detectDevice, renderDeviceCard } from './device.js'
+import { runBenchmark, hasWebCrypto } from './benchmark.js'
+import { renderResults, renderVerdict } from './results.js'
+
+// Detect device on load
+const device = detectDevice()
+renderDeviceCard(device)
+
+// Scroll reveal
+const sections = document.querySelectorAll('.section')
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible')
+      }
+    })
+  },
+  { threshold: 0.1 }
+)
+sections.forEach((s) => observer.observe(s))
+
+// Show notice if Web Crypto unavailable (HTTP, not HTTPS)
+if (!hasWebCrypto) {
+  const intro = document.querySelector('.benchmark-intro')
+  if (intro) {
+    intro.insertAdjacentHTML('afterend',
+      '<p class="webcrypto-notice">Web Crypto API unavailable (requires HTTPS). Running BLAKE3 vs SHA-256 software comparison only.</p>'
+    )
+  }
+}
+
+// Benchmark
+const runBtn = document.getElementById('run-btn')
+const progressEl = document.getElementById('benchmark-progress')
+const progressFill = document.getElementById('progress-fill')
+const progressLabel = document.getElementById('progress-label')
+
+runBtn.addEventListener('click', async () => {
+  runBtn.disabled = true
+  runBtn.querySelector('.run-text').textContent = 'Running...'
+  progressEl.classList.remove('hidden')
+
+  try {
+    const results = await runBenchmark(({ step, totalSteps, current }) => {
+      const pct = (step / totalSteps) * 100
+      progressFill.style.width = `${pct}%`
+      progressLabel.textContent = current
+    })
+
+    progressEl.classList.add('hidden')
+    runBtn.querySelector('.run-text').textContent = 'Run again'
+    runBtn.disabled = false
+
+    renderResults(results)
+    renderVerdict(results, device)
+
+    // Scroll to results
+    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth', block: 'start' })
+  } catch (err) {
+    console.error('Benchmark failed:', err)
+    progressLabel.textContent = `Error: ${err.message}`
+    runBtn.querySelector('.run-text').textContent = 'Try again'
+    runBtn.disabled = false
+  }
+})
