@@ -1,6 +1,6 @@
 # BLAKE3 vs SHA-256 Benchmark
 
-> **Alpha / MVP** — This is an early experiment for private use. The benchmark methodology is evolving and results should be treated as directional, not definitive.
+> **Alpha / MVP** — This is an early experiment. The benchmark methodology is evolving and results should be treated as directional, not definitive. Contributions and feedback welcome.
 
 A mobile-first webapp that benchmarks BLAKE3 against SHA-256 on your device, with narrative storytelling and real-time results.
 

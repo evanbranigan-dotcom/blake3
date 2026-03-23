@@ -9,6 +9,16 @@
 </head>
 <body>
 
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand">BLAKE3 vs SHA-256</span>
+      <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener" class="top-bar-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Source
+      </a>
+    </div>
+  </nav>
+
   <!-- Section 1: Hero -->
   <section id="hero" class="section">
     <div class="container">
@@ -132,8 +142,46 @@
     </div>
   </section>
 
+  <!-- Section 6: Open Questions -->
+  <section id="open-questions" class="section">
+    <div class="container">
+      <h2 class="section-title">Open questions</h2>
+      <p class="questions-intro">This benchmark is a living experiment. Here's what we're still investigating — and where your device's results might help.</p>
+
+      <div class="questions-list">
+        <div class="question-card">
+          <h4>Does multi-core BLAKE3 overtake hardware SHA-256 at 10 MB?</h4>
+          <p>BLAKE3's tree hashing should dominate at large data sizes, but Web Worker overhead is real. We're looking for the crossover point where parallelism definitively wins.</p>
+        </div>
+
+        <div class="question-card">
+          <h4>How much would WASM SIMD accelerate BLAKE3?</h4>
+          <p>BLAKE3 is designed to exploit SIMD instructions (NEON on ARM, SSE/AVX on x86). The current WASM implementation doesn't use WASM SIMD — enabling it could significantly widen the gap.</p>
+        </div>
+
+        <div class="question-card">
+          <h4>Why do BLAKE3 and SHA-256 WASM tie at 1 KB?</h4>
+          <p>Both show identical throughput at very small sizes. Is this the browser timer resolution floor? Fixed per-call overhead? We're investigating whether this is a measurement artifact or a real performance ceiling.</p>
+        </div>
+
+        <div class="question-card">
+          <h4>How do older iPhones compare?</h4>
+          <p>We've tested on recent devices, but iPhone SE, iPhone 11, and other older models have different chips and fewer cores. If you're on an older device, your results are especially valuable.</p>
+        </div>
+
+        <div class="question-card">
+          <h4>Should parallel BLAKE3 use full Merkle tree assembly?</h4>
+          <p>Currently, multi-core BLAKE3 hashes independent chunks across workers. A full Merkle tree implementation would combine chunk hashes into a single root — matching the BLAKE3 spec more faithfully and potentially improving large-data throughput.</p>
+        </div>
+      </div>
+
+      <p class="questions-cta">Curious about the methodology? <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">Read the source code</a> — every benchmark decision is documented.</p>
+    </div>
+  </section>
+
   <footer class="footer">
     <div class="container">
+      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a> — review the benchmark code yourself.</p>
       <p>Built to advocate for better cryptography. <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener">BLAKE3</a> is open source.</p>
       <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
     </div>

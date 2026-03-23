@@ -198,7 +198,7 @@ The app doesn't hide SHA-256's wins. Each size group has a contextual insight ex
 
 ## 8. Infrastructure
 
-- **GitHub:** `evanbranigan-dotcom/blake3` (private)
+- **GitHub:** `evanbranigan-dotcom/blake3` (public)
 - **Vercel:** `blake3.loonlabs.dev` (production)
 - **Branch:** `master`
 - **Deploy:** `vercel --prod` from CLI
