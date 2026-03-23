@@ -514,6 +514,7 @@ body {
 }
 
 .bar-blake3 { background: var(--blake3); }
+.bar-blake3-parallel { background: linear-gradient(90deg, #00ff88, #00ffcc); }
 .bar-sha256wasm { background: var(--sha256); }
 .bar-sha256crypto { background: var(--webcrypto); }
 

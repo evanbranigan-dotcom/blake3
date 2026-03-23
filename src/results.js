@@ -1,5 +1,6 @@
 const ALGO_CONFIG = {
   blake3: { label: 'BLAKE3', color: '#00ff88', class: 'bar-blake3' },
+  blake3parallel: { label: 'BLAKE3 (multi-core)', color: '#00ffcc', class: 'bar-blake3-parallel' },
   sha256wasm: { label: 'SHA-256 (WASM)', color: '#ff8800', class: 'bar-sha256wasm' },
   sha256crypto: { label: 'SHA-256 (HW)', color: '#4488ff', class: 'bar-sha256crypto' },
 }
@@ -49,7 +50,7 @@ export function renderResults(results) {
           </div>
           <div class="result-value">${formatThroughput(stats.throughputMBps)}</div>
           <div class="result-time">${formatTime(stats.median)}/op</div>
-          <div class="result-proof">${stats.totalOps} ops (${stats.batchSize}&times;${stats.batches} batches)</div>
+          <div class="result-proof">${stats.totalOps} ops (${stats.batchSize}&times;${stats.batches} batches)${stats.workers ? ` &middot; ${stats.workers} workers` : ''}</div>
         </div>
       `
     }

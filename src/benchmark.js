@@ -115,11 +115,69 @@ async function verifyHashes(data) {
 // Web Crypto API requires a secure context (HTTPS or localhost)
 const hasWebCrypto = typeof crypto !== 'undefined' && typeof crypto.subtle !== 'undefined'
 
+// Number of cores for parallel BLAKE3
+const NUM_WORKERS = navigator.hardwareConcurrency || 4
+
+// Create a pool of BLAKE3 workers
+function createWorkerPool(count) {
+  return Array.from({ length: count }, () =>
+    new Worker(new URL('./blake3-worker.js', import.meta.url), { type: 'module' })
+  )
+}
+
+// Hash data in parallel: split into chunks, one per worker
+function parallelBlake3(workers, data) {
+  return new Promise((resolve) => {
+    const chunkSize = Math.ceil(data.length / workers.length)
+    const results = new Array(workers.length)
+    let completed = 0
+
+    workers.forEach((worker, i) => {
+      const start = i * chunkSize
+      const end = Math.min(start + chunkSize, data.length)
+      const chunk = data.slice(start, end)
+
+      worker.onmessage = (e) => {
+        results[e.data.index] = e.data.hash
+        completed++
+        if (completed === workers.length) {
+          resolve(results)
+        }
+      }
+
+      worker.postMessage({ chunk, index: i })
+    })
+  })
+}
+
+// Benchmark parallel BLAKE3 — only meaningful for larger data sizes
+async function runParallelBatched(workers, data, { batchSize, batches }) {
+  // Warm-up
+  await parallelBlake3(workers, data)
+  await parallelBlake3(workers, data)
+
+  const perOpTimes = []
+
+  for (let b = 0; b < batches; b++) {
+    const start = performance.now()
+    for (let i = 0; i < batchSize; i++) {
+      await parallelBlake3(workers, data)
+    }
+    const elapsed = performance.now() - start
+    perOpTimes.push(elapsed / batchSize)
+  }
+
+  return perOpTimes
+}
+
 export async function runBenchmark(onProgress) {
   const results = []
-  const algCount = hasWebCrypto ? 3 : 2
+  const algCount = hasWebCrypto ? 4 : 3  // +1 for parallel BLAKE3
   const totalSteps = SIZES.length * algCount
   let step = 0
+
+  // Create worker pool once for the entire benchmark
+  const workers = createWorkerPool(NUM_WORKERS)
 
   for (const size of SIZES) {
     const data = generateData(size.bytes)
@@ -133,6 +191,12 @@ export async function runBenchmark(onProgress) {
     onProgress?.({ step: ++step, totalSteps, current: `BLAKE3 @ ${size.label}` })
     const blake3Times = await runBatched((d) => blake3(d), data, cfg)
     sizeResults.algorithms.blake3 = computeStats(blake3Times, size.bytes, cfg)
+
+    // BLAKE3 (Parallel)
+    onProgress?.({ step: ++step, totalSteps, current: `BLAKE3 Parallel @ ${size.label}` })
+    const blake3ParTimes = await runParallelBatched(workers, data, cfg)
+    sizeResults.algorithms.blake3parallel = computeStats(blake3ParTimes, size.bytes, cfg)
+    sizeResults.algorithms.blake3parallel.workers = NUM_WORKERS
 
     // SHA-256 (WASM)
     onProgress?.({ step: ++step, totalSteps, current: `SHA-256 WASM @ ${size.label}` })
@@ -148,6 +212,9 @@ export async function runBenchmark(onProgress) {
 
     results.push(sizeResults)
   }
+
+  // Clean up workers
+  workers.forEach(w => w.terminate())
 
   return results
 }
