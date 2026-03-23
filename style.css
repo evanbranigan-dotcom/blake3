@@ -14,6 +14,8 @@
   --text-muted: #64748b;
   --blake3: #00ff88;
   --blake3-dim: #00cc6a;
+  --blake3-multi: #bf5af2;
+  --blake3-multi-dim: #9944cc;
   --sha256: #ff8800;
   --sha256-dim: #cc6d00;
   --webcrypto: #4488ff;
@@ -514,7 +516,7 @@ body {
 }
 
 .bar-blake3 { background: var(--blake3); }
-.bar-blake3-parallel { background: linear-gradient(90deg, #00ff88, #00ffcc); }
+.bar-blake3-parallel { background: var(--blake3-multi); }
 .bar-sha256wasm { background: var(--sha256); }
 .bar-sha256crypto { background: var(--webcrypto); }
 
