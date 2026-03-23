@@ -50,6 +50,29 @@ async function runBatched(fn, data, { batchSize, batches }) {
   return perOpTimes
 }
 
+// Parallel batch runner for Web Crypto — fires all ops concurrently via Promise.all
+// This avoids per-call async overhead that unfairly penalizes the native API
+async function runBatchedParallel(fn, data, { batchSize, batches }) {
+  // Warm-up
+  await fn(data)
+  await fn(data)
+
+  const perOpTimes = []
+
+  for (let b = 0; b < batches; b++) {
+    const promises = []
+    const start = performance.now()
+    for (let i = 0; i < batchSize; i++) {
+      promises.push(fn(data))
+    }
+    await Promise.all(promises)
+    const elapsed = performance.now() - start
+    perOpTimes.push(elapsed / batchSize)
+  }
+
+  return perOpTimes
+}
+
 function computeStats(times, bytes, cfg) {
   const sorted = [...times].sort((a, b) => a - b)
   const median = sorted[Math.floor(sorted.length / 2)]
@@ -119,7 +142,7 @@ export async function runBenchmark(onProgress) {
     // SHA-256 (Web Crypto) — only available on HTTPS or localhost
     if (hasWebCrypto) {
       onProgress?.({ step: ++step, totalSteps, current: `SHA-256 WebCrypto @ ${size.label}` })
-      const sha256CryptoTimes = await runBatched((d) => crypto.subtle.digest('SHA-256', d), data, cfg)
+      const sha256CryptoTimes = await runBatchedParallel((d) => crypto.subtle.digest('SHA-256', d), data, cfg)
       sizeResults.algorithms.sha256crypto = computeStats(sha256CryptoTimes, size.bytes, cfg)
     }
 
