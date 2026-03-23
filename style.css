@@ -534,6 +534,48 @@ body {
   font-family: 'SF Mono', ui-monospace, monospace;
 }
 
+.result-proof {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: 'SF Mono', ui-monospace, monospace;
+  text-align: right;
+}
+
+.verification {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--bg-card-alt);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.verify-label {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.verify-hash {
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.verify-match.match-ok {
+  color: var(--blake3);
+  font-weight: 600;
+}
+
+.verify-match.match-fail {
+  color: #ff4444;
+  font-weight: 600;
+}
+
 /* ── Verdict ── */
 .verdict-placeholder {
   text-align: center;

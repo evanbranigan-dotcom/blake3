@@ -49,8 +49,22 @@ export function renderResults(results) {
           </div>
           <div class="result-value">${formatThroughput(stats.throughputMBps)}</div>
           <div class="result-time">${formatTime(stats.median)}/op</div>
+          <div class="result-proof">${stats.totalOps} ops (${stats.batchSize}&times;${stats.batches} batches)</div>
         </div>
       `
+    }
+
+    // Verification proof
+    const v = sizeResult.verification
+    if (v) {
+      html += `<div class="verification">`
+      html += `<span class="verify-label">Hash verification:</span> `
+      html += `<span class="verify-hash">BLAKE3: ${v.blake3}</span> `
+      html += `<span class="verify-hash">SHA-256: ${v.sha256wasm}</span>`
+      if (v.sha256crypto) {
+        html += ` <span class="verify-match ${v.sha256Match ? 'match-ok' : 'match-fail'}">${v.sha256Match ? 'WASM = HW' : 'MISMATCH'}</span>`
+      }
+      html += `</div>`
     }
 
     html += `</div>`
