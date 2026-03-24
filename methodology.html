@@ -36,8 +36,10 @@
     .source-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
     .source-table tr:last-child td { border-bottom: none; }
     .source-table a { color: var(--blake3-dim); }
-    /* Override scroll-reveal animation — no main.js on this page */
-    .section { opacity: 1; transform: none; }
+    /* Override scroll-reveal animation — no main.js on this page.
+       Uses higher specificity because Vite reorders the external
+       stylesheet after this inline block in production builds. */
+    body .section { opacity: 1; transform: none; }
     @media (max-width: 640px) {
       .method-section h2 { font-size: 1.1rem; }
       .method-section p, .method-section li { font-size: 0.8rem; }
@@ -208,9 +210,15 @@
 
   <footer class="footer">
     <div class="container">
-      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a> — review the benchmark code yourself.</p>
-      <p>Built to advocate for better cryptography. <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener">BLAKE3</a> is open source.</p>
-      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
+      <div class="footer-links">
+        <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">Source</a>
+        <span class="footer-dot"></span>
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener">BLAKE3</a>
+      </div>
+      <p class="footer-tagline">Built to advocate for better cryptography.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
     </div>
   </footer>
 
