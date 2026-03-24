@@ -285,6 +285,86 @@ If you just want Play Store presence quickly, **Option 1 (TWA)** gets you there 
 
 ---
 
+## Where SHA-256 Is Used Today (March 2026)
+
+A comprehensive inventory of computing processes that currently depend on SHA-256, organized by category.
+
+### 1. TLS/SSL Certificates (Every HTTPS Connection)
+- Every TLS/SSL certificate uses SHA-256 — mandatory standard since 2017 (replacing SHA-1)
+- Browsers verify certificate authenticity via SHA-256 on every HTTPS page load
+- Let's Encrypt alone issues 10+ million certificates per day, all SHA-256
+- Every lock icon in a browser = SHA-256 running
+- **BLAKE3 could replace**: Not directly (standards mandate SHA-256), but future standards could adopt BLAKE3
+
+### 2. Mobile Network Security (4G LTE / 5G)
+- HMAC-SHA-256 is the mandatory key derivation function (KDF) in 4G and 5G (3GPP Technical Specifications)
+- Every cell tower connection derives encryption keys via SHA-256
+- Billions of devices worldwide, multiple connections per day per device
+- **BLAKE3 could replace**: Yes, for the KDF role — BLAKE3's built-in KDF mode is faster and purpose-built
+
+### 3. Bitcoin & Cryptocurrency
+- Bitcoin uses double-SHA-256 for block hashing, transaction verification, and proof-of-work mining
+- "Double" hashing is specifically to mitigate length extension attacks — a vulnerability BLAKE3 doesn't have
+- Network hashrate: ~600 exahashes/second of SHA-256
+- Other SHA-256 coins: Bitcoin Cash (BCH), DigiByte (DGB), Peercoin, Namecoin
+- **BLAKE3 could replace**: Not for Bitcoin (consensus rules), but new chains could and should use BLAKE3
+
+### 4. Docker & Software Distribution
+- Every Docker image identified by SHA-256 digest (immutable fingerprint per layer)
+- Linux package managers (apt, dpkg) verify packages with SHA-256 checksums
+- Apple App Store verifies app integrity with SHA-256
+- Git is migrating from SHA-1 to SHA-256 for object identification
+- npm, pip, and other package managers use SHA-256 for integrity checks
+- **BLAKE3 could replace**: Yes — these are pure integrity checks where speed matters
+
+### 5. Messaging & Communication
+- iMessage uses HMAC-SHA-256 for message authentication and key derivation
+- Signal Protocol (Signal, WhatsApp) uses SHA-256 in key derivation chains
+- Apple's iMessage Contact Key Verification uses SHA-256 for its verification service
+- **BLAKE3 could replace**: Yes, via its keyed hashing and KDF modes
+
+### 6. Cloud Infrastructure (AWS, GCP, Azure)
+- AWS Signature Version 4: every API call signed with SHA-256 (S3, Lambda, DynamoDB, etc.)
+- Google Cloud uses SHA-256 for service account authentication
+- Azure uses SHA-256 in various authentication flows
+- iCloud Advanced Data Protection uses SHA-256 in its encryption scheme
+- **BLAKE3 could replace**: Yes — request signing benefits from speed
+
+### 7. Two-Factor Authentication (TOTP)
+- Authenticator apps generate TOTP codes using HMAC-SHA-256
+- New code every 30 seconds = SHA-256 computation every 30 seconds per service
+- Microsoft Entra ID supports SHA-256 OATH-TOTP tokens
+- Server and client must agree on algorithm (SHA-1/256/512)
+- **BLAKE3 could replace**: Theoretically, but TOTP is moving toward FIDO2/passkeys anyway
+
+### 8. Password Storage (Indirect)
+- SHA-256 alone is too fast for password hashing (enables brute force)
+- PBKDF2-SHA-256 iterates SHA-256 thousands of times to slow down attackers
+- Used in: WPA2 WiFi, macOS FileVault, enterprise login systems
+- The iteration workaround highlights SHA-256's design wasn't intended for this use case
+- **BLAKE3 could replace**: Not directly — passwords need slow hashes (Argon2, bcrypt)
+
+### 9. Email & Code Signing
+- DKIM signs outgoing emails with SHA-256 for sender verification
+- Code signing certificates for macOS, Windows, Android all use SHA-256
+- PDF digital signatures use SHA-256
+- S/MIME email encryption uses SHA-256
+- **BLAKE3 could replace**: Yes, once standards bodies adopt it
+
+### 10. File Integrity & Downloads
+- Software distributors provide SHA-256 checksums for download verification
+- macOS Gatekeeper and Windows Authenticode verify executables with SHA-256
+- Backup systems use SHA-256 for deduplication and corruption detection
+- SHA-256 requires full file download before verification; BLAKE3's tree structure enables verified streaming
+- **BLAKE3 could replace**: Yes — this is where BLAKE3's advantages shine most (speed + verified streaming)
+
+### Key Observations
+
+1. **Scale**: SHA-256 runs trillions of times per day across TLS, mobile networks, Docker, Git, and cryptocurrency
+2. **Many uses don't need SHA-256 specifically**: File integrity, Docker digests, Git objects, and package verification just need a fast, collision-resistant hash — BLAKE3 qualifies
+3. **Workarounds exist for SHA-256's weaknesses**: Bitcoin double-hashes to avoid length extension; PBKDF2 iterates to slow it down for passwords; HMAC wraps it twice for safe MAC construction
+4. **Hardware acceleration is the crutch**: SHA-256 stays competitive on modern chips only because of dedicated silicon (ARM SHA-2 extensions). BLAKE3 is faster in pure software
+
 ## Sources
 
 - [SHA-256 Alternatives 2025: BLAKE3 vs SHA-3 vs xxHash3 Benchmarks](https://devtoolspro.org/articles/sha256-alternatives-faster-hash-functions-2025/)
@@ -307,3 +387,16 @@ If you just want Play Store presence quickly, **Option 1 (TWA)** gets you there 
 - [Kotlin/WASM Overview](https://kotlinlang.org/docs/wasm-overview.html)
 - [Kotlin/WASM + Compose for Web](https://www.kmpship.app/blog/kotlin-wasm-and-compose-web-2025)
 - [Android Cryptography Guide](https://developer.android.com/privacy-and-security/cryptography)
+- [SHA-256 Algorithm: Features & Applications 2026 — UpGrad](https://www.upgrad.com/blog/sha-256-algorithm/)
+- [SHA-256 and SHA-3 in 2026: Practical Guidance — TheLinuxCode](https://thelinuxcode.com/sha-256-and-sha-3-in-2026-practical-guidance-for-developers/)
+- [SHA-256: How Bitcoin Achieves Security — CoinGecko](https://www.coingecko.com/learn/how-sha256-secures-bitcoin-network)
+- [SHA-2 — Wikipedia](https://en.wikipedia.org/wiki/SHA-2)
+- [Docker Image Digests — Docker Docs](https://docs.docker.com/dhi/core-concepts/digests/)
+- [All Those SHA256s in a Docker Image — Medium](https://medium.com/@emmaliaocode/all-those-sha256s-in-a-docker-image-9e8984065f2e)
+- [SHA-256 Algorithm & How It Works — SSL Dragon](https://www.ssldragon.com/blog/sha-256-algorithm/)
+- [Why Migrate to SHA-2 Certificates — DigiCert](https://www.digicert.com/faq/sha2/sha-2-ssl-certificates)
+- [How iMessage Sends Messages Securely — Apple](https://support.apple.com/guide/security/how-imessage-sends-and-receives-messages-sec70e68c949/web)
+- [iMessage Contact Key Verification — Apple Security Research](https://security.apple.com/blog/imessage-contact-key-verification/)
+- [SHA-256 vs SHA-1 for TOTP Security — Protectimus](https://www.protectimus.com/blog/sha-256-vs-sha-1-for-totp-token-security/)
+- [Implementing TOTP in 2025](https://feeding.cloud.geek.nz/posts/totp-in-2025/)
+- [TLS Certificate Validity Reduction — CaptainDNS](https://www.captaindns.com/en/blog/tls-certificate-validity-reduction-47-days)

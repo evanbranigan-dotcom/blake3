@@ -52,14 +52,32 @@ BLAKE3's advantages over SHA-256:
 - **Verified streaming** — verify data integrity during download, not after
 - **Hardware independent** — fast everywhere, not just on chips with SHA extensions
 
+## Bandwidth & hosting
+
+Deployed on the **Vercel Free Plan** (100 GB/month). The site is extremely lean:
+
+| Asset | Gzipped size |
+|-------|-------------|
+| HTML | ~7.3 KB |
+| CSS | ~4.3 KB |
+| JS (hash-wasm + app) | ~20.9 KB |
+| Web Worker (loaded on demand) | ~8 KB |
+| OG image (WebP) | ~69 KB |
+| Favicon (SVG) | ~0.2 KB |
+| **Total first visit** | **~110 KB** |
+
+- No external fonts, analytics, tracking, or API calls — all computation is client-side
+- Hashed filenames enable long browser caching; repeat visits transfer only ~7 KB (HTML)
+- Approximately **900,000+ unique visits/month** before hitting the free tier limit
+
 ## Tech stack
 
 - **Vite** — build tool
 - **hash-wasm** — BLAKE3 and SHA-256 via hand-tuned WebAssembly
 - **Web Crypto API** — browser-native hardware-accelerated SHA-256
 - **Web Workers** — parallel BLAKE3 hashing across CPU cores
-- **Vanilla JS + CSS** — no framework, minimal bundle (~47 KB gzipped)
-- **Vercel** — hosting (HTTPS)
+- **Vanilla JS + CSS** — no framework, minimal bundle (~21 KB gzipped JS)
+- **Vercel** — hosting (HTTPS, free tier)
 
 ## Benchmark methodology
 

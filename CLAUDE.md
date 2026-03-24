@@ -22,7 +22,11 @@ bun run preview # preview production build
 
 ## Deployment
 
-Deployed at [blake3.loonlabs.dev](https://blake3.loonlabs.dev) via Vercel.
+Deployed at [blake3.loonlabs.dev](https://blake3.loonlabs.dev) via Vercel (free plan).
+
+## Bandwidth Profile
+
+Total first-visit transfer: ~110 KB gzipped. No external fonts, analytics, tracking, or API calls. All benchmark computation is client-side. Hashed filenames enable long browser caching. Comfortably within Vercel free tier (100 GB/month) for 900K+ unique visits/month. OG image uses WebP format (69 KB, converted from 140 KB PNG).
 
 ## Prototype Directions
 
