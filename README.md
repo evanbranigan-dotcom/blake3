@@ -24,8 +24,8 @@ Tests run at 4 data sizes: 1 KB, 100 KB, 1 MB, 10 MB.
 ```bash
 git clone https://github.com/evanbranigan-dotcom/blake3.git
 cd blake3
-npm install
-npm run dev
+bun install
+bun dev
 ```
 
 ### HTTPS limitations
