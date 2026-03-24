@@ -1731,6 +1731,31 @@ details.usage-card[open] .usage-chevron {
   font-style: italic;
 }
 
+.usage-source {
+  margin-top: 10px !important;
+  font-size: 0.7rem !important;
+  color: var(--text-muted) !important;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.usage-source a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.usage-source a:hover {
+  color: var(--text-dim);
+}
+
+@media (max-width: 480px) {
+  .usage-source {
+    font-size: 0.65rem !important;
+  }
+}
+
 .usage-takeaway {
   margin-top: 2rem;
   padding: 16px 20px;

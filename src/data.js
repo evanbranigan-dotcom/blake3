@@ -18,8 +18,8 @@ export const IPHONE_MODELS = {
   // iPhone 8 Plus / 7 Plus / 6s Plus
   '414x736@3': {
     models: ['iPhone 8 Plus', '7 Plus'],
-    chip: 'A11 Bionic',
-    chipGen: 'A11',
+    chip: 'A10 Fusion / A11 Bionic',
+    chipGen: 'A10',
     cores: 6,
     shaHW: true,
   },

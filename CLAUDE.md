@@ -51,6 +51,24 @@ Three breakpoints used throughout:
 - **480px** — Mobile (compact padding, smaller card interiors, tighter gaps)
 - Touch targets are minimum 44px on all interactive elements.
 
+## Methodology & Sources
+
+`methodology.html` is a standalone page documenting:
+- Benchmark methodology (algorithms, timing, known limitations)
+- Primary sources for every factual claim, organized by section
+- Caveats and editorial choices (e.g., "more secure" framing, BLAKE3 as replacement)
+- Correction log (errors found and fixed via fact-checking)
+
+Linked from the footer and the Open Questions section. Uses the shared `style.css` but overrides `.section { opacity: 1 }` since it doesn't load `main.js` (which provides scroll-reveal animation).
+
+## Inline Source Citations
+
+Each of the 10 use case cards in the "SHA-256 is everywhere" section has a `<p class="usage-source">` with links to primary sources (RFCs, specs, official docs). Styled as subtle muted text with a thin top border.
+
+## Fact-Check
+
+`fact-check.md` is an internal reference document with 116 claims extracted from the site, each assessed and rated. Not deployed. Summary: 3 errors were found and corrected (TOTP default algorithm, WPA2 hash algorithm, iPhone 7 Plus chip).
+
 ## Prototype Directions
 
 Three static HTML mockups exploring future directions for the site:

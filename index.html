@@ -375,6 +375,7 @@
           </summary>
           <div class="usage-body">
             <p>Every TLS/SSL certificate uses SHA-256. Every time you see the lock icon in your browser, SHA-256 verifies the certificate is authentic and untampered. Let's Encrypt alone issues 10+ million certificates per day — all SHA-256.</p>
+            <p class="usage-source">Sources: <a href="https://cabforum.org/baseline-requirements/" target="_blank" rel="noopener">CA/Browser Forum Baseline Requirements</a>; <a href="https://letsencrypt.org/stats/" target="_blank" rel="noopener">Let's Encrypt Stats</a></p>
           </div>
         </details>
 
@@ -389,6 +390,7 @@
           </summary>
           <div class="usage-body">
             <p>Every time your phone connects to a cell tower, HMAC-SHA-256 derives the encryption keys securing your call and data. It's the mandatory key derivation function in both 4G LTE and 5G networks (3GPP standard).</p>
+            <p class="usage-source">Sources: <a href="https://www.3gpp.org/specifications" target="_blank" rel="noopener">3GPP TS 33.401</a> (LTE); <a href="https://www.3gpp.org/specifications" target="_blank" rel="noopener">3GPP TS 33.501</a> (5G)</p>
           </div>
         </details>
 
@@ -402,7 +404,8 @@
             <span class="usage-chevron"></span>
           </summary>
           <div class="usage-body">
-            <p>Bitcoin uses double-SHA-256 for block hashing, transaction verification, and proof-of-work mining. The "double" part? A workaround for the length extension attack — a weakness BLAKE3 doesn't have. The entire network performs ~600 exahashes per second of SHA-256.</p>
+            <p>Bitcoin uses double-SHA-256 for block hashing, transaction verification, and proof-of-work mining. The "double" part? Likely a defense against the length extension attack — a weakness BLAKE3 doesn't have. The entire network performs ~600 exahashes per second of SHA-256.</p>
+            <p class="usage-source">Sources: <a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">Bitcoin whitepaper (Nakamoto, 2008)</a>; <a href="https://mempool.space" target="_blank" rel="noopener">mempool.space</a> (live hashrate)</p>
           </div>
         </details>
 
@@ -417,6 +420,7 @@
           </summary>
           <div class="usage-body">
             <p>Every Docker image is identified by its SHA-256 digest — an immutable fingerprint for each layer. Linux package managers (apt, dpkg) verify packages with SHA-256 checksums. Apple's App Store uses it to verify every app download. Git is migrating from SHA-1 to SHA-256.</p>
+            <p class="usage-source">Sources: <a href="https://github.com/opencontainers/image-spec" target="_blank" rel="noopener">OCI Image Spec</a>; <a href="https://git-scm.com/docs/hash-function-transition" target="_blank" rel="noopener">Git SHA-256 transition</a></p>
           </div>
         </details>
 
@@ -431,6 +435,7 @@
           </summary>
           <div class="usage-body">
             <p>iMessage uses HMAC-SHA-256 for message authentication and key derivation. The Signal Protocol — powering both Signal and WhatsApp — uses SHA-256 in its key derivation chain. Your encrypted chats depend on it.</p>
+            <p class="usage-source">Sources: <a href="https://support.apple.com/guide/security/" target="_blank" rel="noopener">Apple Platform Security Guide</a>; <a href="https://signal.org/docs/" target="_blank" rel="noopener">Signal Protocol specs</a></p>
           </div>
         </details>
 
@@ -445,6 +450,7 @@
           </summary>
           <div class="usage-body">
             <p>AWS Signature Version 4 signs every API request with SHA-256 — every S3 upload, every Lambda invocation, every DynamoDB query. Google Cloud and Azure use similar SHA-256-based authentication for service accounts.</p>
+            <p class="usage-source">Source: <a href="https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html" target="_blank" rel="noopener">AWS Signature Version 4 docs</a></p>
           </div>
         </details>
 
@@ -458,7 +464,8 @@
             <span class="usage-chevron"></span>
           </summary>
           <div class="usage-body">
-            <p>Authenticator apps generate 6-digit TOTP codes using HMAC-SHA-256. Every 30 seconds, your phone computes a new SHA-256-based code. Microsoft Entra ID, Google, and most enterprise 2FA systems support SHA-256 TOTP tokens.</p>
+            <p>Authenticator apps generate 6-digit TOTP codes using HMAC-SHA-1 by default (RFC 6238), though newer systems increasingly support HMAC-SHA-256. Every 30 seconds, your phone computes a new hash-based code. Microsoft Entra ID, Google, and most enterprise 2FA systems support both SHA-1 and SHA-256 TOTP tokens.</p>
+            <p class="usage-source">Sources: <a href="https://datatracker.ietf.org/doc/html/rfc6238" target="_blank" rel="noopener">RFC 6238 (TOTP)</a>; <a href="https://datatracker.ietf.org/doc/html/rfc4226" target="_blank" rel="noopener">RFC 4226 (HOTP)</a></p>
           </div>
         </details>
 
@@ -472,7 +479,8 @@
             <span class="usage-chevron"></span>
           </summary>
           <div class="usage-body">
-            <p>SHA-256 alone is too fast for password hashing — so PBKDF2-SHA-256 iterates it thousands of times to slow attackers down. It secures WPA2 WiFi passwords, macOS FileVault encryption, and countless enterprise login systems. The workaround is the point: SHA-256 wasn't designed for this.</p>
+            <p>SHA-256 alone is too fast for password hashing — so PBKDF2 iterates a hash function thousands of times to slow attackers down. WPA2 WiFi uses PBKDF2-SHA-1, while macOS FileVault and many enterprise login systems use PBKDF2-SHA-256. The workaround is the point: SHA-256 wasn't designed for this.</p>
+            <p class="usage-source">Sources: <a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener">NIST SP 800-63B</a>; <a href="https://standards.ieee.org/ieee/802.11i/3127/" target="_blank" rel="noopener">IEEE 802.11i (WPA2)</a></p>
           </div>
         </details>
 
@@ -486,7 +494,8 @@
             <span class="usage-chevron"></span>
           </summary>
           <div class="usage-body">
-            <p>DKIM signs outgoing emails with SHA-256 so recipients can verify the sender. Code signing certificates for macOS, Windows, and Android all use SHA-256. Every signed PDF, every verified app update — SHA-256.</p>
+            <p>DKIM signs outgoing emails with SHA-256 so recipients can verify the sender. Code signing certificates for macOS, Windows, and Android all use SHA-256. Most modern signed PDFs and verified app updates rely on SHA-256.</p>
+            <p class="usage-source">Sources: <a href="https://datatracker.ietf.org/doc/html/rfc6376" target="_blank" rel="noopener">RFC 6376 (DKIM)</a>; <a href="https://datatracker.ietf.org/doc/html/rfc8301" target="_blank" rel="noopener">RFC 8301</a> (SHA-1 deprecation for DKIM)</p>
           </div>
         </details>
 
@@ -501,6 +510,7 @@
           </summary>
           <div class="usage-body">
             <p>Software distributors provide SHA-256 checksums for downloads. macOS Gatekeeper and Windows Authenticode verify executables with SHA-256. Backup systems use it for deduplication and corruption detection. But you must download the <em>entire</em> file before you can verify — BLAKE3's tree structure lets you verify chunks as they arrive.</p>
+            <p class="usage-source">Source: <a href="https://csrc.nist.gov/publications/detail/fips/180/4/final" target="_blank" rel="noopener">NIST FIPS 180-4</a></p>
           </div>
         </details>
 
@@ -606,7 +616,7 @@
         </details>
       </div>
 
-      <p class="questions-cta">Curious about the methodology? <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">Read the source code</a> — every benchmark decision is documented.</p>
+      <p class="questions-cta">Curious about the methodology? <a href="/methodology.html">Read our sources and methodology</a> — or <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">view the source code</a> directly.</p>
     </div>
   </section>
 
@@ -668,7 +678,7 @@
 
   <footer class="footer">
     <div class="container">
-      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a> — review the benchmark code yourself.</p>
+      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a> — review the benchmark code yourself. <a href="/methodology.html">Methodology & sources</a>.</p>
       <p>Built to advocate for better cryptography. <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener">BLAKE3</a> is open source.</p>
       <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
     </div>

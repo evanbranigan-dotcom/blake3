@@ -101,6 +101,22 @@ We're exploring expanding the site beyond BLAKE3 vs SHA-256. Three prototype dir
 
 These are UI/UX mockups with hardcoded data, not yet wired to real benchmarks.
 
+## Methodology & fact-checking
+
+Every factual claim on the site has been [reviewed and sourced](/methodology.html). The methodology page documents:
+
+- **Benchmark methodology** — algorithms, timing approach, known limitations
+- **Primary sources** — RFCs, NIST publications, protocol specs for each claim
+- **Editorial caveats** — where we make judgment calls (e.g., "more secure" framing)
+- **Correction log** — errors found and fixed, with dates and explanations
+
+Corrections made after fact-checking (March 2026):
+- TOTP section: default is HMAC-SHA-1, not SHA-256 (per RFC 6238)
+- WPA2: uses PBKDF2-SHA-1, not PBKDF2-SHA-256 (per IEEE 802.11i)
+- Bitcoin: "workaround" softened to "likely a defense" (unconfirmed by Satoshi)
+- PDF signing: "every" changed to "most modern"
+- iPhone 7 Plus: chip corrected from A11 to A10 Fusion / A11 Bionic
+
 ## Status
 
 This is an alpha/MVP. Known limitations:

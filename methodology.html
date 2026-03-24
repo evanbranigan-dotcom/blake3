@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Methodology & Sources — BLAKE3 vs SHA-256</title>
+  <meta name="description" content="How we benchmark, what we claim, and where the evidence comes from. Full sourcing for the BLAKE3 vs SHA-256 comparison.">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .method-section { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .method-section:last-of-type { border-bottom: none; }
+    .method-section h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+    .method-section h3 { font-size: 1rem; margin: 1.5rem 0 0.5rem; color: var(--text-dim); }
+    .method-section p, .method-section li { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; }
+    .method-section a { color: var(--blake3-dim); text-decoration: underline; text-underline-offset: 3px; }
+    .method-section a:hover { color: var(--blake3); }
+    .method-section ul { margin: 0.5rem 0 1rem 1.5rem; }
+    .method-section li { margin-bottom: 0.3rem; }
+    .method-section code { font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
+    .method-breadcrumb { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+    .method-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .method-breadcrumb a:hover { color: var(--text-dim); }
+    .method-back { display: inline-block; color: var(--text-muted); font-size: 0.85rem; text-decoration: none; }
+    .method-back:hover { color: var(--text-dim); }
+    .correction-log { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-top: 1rem; }
+    .correction-log h4 { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .correction-entry { font-size: 0.8rem; color: var(--text-muted); padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .correction-entry:last-child { border-bottom: none; }
+    .correction-entry strong { color: var(--text-dim); }
+    .source-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 0.5rem; }
+    .source-table { width: 100%; border-collapse: collapse; min-width: 480px; }
+    .source-table th { text-align: left; font-size: 0.75rem; color: var(--text-muted); padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .source-table td { font-size: 0.8rem; color: var(--text-dim); padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .source-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+    .source-table tr:last-child td { border-bottom: none; }
+    .source-table a { color: var(--blake3-dim); }
+    /* Override scroll-reveal animation — no main.js on this page */
+    .section { opacity: 1; transform: none; }
+    @media (max-width: 640px) {
+      .method-section h2 { font-size: 1.1rem; }
+      .method-section p, .method-section li { font-size: 0.8rem; }
+      .source-table th, .source-table td { font-size: 0.72rem; padding: 6px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand">BLAKE3 vs SHA-256</span>
+      <a href="/" class="top-bar-link">Back to benchmark</a>
+    </div>
+  </nav>
+
+  <section class="section">
+    <div class="container" style="padding-top: 80px;">
+      <p class="method-breadcrumb"><a href="/">BLAKE3 vs SHA-256</a> / Methodology</p>
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Methodology & Sources</h1>
+      <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem;">How the benchmark works, what we claim, where the evidence comes from, and what we've corrected.</p>
+
+      <!-- Benchmark Methodology -->
+      <div class="method-section">
+        <h2>Benchmark methodology</h2>
+        <p>The benchmark runs entirely in your browser. No data is sent to any server. Four algorithms are tested across four data sizes (1 KB, 100 KB, 1 MB, 10 MB).</p>
+
+        <h3>Algorithms tested</h3>
+        <ul>
+          <li><strong>BLAKE3 (single-threaded)</strong> — <a href="https://github.com/Daninet/hash-wasm">hash-wasm</a> WebAssembly implementation</li>
+          <li><strong>BLAKE3 (multi-core)</strong> — Same WASM library, parallelized across Web Workers (one per CPU core). Each worker hashes an independent chunk; this measures parallelism overhead and scaling, not full Merkle tree assembly.</li>
+          <li><strong>SHA-256 (WASM)</strong> — hash-wasm WebAssembly implementation. Fair software-vs-software comparison with BLAKE3.</li>
+          <li><strong>SHA-256 (Web Crypto)</strong> — Browser's native <code>crypto.subtle.digest()</code> API. On devices with Intel SHA-NI or ARMv8 Crypto Extensions, this is hardware-accelerated. On older CPUs, it's native compiled code (faster than WASM but not hardware-accelerated). Requires HTTPS.</li>
+        </ul>
+
+        <h3>Timing methodology</h3>
+        <ul>
+          <li><strong>Warm-up:</strong> 2 calls discarded before measurement to ensure JIT compilation and WASM initialization are complete.</li>
+          <li><strong>Batched timing:</strong> Small data sizes (1 KB, 100 KB) are timed in batches (500 and 50 ops respectively) to overcome browser timer resolution limits (~0.1ms). Per-op time is derived by dividing batch time.</li>
+          <li><strong>Individual timing:</strong> Large data sizes (1 MB, 10 MB) are timed individually per operation.</li>
+          <li><strong>Median reported:</strong> All timings sorted, median used as the representative value. This resists outliers from garbage collection, tab throttling, or OS scheduling.</li>
+          <li><strong>Throughput:</strong> Calculated as <code>data_size / median_time</code>, reported in MB/s or GB/s.</li>
+          <li><strong>Verification:</strong> After each data size, all algorithms hash the same random data and output prefixes are displayed. SHA-256 WASM and Web Crypto outputs are compared to confirm they match.</li>
+        </ul>
+
+        <h3>Known limitations</h3>
+        <ul>
+          <li>Multi-core BLAKE3 splits data across workers but does <em>not</em> assemble a full Merkle tree. This means multi-core results represent parallel chunk hashing, not the full BLAKE3 tree hash.</li>
+          <li>Web Worker message-passing overhead is significant at small data sizes, making multi-core slower than single-threaded for 1 KB and 100 KB inputs.</li>
+          <li>The WASM BLAKE3 implementation does not use WASM SIMD instructions. Enabling SIMD could significantly widen the BLAKE3 advantage.</li>
+          <li>Web Crypto API batches are run with <code>Promise.all()</code> to avoid unfair per-call async overhead, but this may slightly overstate Web Crypto throughput compared to sequential calls.</li>
+          <li>Browser throttling (background tabs, low-power mode) can affect results. Run with the tab in the foreground for best accuracy.</li>
+        </ul>
+      </div>
+
+      <!-- Source claims -->
+      <div class="method-section">
+        <h2>Sourcing for factual claims</h2>
+        <p>Every factual claim on the main page has been reviewed. Below are the primary sources for each section.</p>
+
+        <h3>SHA-256 architecture & history</h3>
+        <div class="source-table-wrap"><table class="source-table">
+          <thead><tr><th>Claim</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>SHA-256 designed 2001, by NSA, published by NIST</td><td><a href="https://csrc.nist.gov/publications/detail/fips/180/4/final">NIST FIPS 180-4</a></td></tr>
+            <tr><td>Sequential Merkle-Damgard construction</td><td><a href="https://csrc.nist.gov/publications/detail/fips/180/4/final">FIPS 180-4 Section 6.2</a>; Merkle (1979); Damgard (1989)</td></tr>
+            <tr><td>Length extension vulnerability</td><td>Duong & Rizzo (2009); <a href="https://datatracker.ietf.org/doc/html/rfc6234">RFC 6234</a></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>BLAKE3 architecture & properties</h3>
+        <div class="source-table-wrap"><table class="source-table">
+          <thead><tr><th>Claim</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Designed 2020 by O'Connor, Aumasson, Neves, Wilcox-O'Hearn</td><td><a href="https://github.com/BLAKE3-team/BLAKE3-specs/blob/master/blake3.pdf">BLAKE3 paper</a></td></tr>
+            <tr><td>Merkle tree structure, parallel processing</td><td>BLAKE3 specification, Section 5</td></tr>
+            <tr><td>Immune to length extension (finalization flags)</td><td>BLAKE3 specification, Section 5.1</td></tr>
+            <tr><td>Verified streaming</td><td><a href="https://github.com/oconnor663/bao">Bao project</a></td></tr>
+            <tr><td>Built-in keyed hashing, KDF, PRF modes</td><td>BLAKE3 specification, Section 5.1 (flag definitions)</td></tr>
+            <tr><td>Open source (CC0 / Apache 2.0)</td><td><a href="https://github.com/BLAKE3-team/BLAKE3">BLAKE3 GitHub</a></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>SHA-256 weaknesses (theoretical)</h3>
+        <div class="source-table-wrap"><table class="source-table">
+          <thead><tr><th>Claim</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Joux multicollisions (2^k collisions at k &times; 2^(n/2) cost)</td><td>Joux, "Multicollisions in Iterated Hash Functions," <a href="https://link.springer.com/chapter/10.1007/978-3-540-28628-8_19">CRYPTO 2004</a></td></tr>
+            <tr><td>Herding / Nostradamus attacks</td><td>Kelsey & Kohno, <a href="https://link.springer.com/chapter/10.1007/11761679_12">Eurocrypt 2006</a></td></tr>
+            <tr><td>Long-message second preimage attacks</td><td>Kelsey & Schneier, <a href="https://link.springer.com/chapter/10.1007/11426639_28">Eurocrypt 2005</a></td></tr>
+            <tr><td>Grover's algorithm halves preimage resistance</td><td>Grover (1996); Brassard, Hoyer, Tapp (1998)</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>SHA-256 real-world usage</h3>
+        <div class="source-table-wrap"><table class="source-table">
+          <thead><tr><th>Use case</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>TLS/SSL certificates</td><td><a href="https://cabforum.org/baseline-requirements/">CA/Browser Forum Baseline Requirements</a></td></tr>
+            <tr><td>4G LTE / 5G key derivation</td><td><a href="https://www.3gpp.org/specifications">3GPP TS 33.401</a> (LTE); <a href="https://www.3gpp.org/specifications">TS 33.501</a> (5G)</td></tr>
+            <tr><td>Bitcoin double-SHA-256</td><td><a href="https://bitcoin.org/bitcoin.pdf">Bitcoin whitepaper (Nakamoto, 2008)</a></td></tr>
+            <tr><td>Docker image digests</td><td><a href="https://github.com/opencontainers/image-spec">OCI Image Specification</a></td></tr>
+            <tr><td>Git SHA-256 migration</td><td><a href="https://git-scm.com/docs/hash-function-transition">Git hash function transition plan</a></td></tr>
+            <tr><td>iMessage</td><td><a href="https://support.apple.com/guide/security/">Apple Platform Security Guide</a></td></tr>
+            <tr><td>Signal Protocol / WhatsApp</td><td><a href="https://signal.org/docs/">Signal Protocol specifications</a></td></tr>
+            <tr><td>AWS Signature Version 4</td><td><a href="https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html">AWS SigV4 documentation</a></td></tr>
+            <tr><td>TOTP (2FA)</td><td><a href="https://datatracker.ietf.org/doc/html/rfc6238">RFC 6238</a> (default: HMAC-SHA-1; SHA-256 optional)</td></tr>
+            <tr><td>WPA2 WiFi</td><td><a href="https://standards.ieee.org/ieee/802.11i/3127/">IEEE 802.11i</a> (uses PBKDF2-SHA-1, not SHA-256)</td></tr>
+            <tr><td>PBKDF2 password hashing</td><td><a href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST SP 800-63B</a>; NIST SP 800-132</td></tr>
+            <tr><td>DKIM email signing</td><td><a href="https://datatracker.ietf.org/doc/html/rfc6376">RFC 6376</a>; <a href="https://datatracker.ietf.org/doc/html/rfc8301">RFC 8301</a></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- Caveats -->
+      <div class="method-section">
+        <h2>Caveats & editorial choices</h2>
+        <p>This site advocates for BLAKE3 adoption. We believe the technical case is strong, but some claims involve editorial judgment. Here's where we draw the line.</p>
+
+        <h3>"More secure"</h3>
+        <p>The hero section calls BLAKE3 "a faster, more secure alternative." BLAKE3 has the same output size and security level (256-bit preimage, 128-bit collision) as SHA-256. "More secure" refers to structural properties: immunity to length extension attacks, built-in domain separation, and avoidance of Merkle-Damgard generic weaknesses. SHA-256 has survived 25 years of intense cryptanalysis with no practical breaks. Reasonable cryptographers may disagree on whether structural advantages outweigh the shorter track record.</p>
+
+        <h3>Double-SHA-256 rationale</h3>
+        <p>We say Bitcoin's double-SHA-256 is "likely a defense against the length extension attack." This is the most commonly cited explanation, but Satoshi Nakamoto never stated the reason explicitly. It may also be general defense-in-depth.</p>
+
+        <h3>BLAKE3 as a SHA-256 replacement</h3>
+        <p>BLAKE3 is cryptographically sound and faster in software. However, it lacks NIST standardization, FIPS certification, and the decades of cryptanalysis that SHA-256 has undergone. In regulated contexts (government, finance, healthcare), SHA-256 or SHA-3 remain the mandated choices. Our claim that "BLAKE3 qualifies" applies to non-regulated applications where performance matters and standards compliance is not required.</p>
+
+        <h3>Web Crypto as "hardware-accelerated"</h3>
+        <p>We label the Web Crypto API implementation "SHA-256 (HW)" in benchmark results. On devices with Intel SHA-NI or ARMv8 Crypto Extensions, the browser does use hardware acceleration. On older CPUs without these instructions, Web Crypto is native compiled code — faster than WASM but not truly hardware-accelerated. The label is accurate for most modern phones and recent laptops.</p>
+      </div>
+
+      <!-- Correction log -->
+      <div class="method-section">
+        <h2>Correction log</h2>
+        <p>We fact-checked every claim on this site and corrected the errors we found. Transparency matters.</p>
+
+        <div class="correction-log">
+          <h4>March 2026</h4>
+          <div class="correction-entry">
+            <strong>Two-factor authentication section:</strong> Originally stated TOTP codes use "HMAC-SHA-256." Corrected to "HMAC-SHA-1 by default (RFC 6238), though newer systems increasingly support HMAC-SHA-256." The TOTP standard defaults to SHA-1, not SHA-256.
+          </div>
+          <div class="correction-entry">
+            <strong>Passwords & WiFi section:</strong> Originally stated "PBKDF2-SHA-256 secures WPA2 WiFi passwords." Corrected: WPA2 uses PBKDF2 with HMAC-SHA-1 (4,096 iterations) per IEEE 802.11i. PBKDF2-SHA-256 is used in macOS FileVault and enterprise systems, not WPA2.
+          </div>
+          <div class="correction-entry">
+            <strong>Email & code signing section:</strong> Changed "Every signed PDF" to "Most modern signed PDFs" — legacy PDFs may use SHA-1, and the spec supports SHA-384/512.
+          </div>
+          <div class="correction-entry">
+            <strong>Bitcoin section:</strong> Changed "A workaround for" to "Likely a defense against" the length extension attack — the reason for double-SHA-256 was never explicitly confirmed by Satoshi Nakamoto.
+          </div>
+          <div class="correction-entry">
+            <strong>Device detection (data.js):</strong> iPhone 7 Plus was incorrectly labeled as A11 Bionic. Corrected to "A10 Fusion / A11 Bionic" to reflect both possible models sharing the same screen resolution signature.
+          </div>
+          <div class="correction-entry">
+            <strong>Inline source citations:</strong> Added source links to all ten use case cards in the "SHA-256 is everywhere" section.
+          </div>
+        </div>
+      </div>
+
+      <!-- Back link -->
+      <div style="padding: 2rem 0;">
+        <a href="/" class="method-back">&larr; Back to benchmark</a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a> — review the benchmark code yourself.</p>
+      <p>Built to advocate for better cryptography. <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener">BLAKE3</a> is open source.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
