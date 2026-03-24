@@ -73,6 +73,16 @@ BLAKE3's advantages over SHA-256:
 
 The app detects iPhone models via screen dimensions, pixel ratio, and core count, mapping to chip generation and SHA-2 hardware acceleration status. Covers iPhone SE (2nd gen) through iPhone 16 Pro Max. Detection is best-effort — some models share screen characteristics.
 
+## Future directions
+
+We're exploring expanding the site beyond BLAKE3 vs SHA-256. Three prototype directions are linked from the main page:
+
+- **[CryptoBench](/cryptobench.html)** — Encryption speed test across hashing, AES, HMAC, and key derivation
+- **[DeviceBench](/devicebench.html)** — Full device diagnostic with hardware detection, browser feature matrix, and modular benchmarks
+- **[HashMeter](/hashmeter.html)** — Speedtest.net for hashing — one big number, six algorithms from three decades
+
+These are UI/UX mockups with hardcoded data, not yet wired to real benchmarks.
+
 ## Status
 
 This is an alpha/MVP. Known limitations:

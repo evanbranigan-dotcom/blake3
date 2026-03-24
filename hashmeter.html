@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>HashMeter — How Fast Can Your Device Hash?</title>
+  <meta name="description" content="The speed test for hash functions. Six algorithms from three decades. One button. Your device's real throughput, measured in your browser.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://blake3.loonlabs.dev">
+  <meta property="og:title" content="HashMeter — How Fast Can Your Device Hash?">
+  <meta property="og:description" content="Six hash algorithms. Three decades of cryptography. One button. How fast is your device?">
+  <meta property="og:image" content="https://blake3.loonlabs.dev/og-image.png">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .prototype-banner { background: rgba(0, 255, 136, 0.08); border-color: rgba(0, 255, 136, 0.2); color: var(--blake3); }
+    .top-bar-brand { color: var(--blake3); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="prototype-banner">
+    <div class="container">Prototype direction — <a href="/">back to main site</a></div>
+  </div>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand">HashMeter</span>
+      <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener" class="top-bar-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Source
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero: Speedtest-style headline -->
+  <section id="hero" class="section">
+    <div class="container hero-meter">
+      <p class="hero-eyebrow">Hash function speed test</p>
+
+      <!-- The "speedometer" — big headline number -->
+      <div class="meter-display">
+        <div class="meter-number">2.1</div>
+        <div class="meter-unit">GB/s</div>
+        <div class="meter-algo">BLAKE3 &middot; peak throughput</div>
+      </div>
+
+      <div class="meter-device">
+        <span class="meter-device-icon">💻</span>
+        <span class="meter-device-name">MacBook Pro</span>
+        <span class="meter-device-chip">M2 Pro &middot; 12 cores</span>
+      </div>
+
+      <button id="run-btn" class="run-button meter-run">
+        <span class="run-text">Test your device</span>
+      </button>
+
+      <div id="benchmark-progress" class="hidden">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-label" id="progress-label">Preparing...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Timeline: Three decades of hashing -->
+  <section id="timeline" class="section">
+    <div class="container">
+      <h2 class="section-title">Three decades of hash functions</h2>
+      <p class="timeline-intro">From the early internet to the post-quantum era. Each generation brought faster, more secure hashing — but the old ones never went away.</p>
+
+      <div class="timeline">
+        <div class="timeline-era">
+          <div class="timeline-year">1992</div>
+          <div class="timeline-content">
+            <h3 class="timeline-name">MD5</h3>
+            <p class="timeline-desc">The original workhorse. Fast, simple, and now cryptographically broken — but still used for checksums everywhere.</p>
+            <span class="timeline-status status-broken">Broken</span>
+          </div>
+        </div>
+
+        <div class="timeline-era">
+          <div class="timeline-year">1995</div>
+          <div class="timeline-content">
+            <h3 class="timeline-name">SHA-1</h3>
+            <p class="timeline-desc">Replaced MD5 for certificates and signatures. Google produced a real collision in 2017. Deprecated but lingering.</p>
+            <span class="timeline-status status-broken">Broken</span>
+          </div>
+        </div>
+
+        <div class="timeline-era">
+          <div class="timeline-year">2001</div>
+          <div class="timeline-content">
+            <h3 class="timeline-name">SHA-256</h3>
+            <p class="timeline-desc">The current standard. Designed by the NSA, standardized by NIST. Powers TLS, Bitcoin, and every certificate chain on the internet. Sequential and can't parallelize.</p>
+            <span class="timeline-status status-current">Current standard</span>
+          </div>
+        </div>
+
+        <div class="timeline-era">
+          <div class="timeline-year">2015</div>
+          <div class="timeline-content">
+            <h3 class="timeline-name">SHA-3 (Keccak)</h3>
+            <p class="timeline-desc">NIST's backup plan. A completely different internal structure (sponge construction) as insurance if SHA-2 ever falls. Slower in software.</p>
+            <span class="timeline-status status-alt">Alternative standard</span>
+          </div>
+        </div>
+
+        <div class="timeline-era">
+          <div class="timeline-year">2012</div>
+          <div class="timeline-content">
+            <h3 class="timeline-name">BLAKE2b</h3>
+            <p class="timeline-desc">The predecessor to BLAKE3. Faster than SHA-256 in software, used in Argon2 password hashing. Single-threaded only.</p>
+            <span class="timeline-status status-good">Trusted</span>
+          </div>
+        </div>
+
+        <div class="timeline-era timeline-highlight">
+          <div class="timeline-year">2020</div>
+          <div class="timeline-content">
+            <h3 class="timeline-name">BLAKE3</h3>
+            <p class="timeline-desc">Parallelizable tree hashing. Scales with every core. No hardware acceleration needed. The fastest secure hash function available.</p>
+            <span class="timeline-status status-best">Fastest</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="results" class="section">
+    <div class="container">
+      <h2 class="section-title">Your device's results</h2>
+      <p class="results-intro">Throughput at 10 MB — large enough to measure real performance, small enough to run quickly.</p>
+
+      <!-- Mock Results -->
+      <div id="results-container">
+        <div class="result-group">
+          <div class="result-row winner">
+            <div class="result-label">BLAKE3 <span class="winner-badge">fastest</span></div>
+            <div class="result-bar-track"><div class="result-bar bar-blake3" style="width: 100%"></div></div>
+            <div class="result-value">2.1 GB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">BLAKE2b</div>
+            <div class="result-bar-track"><div class="result-bar bar-blake2" style="width: 42%"></div></div>
+            <div class="result-value">880 MB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">SHA-256 (HW)</div>
+            <div class="result-bar-track"><div class="result-bar bar-sha256crypto" style="width: 62%"></div></div>
+            <div class="result-value">1.3 GB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">SHA-256 (WASM)</div>
+            <div class="result-bar-track"><div class="result-bar bar-sha256wasm" style="width: 28%"></div></div>
+            <div class="result-value">580 MB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">SHA-3 (Keccak)</div>
+            <div class="result-bar-track"><div class="result-bar bar-sha3" style="width: 18%"></div></div>
+            <div class="result-value">380 MB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">SHA-1</div>
+            <div class="result-bar-track"><div class="result-bar bar-sha1" style="width: 52%"></div></div>
+            <div class="result-value">1.1 GB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">MD5</div>
+            <div class="result-bar-track"><div class="result-bar bar-md5" style="width: 48%"></div></div>
+            <div class="result-value">1.0 GB/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Verdict -->
+  <section id="verdict" class="section">
+    <div class="container">
+      <h2 class="section-title">What the numbers mean</h2>
+      <div class="verdict-card">
+        <h3 class="verdict-title">BLAKE3 is the fastest secure hash function you can run today.</h3>
+
+        <div class="verdict-insights">
+          <div class="insight-item">
+            <div class="insight-label">vs SHA-256 (software)</div>
+            <div class="insight-number" style="color: var(--blake3)">3.6x</div>
+            <div class="insight-note">Fair fight — no hardware help on either side</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-label">vs SHA-256 (hardware)</div>
+            <div class="insight-number" style="color: var(--blake3)">1.6x</div>
+            <div class="insight-note">BLAKE3 in software beats SHA-256 with dedicated silicon</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-label">vs MD5 (broken)</div>
+            <div class="insight-number" style="color: var(--blake3)">2.1x</div>
+            <div class="insight-note">Faster than the broken hash people still use for "speed"</div>
+          </div>
+        </div>
+
+        <p class="verdict-highlight">The fastest hash function from 1992 (MD5) has been broken for years. The fastest secure hash function from 2020 (BLAKE3) is also the fastest hash function, period.</p>
+
+        <p class="verdict-context">These results were measured on your MacBook Pro with Apple M2 Pro. SHA-256 had dedicated hardware acceleration — and still lost.</p>
+
+        <div class="verdict-cta">
+          <a href="https://github.com/BLAKE3-team/BLAKE3" target="_blank" rel="noopener" class="cta-button">Explore BLAKE3</a>
+          <a href="https://blake3.io" target="_blank" rel="noopener" class="cta-link">blake3.io</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a></p>
+      <p>All benchmarks run locally. No data leaves your device.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.section').forEach(s => s.classList.add('visible'))
+  </script>
+</body>
+</html>

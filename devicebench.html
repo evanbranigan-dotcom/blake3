@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DeviceBench — What Can Your Browser Do?</title>
+  <meta name="description" content="A comprehensive device diagnostic tool. See your hardware specs, browser capabilities, and cryptographic performance — all from one page.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://blake3.loonlabs.dev">
+  <meta property="og:title" content="DeviceBench — What Can Your Browser Do?">
+  <meta property="og:description" content="Hardware specs, browser capabilities, and crypto benchmarks. One page, no downloads.">
+  <meta property="og:image" content="https://blake3.loonlabs.dev/og-image.webp">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    :root {
+      --blake3: #00ddcc;
+      --blake3-dim: #00bbaa;
+    }
+    .hero-eyebrow { color: #00ddcc; }
+    .run-button { background: #00ddcc; }
+    .prototype-banner { background: rgba(0, 221, 204, 0.1); border-color: rgba(0, 221, 204, 0.25); color: #00ddcc; }
+    .top-bar-brand { color: #00ddcc; font-weight: 800; }
+    .winner-badge { background: rgba(0, 221, 204, 0.15); color: #00ddcc; }
+    .bar-blake3 { background: #00ddcc; }
+  </style>
+</head>
+<body>
+
+  <div class="prototype-banner">
+    <div class="container">Prototype direction — <a href="/">back to main site</a></div>
+  </div>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand">DeviceBench</span>
+      <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener" class="top-bar-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Source
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="hero" class="section">
+    <div class="container">
+      <p class="hero-eyebrow">Device diagnostic tool</p>
+      <h1 class="hero-title">What can your <span class="highlight-accent">browser</span> actually do?</h1>
+      <p class="hero-sub">Hardware detection, feature support, and cryptographic performance — all tested locally, nothing sent anywhere.</p>
+      <div class="scroll-hint">
+        <span>Scroll to explore</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Device Identity -->
+  <section id="device" class="section">
+    <div class="container">
+      <h2 class="section-title">Device identity</h2>
+      <div class="device-identity-grid">
+
+        <div class="identity-card identity-main">
+          <div class="identity-icon">💻</div>
+          <div class="identity-body">
+            <h3 class="identity-label">Device</h3>
+            <div class="identity-value">MacBook Pro</div>
+            <div class="identity-detail">macOS &middot; Apple Silicon</div>
+          </div>
+        </div>
+
+        <div class="identity-card">
+          <h3 class="identity-label">Processor</h3>
+          <div class="identity-value">Apple M2 Pro</div>
+          <div class="identity-detail">12 cores (8P + 4E)</div>
+        </div>
+
+        <div class="identity-card">
+          <h3 class="identity-label">GPU</h3>
+          <div class="identity-value">Apple M2 Pro 19-core</div>
+          <div class="identity-detail">Via WebGL UNMASKED_RENDERER</div>
+        </div>
+
+        <div class="identity-card">
+          <h3 class="identity-label">Memory</h3>
+          <div class="identity-value">8 GB</div>
+          <div class="identity-detail">navigator.deviceMemory (approximate)</div>
+        </div>
+
+        <div class="identity-card">
+          <h3 class="identity-label">Display</h3>
+          <div class="identity-value">3024 x 1964</div>
+          <div class="identity-detail">2x pixel ratio &middot; P3 color gamut</div>
+        </div>
+
+        <div class="identity-card">
+          <h3 class="identity-label">Browser</h3>
+          <div class="identity-value">Chrome 124</div>
+          <div class="identity-detail">Blink engine &middot; V8 JavaScript</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Detection -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2 class="section-title">Browser capabilities</h2>
+      <p class="features-intro">What modern web APIs does your browser support?</p>
+
+      <div class="feature-grid">
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">WebCrypto API</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">WebAssembly</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">Web Workers</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">SharedArrayBuffer</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">WebGL 2.0</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">WebGPU</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">WASM SIMD</span>
+        </div>
+        <div class="feature-item feature-no">
+          <span class="feature-status">unsupported</span>
+          <span class="feature-name">WASM Threads</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">WebCodecs</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">OffscreenCanvas</span>
+        </div>
+        <div class="feature-item feature-partial">
+          <span class="feature-status">partial</span>
+          <span class="feature-name">WebTransport</span>
+        </div>
+        <div class="feature-item feature-yes">
+          <span class="feature-status">supported</span>
+          <span class="feature-name">Compression Streams</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Crypto Benchmark Module -->
+  <section id="benchmark" class="section">
+    <div class="container">
+      <h2 class="section-title">Crypto benchmark</h2>
+      <p class="benchmark-intro">Hashing and encryption throughput on your hardware.</p>
+
+      <div id="benchmark-controls">
+        <button id="run-btn" class="run-button">
+          <span class="run-text">Run crypto benchmark</span>
+        </button>
+      </div>
+
+      <div id="benchmark-progress" class="hidden">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-label" id="progress-label">Preparing...</p>
+      </div>
+
+      <!-- Mock Results -->
+      <div id="results-container">
+        <div class="result-group">
+          <h3 class="result-size">Hashing @ 10 MB</h3>
+          <div class="result-row winner">
+            <div class="result-label">BLAKE3 <span class="winner-badge">fastest</span></div>
+            <div class="result-bar-track"><div class="result-bar bar-blake3" style="width: 100%"></div></div>
+            <div class="result-value">2.1 GB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">SHA-256 (HW)</div>
+            <div class="result-bar-track"><div class="result-bar bar-sha256crypto" style="width: 62%"></div></div>
+            <div class="result-value">1.3 GB/s</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">SHA-256 (WASM)</div>
+            <div class="result-bar-track"><div class="result-bar bar-sha256wasm" style="width: 28%"></div></div>
+            <div class="result-value">580 MB/s</div>
+          </div>
+        </div>
+
+        <div class="result-group">
+          <h3 class="result-size">Encryption @ 10 MB</h3>
+          <div class="result-row winner">
+            <div class="result-label">AES-256-GCM</div>
+            <div class="result-bar-track"><div class="result-bar bar-aes" style="width: 100%"></div></div>
+            <div class="result-value">3.8 GB/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Placeholder Modules -->
+  <section id="more-tests" class="section">
+    <div class="container">
+      <h2 class="section-title">More benchmarks</h2>
+      <p class="modules-intro">Additional performance modules — coming soon.</p>
+
+      <div class="module-grid">
+        <div class="module-card module-coming">
+          <div class="module-icon">JS</div>
+          <h3 class="module-name">JavaScript Engine</h3>
+          <p class="module-desc">Object creation, iteration, regex, JSON parse/stringify, async overhead</p>
+          <span class="module-badge">Coming soon</span>
+        </div>
+
+        <div class="module-card module-coming">
+          <div class="module-icon">GL</div>
+          <h3 class="module-name">WebGL / GPU</h3>
+          <p class="module-desc">Triangle throughput, texture fill, shader compilation</p>
+          <span class="module-badge">Coming soon</span>
+        </div>
+
+        <div class="module-card module-coming">
+          <div class="module-icon">MEM</div>
+          <h3 class="module-name">Memory Throughput</h3>
+          <p class="module-desc">ArrayBuffer copy speed, TypedArray performance, allocation patterns</p>
+          <span class="module-badge">Coming soon</span>
+        </div>
+
+        <div class="module-card module-coming">
+          <div class="module-icon">NET</div>
+          <h3 class="module-name">Network</h3>
+          <p class="module-desc">Download speed, latency, connection type detection</p>
+          <span class="module-badge">Coming soon</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-source"><a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">View source on GitHub</a></p>
+      <p>All tests run locally. No data leaves your device.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.section').forEach(s => s.classList.add('visible'))
+  </script>
+</body>
+</html>
