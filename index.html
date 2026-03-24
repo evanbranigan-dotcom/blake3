@@ -118,13 +118,18 @@
   <!-- Section 2b: SHA-256 Weaknesses -->
   <section id="weaknesses" class="section">
     <div class="container">
-      <h2 class="section-title">SHA-256 has six structural weaknesses</h2>
-      <p class="weaknesses-intro">SHA-256 hasn't been "broken" — no one has found collisions. But its <em>architecture</em> has known structural weaknesses that modern hash functions were specifically designed to eliminate.</p>
+      <h2 class="section-title">SHA-256 is <span class="title-weak">Weak</span></h2>
+      <p class="weaknesses-intro">No one has found collisions — but its <em>architecture</em> has six known weaknesses that modern hash functions were designed to eliminate.</p>
 
+      <details class="section-accordion">
+        <summary class="section-accordion-toggle">
+          <span class="accordion-label">Show all 6 weaknesses</span>
+          <span class="section-accordion-chevron"></span>
+        </summary>
       <div class="weaknesses-grid">
 
         <!-- 1. Length Extension -->
-        <details class="weakness-card" open>
+        <details class="weakness-card">
           <summary class="weakness-summary">
             <span class="weakness-number">01</span>
             <h3>Length extension attacks</h3>
@@ -342,6 +347,169 @@
         </details>
 
       </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Section 2c: Where SHA-256 Runs Today -->
+  <section id="usage" class="section">
+    <div class="container">
+      <h2 class="section-title">SHA-256 is <span class="title-everywhere">everywhere</span></h2>
+      <p class="usage-intro">Trillions of calls per day — across your phone, your browser, and the infrastructure behind both.</p>
+
+      <details class="section-accordion">
+        <summary class="section-accordion-toggle">
+          <span class="accordion-label">Show all 10 use cases</span>
+          <span class="section-accordion-chevron"></span>
+        </summary>
+      <div class="usage-grid">
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">🔒</span>
+            <div class="usage-header">
+              <h3>Every HTTPS connection</h3>
+              <span class="usage-scale">Trillions/day</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>Every TLS/SSL certificate uses SHA-256. Every time you see the lock icon in your browser, SHA-256 verifies the certificate is authentic and untampered. Let's Encrypt alone issues 10+ million certificates per day — all SHA-256.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">📱</span>
+            <div class="usage-header">
+              <h3>Your phone's cell connection</h3>
+              <span class="usage-scale">Billions of devices</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>Every time your phone connects to a cell tower, HMAC-SHA-256 derives the encryption keys securing your call and data. It's the mandatory key derivation function in both 4G LTE and 5G networks (3GPP standard).</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">⛓</span>
+            <div class="usage-header">
+              <h3>Bitcoin & cryptocurrency</h3>
+              <span class="usage-scale">~600 EH/s</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>Bitcoin uses double-SHA-256 for block hashing, transaction verification, and proof-of-work mining. The "double" part? A workaround for the length extension attack — a weakness BLAKE3 doesn't have. The entire network performs ~600 exahashes per second of SHA-256.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">📦</span>
+            <div class="usage-header">
+              <h3>Docker & software packages</h3>
+              <span class="usage-scale">Every deploy</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>Every Docker image is identified by its SHA-256 digest — an immutable fingerprint for each layer. Linux package managers (apt, dpkg) verify packages with SHA-256 checksums. Apple's App Store uses it to verify every app download. Git is migrating from SHA-1 to SHA-256.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">💬</span>
+            <div class="usage-header">
+              <h3>iMessage, Signal & WhatsApp</h3>
+              <span class="usage-scale">Billions of messages</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>iMessage uses HMAC-SHA-256 for message authentication and key derivation. The Signal Protocol — powering both Signal and WhatsApp — uses SHA-256 in its key derivation chain. Your encrypted chats depend on it.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">☁️</span>
+            <div class="usage-header">
+              <h3>Cloud infrastructure</h3>
+              <span class="usage-scale">Every API call</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>AWS Signature Version 4 signs every API request with SHA-256 — every S3 upload, every Lambda invocation, every DynamoDB query. Google Cloud and Azure use similar SHA-256-based authentication for service accounts.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">🔑</span>
+            <div class="usage-header">
+              <h3>Two-factor authentication</h3>
+              <span class="usage-scale">Every 30 seconds</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>Authenticator apps generate 6-digit TOTP codes using HMAC-SHA-256. Every 30 seconds, your phone computes a new SHA-256-based code. Microsoft Entra ID, Google, and most enterprise 2FA systems support SHA-256 TOTP tokens.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">🔐</span>
+            <div class="usage-header">
+              <h3>Passwords & WiFi</h3>
+              <span class="usage-scale">Every login</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>SHA-256 alone is too fast for password hashing — so PBKDF2-SHA-256 iterates it thousands of times to slow attackers down. It secures WPA2 WiFi passwords, macOS FileVault encryption, and countless enterprise login systems. The workaround is the point: SHA-256 wasn't designed for this.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">✉️</span>
+            <div class="usage-header">
+              <h3>Email & code signing</h3>
+              <span class="usage-scale">Every email sent</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>DKIM signs outgoing emails with SHA-256 so recipients can verify the sender. Code signing certificates for macOS, Windows, and Android all use SHA-256. Every signed PDF, every verified app update — SHA-256.</p>
+          </div>
+        </details>
+
+        <details class="usage-card">
+          <summary class="usage-summary">
+            <span class="usage-icon">📁</span>
+            <div class="usage-header">
+              <h3>File integrity & downloads</h3>
+              <span class="usage-scale">Every download</span>
+            </div>
+            <span class="usage-chevron"></span>
+          </summary>
+          <div class="usage-body">
+            <p>Software distributors provide SHA-256 checksums for downloads. macOS Gatekeeper and Windows Authenticode verify executables with SHA-256. Backup systems use it for deduplication and corruption detection. But you must download the <em>entire</em> file before you can verify — BLAKE3's tree structure lets you verify chunks as they arrive.</p>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="usage-takeaway">
+        <p>SHA-256 is everywhere — but most of these use cases don't <em>need</em> SHA-256 specifically. They need a fast, collision-resistant hash. BLAKE3 qualifies, and it's faster in software on every device without dedicated hardware.</p>
+      </div>
+      </details>
     </div>
   </section>
 

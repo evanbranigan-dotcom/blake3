@@ -44,7 +44,19 @@ function setupAccordion(selector) {
   })
 }
 setupAccordion('details.weakness-card')
+setupAccordion('details.usage-card')
 setupAccordion('details.question-card')
+
+// Section accordion: toggle "Show" / "Hide" text
+document.querySelectorAll('.section-accordion').forEach((accordion) => {
+  const toggle = accordion.querySelector('.section-accordion-toggle span:first-child')
+  if (!toggle) return
+  const showText = toggle.textContent
+  const hideText = showText.replace('Show', 'Hide')
+  accordion.addEventListener('toggle', () => {
+    toggle.textContent = accordion.open ? hideText : showText
+  })
+})
 
 // Benchmark
 const runBtn = document.getElementById('run-btn')
