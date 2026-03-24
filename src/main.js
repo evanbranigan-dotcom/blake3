@@ -30,6 +30,22 @@ if (!hasWebCrypto) {
   }
 }
 
+// Accordion: only one item open at a time within each group
+function setupAccordion(selector) {
+  const items = document.querySelectorAll(selector)
+  items.forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (item.open) {
+        items.forEach((other) => {
+          if (other !== item) other.removeAttribute('open')
+        })
+      }
+    })
+  })
+}
+setupAccordion('details.weakness-card')
+setupAccordion('details.question-card')
+
 // Benchmark
 const runBtn = document.getElementById('run-btn')
 const progressEl = document.getElementById('benchmark-progress')

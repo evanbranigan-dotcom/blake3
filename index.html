@@ -118,18 +118,20 @@
   <!-- Section 2b: SHA-256 Weaknesses -->
   <section id="weaknesses" class="section">
     <div class="container">
-      <h2 class="section-title">Six reasons SHA-256 shows its age</h2>
+      <h2 class="section-title">SHA-256 has six structural weaknesses</h2>
       <p class="weaknesses-intro">SHA-256 hasn't been "broken" — no one has found collisions. But its <em>architecture</em> has known structural weaknesses that modern hash functions were specifically designed to eliminate.</p>
 
       <div class="weaknesses-grid">
 
         <!-- 1. Length Extension -->
-        <div class="weakness-card">
-          <div class="weakness-header">
+        <details class="weakness-card" open>
+          <summary class="weakness-summary">
             <span class="weakness-number">01</span>
+            <h3>Length extension attacks</h3>
             <span class="weakness-severity severity-high">Exploitable</span>
-          </div>
-          <h3>Length extension attacks</h3>
+            <span class="weakness-chevron"></span>
+          </summary>
+          <div class="weakness-body">
           <p class="weakness-desc">If you know <code>SHA-256(message)</code> and the message length, you can compute <code>SHA-256(message + attacker_data)</code> without knowing the original message.</p>
           <div class="weakness-diagram">
             <div class="ext-attack">
@@ -152,15 +154,18 @@
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Uses a finalization flag that seals the output. Structurally immune — no state leaks through the hash.
           </div>
-        </div>
+          </div>
+        </details>
 
         <!-- 2. Merkle-Damgard -->
-        <div class="weakness-card">
-          <div class="weakness-header">
+        <details class="weakness-card">
+          <summary class="weakness-summary">
             <span class="weakness-number">02</span>
+            <h3>Merkle-Damgard weaknesses</h3>
             <span class="weakness-severity severity-med">Theoretical</span>
-          </div>
-          <h3>Merkle-Damgard weaknesses</h3>
+            <span class="weakness-chevron"></span>
+          </summary>
+          <div class="weakness-body">
           <p class="weakness-desc">SHA-256's underlying construction has multiple proven theoretical vulnerabilities beyond length extension.</p>
           <div class="weakness-diagram">
             <div class="md-chain">
@@ -184,15 +189,18 @@
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Built on a Merkle tree, not a Merkle-Damgard chain. Each node is independent — the construction itself eliminates these classes of attacks.
           </div>
-        </div>
+          </div>
+        </details>
 
         <!-- 3. Sequential -->
-        <div class="weakness-card">
-          <div class="weakness-header">
+        <details class="weakness-card">
+          <summary class="weakness-summary">
             <span class="weakness-number">03</span>
+            <h3>Sequential-only processing</h3>
             <span class="weakness-severity severity-perf">Performance</span>
-          </div>
-          <h3>Sequential-only processing</h3>
+            <span class="weakness-chevron"></span>
+          </summary>
+          <div class="weakness-body">
           <p class="weakness-desc">Every block depends on the output of the previous block. One core, always — no matter how many your device has.</p>
           <div class="weakness-diagram">
             <div class="seq-vs-par">
@@ -225,15 +233,18 @@
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Tree structure means all chunks process simultaneously. More cores = proportionally faster. Linearly.
           </div>
-        </div>
+          </div>
+        </details>
 
         <!-- 4. No Domain Separation -->
-        <div class="weakness-card">
-          <div class="weakness-header">
+        <details class="weakness-card">
+          <summary class="weakness-summary">
             <span class="weakness-number">04</span>
+            <h3>No built-in domain separation</h3>
             <span class="weakness-severity severity-high">Exploitable</span>
-          </div>
-          <h3>No built-in domain separation</h3>
+            <span class="weakness-chevron"></span>
+          </summary>
+          <div class="weakness-body">
           <p class="weakness-desc">SHA-256 uses the same algorithm regardless of purpose. A hash used as a MAC, KDF, or PRF all look identical — making misuse easy and dangerous.</p>
           <div class="weakness-diagram">
             <div class="domain-demo">
@@ -259,15 +270,18 @@
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Built-in keyed hashing, KDF, and PRF modes with domain separation flags. One primitive, safe in every context.
           </div>
-        </div>
+          </div>
+        </details>
 
         <!-- 5. Quantum -->
-        <div class="weakness-card">
-          <div class="weakness-header">
+        <details class="weakness-card">
+          <summary class="weakness-summary">
             <span class="weakness-number">05</span>
+            <h3>Quantum vulnerability</h3>
             <span class="weakness-severity severity-future">Future risk</span>
-          </div>
-          <h3>Quantum vulnerability</h3>
+            <span class="weakness-chevron"></span>
+          </summary>
+          <div class="weakness-body">
           <p class="weakness-desc">Grover's algorithm halves the effective security of any hash function. SHA-256 drops from 256-bit to 128-bit preimage resistance against a quantum computer.</p>
           <div class="weakness-diagram">
             <div class="quantum-bars">
@@ -285,15 +299,18 @@
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Also 256-bit (same quantum reduction), but its faster speed means you can affordably use longer outputs when post-quantum margins matter.
           </div>
-        </div>
+          </div>
+        </details>
 
         <!-- 6. No Verified Streaming -->
-        <div class="weakness-card">
-          <div class="weakness-header">
+        <details class="weakness-card">
+          <summary class="weakness-summary">
             <span class="weakness-number">06</span>
+            <h3>No verified streaming</h3>
             <span class="weakness-severity severity-perf">Performance</span>
-          </div>
-          <h3>No verified streaming</h3>
+            <span class="weakness-chevron"></span>
+          </summary>
+          <div class="weakness-body">
           <p class="weakness-desc">With SHA-256, you must download the entire file before verifying integrity. If it's corrupted or tampered with, you don't know until the end.</p>
           <div class="weakness-diagram">
             <div class="stream-demo">
@@ -321,7 +338,8 @@
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Tree structure enables verified streaming — verify each chunk independently as it arrives. Reject bad data immediately.
           </div>
-        </div>
+          </div>
+        </details>
 
       </div>
     </div>
@@ -379,30 +397,45 @@
       <p class="questions-intro">This benchmark is a living experiment. Here's what we're still investigating — and where your device's results might help.</p>
 
       <div class="questions-list">
-        <div class="question-card">
-          <h4>Does multi-core BLAKE3 overtake hardware SHA-256 at 10 MB?</h4>
+        <details class="question-card" open>
+          <summary class="question-summary">
+            <h4>Does multi-core BLAKE3 overtake hardware SHA-256 at 10 MB?</h4>
+            <span class="question-chevron"></span>
+          </summary>
           <p>BLAKE3's tree hashing should dominate at large data sizes, but Web Worker overhead is real. We're looking for the crossover point where parallelism definitively wins.</p>
-        </div>
+        </details>
 
-        <div class="question-card">
-          <h4>How much would WASM SIMD accelerate BLAKE3?</h4>
+        <details class="question-card">
+          <summary class="question-summary">
+            <h4>How much would WASM SIMD accelerate BLAKE3?</h4>
+            <span class="question-chevron"></span>
+          </summary>
           <p>BLAKE3 is designed to exploit SIMD instructions (NEON on ARM, SSE/AVX on x86). The current WASM implementation doesn't use WASM SIMD — enabling it could significantly widen the gap.</p>
-        </div>
+        </details>
 
-        <div class="question-card">
-          <h4>Why do BLAKE3 and SHA-256 WASM tie at 1 KB?</h4>
+        <details class="question-card">
+          <summary class="question-summary">
+            <h4>Why do BLAKE3 and SHA-256 WASM tie at 1 KB?</h4>
+            <span class="question-chevron"></span>
+          </summary>
           <p>Both show identical throughput at very small sizes. Is this the browser timer resolution floor? Fixed per-call overhead? We're investigating whether this is a measurement artifact or a real performance ceiling.</p>
-        </div>
+        </details>
 
-        <div class="question-card">
-          <h4>How do older iPhones compare?</h4>
+        <details class="question-card">
+          <summary class="question-summary">
+            <h4>How do older iPhones compare?</h4>
+            <span class="question-chevron"></span>
+          </summary>
           <p>We've tested on recent devices, but iPhone SE, iPhone 11, and other older models have different chips and fewer cores. If you're on an older device, your results are especially valuable.</p>
-        </div>
+        </details>
 
-        <div class="question-card">
-          <h4>Should parallel BLAKE3 use full Merkle tree assembly?</h4>
+        <details class="question-card">
+          <summary class="question-summary">
+            <h4>Should parallel BLAKE3 use full Merkle tree assembly?</h4>
+            <span class="question-chevron"></span>
+          </summary>
           <p>Currently, multi-core BLAKE3 hashes independent chunks across workers. A full Merkle tree implementation would combine chunk hashes into a single root — matching the BLAKE3 spec more faithfully and potentially improving large-data throughput.</p>
-        </div>
+        </details>
       </div>
 
       <p class="questions-cta">Curious about the methodology? <a href="https://github.com/evanbranigan-dotcom/blake3" target="_blank" rel="noopener">Read the source code</a> — every benchmark decision is documented.</p>
