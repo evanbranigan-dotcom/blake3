@@ -78,7 +78,7 @@ Even if hardware-accelerated SHA-256 is competitive on iPhones *today*:
 - BLAKE3 doesn't need special hardware to be fast
 - BLAKE3's parallelism advantage grows with data size
 - Most devices globally don't have SHA hardware extensions
-- BLAKE3 is cryptographically stronger (no length extension attacks)
+- BLAKE3 is structurally stronger (no length extension attacks, built-in domain separation)
 - BLAKE3 enables capabilities SHA-256 can't (verified streaming, incremental updates)
 
 ---
@@ -304,7 +304,7 @@ A comprehensive inventory of computing processes that currently depend on SHA-25
 
 ### 3. Bitcoin & Cryptocurrency
 - Bitcoin uses double-SHA-256 for block hashing, transaction verification, and proof-of-work mining
-- "Double" hashing is specifically to mitigate length extension attacks — a vulnerability BLAKE3 doesn't have
+- "Double" hashing is likely a defense against length extension attacks — a vulnerability BLAKE3 doesn't have (Satoshi never confirmed the reason)
 - Network hashrate: ~600 exahashes/second of SHA-256
 - Other SHA-256 coins: Bitcoin Cash (BCH), DigiByte (DGB), Peercoin, Namecoin
 - **BLAKE3 could replace**: Not for Bitcoin (consensus rules), but new chains could and should use BLAKE3
@@ -331,8 +331,8 @@ A comprehensive inventory of computing processes that currently depend on SHA-25
 - **BLAKE3 could replace**: Yes — request signing benefits from speed
 
 ### 7. Two-Factor Authentication (TOTP)
-- Authenticator apps generate TOTP codes using HMAC-SHA-256
-- New code every 30 seconds = SHA-256 computation every 30 seconds per service
+- Authenticator apps generate TOTP codes using HMAC-SHA-1 by default (RFC 6238), though newer systems increasingly support HMAC-SHA-256
+- New code every 30 seconds = hash computation every 30 seconds per service
 - Microsoft Entra ID supports SHA-256 OATH-TOTP tokens
 - Server and client must agree on algorithm (SHA-1/256/512)
 - **BLAKE3 could replace**: Theoretically, but TOTP is moving toward FIDO2/passkeys anyway
@@ -340,14 +340,14 @@ A comprehensive inventory of computing processes that currently depend on SHA-25
 ### 8. Password Storage (Indirect)
 - SHA-256 alone is too fast for password hashing (enables brute force)
 - PBKDF2-SHA-256 iterates SHA-256 thousands of times to slow down attackers
-- Used in: WPA2 WiFi, macOS FileVault, enterprise login systems
+- Used in: macOS FileVault (PBKDF2-SHA-256), enterprise login systems. Note: WPA2 uses PBKDF2-SHA-1, not SHA-256.
 - The iteration workaround highlights SHA-256's design wasn't intended for this use case
 - **BLAKE3 could replace**: Not directly — passwords need slow hashes (Argon2, bcrypt)
 
 ### 9. Email & Code Signing
 - DKIM signs outgoing emails with SHA-256 for sender verification
 - Code signing certificates for macOS, Windows, Android all use SHA-256
-- PDF digital signatures use SHA-256
+- Most modern PDF digital signatures use SHA-256
 - S/MIME email encryption uses SHA-256
 - **BLAKE3 could replace**: Yes, once standards bodies adopt it
 
@@ -363,7 +363,7 @@ A comprehensive inventory of computing processes that currently depend on SHA-25
 1. **Scale**: SHA-256 runs trillions of times per day across TLS, mobile networks, Docker, Git, and cryptocurrency
 2. **Many uses don't need SHA-256 specifically**: File integrity, Docker digests, Git objects, and package verification just need a fast, collision-resistant hash — BLAKE3 qualifies
 3. **Workarounds exist for SHA-256's weaknesses**: Bitcoin double-hashes to avoid length extension; PBKDF2 iterates to slow it down for passwords; HMAC wraps it twice for safe MAC construction
-4. **Hardware acceleration is the crutch**: SHA-256 stays competitive on modern chips only because of dedicated silicon (ARM SHA-2 extensions). BLAKE3 is faster in pure software
+4. **Hardware acceleration closes the gap**: SHA-256 relies on dedicated silicon (ARM SHA-2 extensions) to match BLAKE3's pure software speed — but that hardware is ubiquitous on modern phones and laptops
 
 ## Sources
 

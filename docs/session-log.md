@@ -44,31 +44,44 @@ Research saved to `research.md` in repo.
 
 ## 3. Architecture
 
-### App structure (5-section scroll narrative)
+### App structure (9-section scroll narrative)
 
 1. **Hero** — "Is your phone using a hash function from 2001?"
-2. **The Story** — Side-by-side SHA-256 (sequential chain) vs BLAKE3 (parallel tree) with CSS diagrams
-3. **Your Device** — Auto-detect iPhone model via screen dimensions + pixel ratio
-4. **The Benchmark** — 4 algorithms x 4 data sizes with live progress
-5. **The Verdict** — Speedup stats, contextual insights, BLAKE3 advocacy
+2. **Two Eras** — Side-by-side SHA-256 (sequential chain) vs BLAKE3 (parallel tree) with CSS diagrams
+3. **SHA-256 is showing its age** — Six architectural limitations (collapsible accordion)
+4. **SHA-256 is everywhere** — Ten real-world use cases with inline sources (collapsible accordion)
+5. **Your Device** — Auto-detect device model via screen dimensions + pixel ratio
+6. **The Benchmark** — 4 algorithms x 4 data sizes with live progress
+7. **The Verdict** — Dynamic results summary
+8. **Open Questions** — Research questions (collapsible)
+9. **Future Directions** — Links to prototype mockups
 
 ### File structure
 
 ```
 blake3/
-├── index.html
-├── style.css
+├── index.html            # Main page (narrative + benchmark)
+├── methodology.html      # Methodology, sources, correction log
+├── cryptobench.html      # Prototype: encryption speed test
+├── devicebench.html      # Prototype: device diagnostic tool
+├── hashmeter.html        # Prototype: Speedtest.net of hashing
+├── style.css             # Shared styles
 ├── vite.config.js
 ├── src/
-│   ├── main.js          # Entry, scroll reveal, benchmark button
-│   ├── data.js          # iPhone model lookup table
-│   ├── device.js        # Screen-based device detection
-│   ├── benchmark.js     # Benchmark engine (4 algorithms)
-│   ├── results.js       # Bar charts, insights, verdict
-│   └── blake3-worker.js # Web Worker for parallel BLAKE3
-├── public/favicon.svg
-├── research.md
-└── docs/session-log.md
+│   ├── main.js           # Entry, scroll reveal, benchmark button
+│   ├── data.js           # iPhone/Android model lookup table
+│   ├── device.js         # Screen-based device detection
+│   ├── benchmark.js      # Benchmark engine (4 algorithms)
+│   ├── results.js        # Bar charts, insights, verdict
+│   └── blake3-worker.js  # Web Worker for parallel BLAKE3
+├── public/
+│   ├── favicon.svg
+│   └── og-image.webp     # Open Graph image (69 KB)
+├── fact-check.md         # 113 claims assessed (internal reference)
+├── research.md           # Research notes & Android options
+├── CLAUDE.md             # Project instructions for Claude Code
+├── README.md             # Public repo documentation
+└── docs/session-log.md   # This file
 ```
 
 ---
@@ -220,7 +233,27 @@ The app doesn't hide SHA-256's wins. Each size group has a contextual insight ex
 
 ---
 
-## 10. Future Work
+## 10. Fact-Check & Reframing (March 2026)
+
+### First pass
+Extracted 113 factual claims from the site and assessed each. Found 3 FALSE claims (TOTP default algorithm, WPA2 hash, iPhone 7 Plus chip), 7 MISLEADING, 4 DEBATABLE, 2 UNVERIFIED. Corrected all FALSE claims, added inline source citations to all 10 use case cards, created `methodology.html` with full sourcing and correction log. Created `fact-check.md` as internal reference.
+
+### Second pass
+Reassessed the site's framing after deeper analysis of SHA-256's legitimate strengths. Key changes:
+- **"more secure" → "structurally stronger"** — BLAKE3 and SHA-256 have the same security level (256-bit). BLAKE3's advantages are structural (no length extension, domain separation, tree construction), not raw cryptographic strength.
+- **"SHA-256 is Weak" → "SHA-256 is showing its age"** — The original heading conflated security vulnerabilities with performance gaps. Now categorizes the 6 items as: 2 security, 2 performance, 1 design, 1 future risk.
+- **Added "Why it still dominates" counterpoint** — Acknowledges 25 years of cryptanalysis, FIPS/NIST certification, ubiquitous hardware, and rational ecosystem lock-in. Makes the site more credible by not being one-sided.
+- **Fixed 5 MISLEADING claims** — parallelism qualifier, hardware framing, unverified AWS exploit, quantum/XOF, PDF signing.
+- Updated `methodology.html` correction log, `fact-check.md` severity tables, `README.md`, and `CLAUDE.md`.
+
+### Remaining items (not yet addressed)
+- 3 DEBATABLE claims (claim #94: BLAKE3 as replacement without compliance qualifier; #65: Bitcoin double-SHA-256 rationale; #52: quantum timeline editorializing)
+- 1 UNVERIFIED claim (#60: Let's Encrypt 10M+ certs/day — check current stats)
+- 1 MISLEADING claim (#115: ARMv8.x Crypto Extension version labeling in data.js)
+
+---
+
+## 11. Future Work
 
 - [ ] Verify multi-core BLAKE3 actually overtakes SHA-256 HW at 10MB
 - [ ] Consider WASM SIMD for BLAKE3 (not yet in hash-wasm)
