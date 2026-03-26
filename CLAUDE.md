@@ -56,7 +56,7 @@ Three breakpoints used throughout:
 `methodology.html` is a standalone page documenting:
 - Benchmark methodology (algorithms, timing, known limitations)
 - Primary sources for every factual claim, organized by section
-- Caveats and editorial choices (e.g., "more secure" framing, BLAKE3 as replacement)
+- Caveats and editorial choices (e.g., "structurally stronger" framing, BLAKE3 as replacement)
 - Correction log (errors found and fixed via fact-checking)
 
 Linked from the footer and the Open Questions section. Uses the shared `style.css` but overrides `.section { opacity: 1 }` since it doesn't load `main.js` (which provides scroll-reveal animation).

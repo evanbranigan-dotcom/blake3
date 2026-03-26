@@ -42,7 +42,7 @@
     <div class="container">
       <p class="hero-eyebrow">A live benchmark experiment</p>
       <h1 class="hero-title">Is your phone using a hash function from <span class="highlight-year">2001</span>?</h1>
-      <p class="hero-sub">SHA-256 is everywhere — passwords, certificates, blockchains, file verification. It was designed before the first iPhone existed. There's a faster, more secure alternative. Let's prove it.</p>
+      <p class="hero-sub">SHA-256 is everywhere — passwords, certificates, blockchains, file verification. It was designed before the first iPhone existed. There's a faster, structurally stronger alternative. Let's prove it.</p>
       <div class="scroll-hint">
         <span>Scroll to learn more</span>
         <div class="scroll-arrow"></div>
@@ -74,8 +74,8 @@
             <p class="arch-note">Each block must wait for the previous one. One core, no matter how many you have.</p>
           </div>
           <ul class="story-traits">
-            <li>Sequential — can't parallelize</li>
-            <li>Needs hardware acceleration to stay fast</li>
+            <li>Sequential — can't parallelize a single message</li>
+            <li>Relies on hardware acceleration to match modern alternatives</li>
             <li>Vulnerable to length extension attacks</li>
             <li>25 years old, showing its age</li>
           </ul>
@@ -118,12 +118,12 @@
   <!-- Section 2b: SHA-256 Weaknesses -->
   <section id="weaknesses" class="section">
     <div class="container">
-      <h2 class="section-title">SHA-256 is <span class="title-weak">Weak</span></h2>
-      <p class="weaknesses-intro">No one has found collisions — but its <em>architecture</em> has six known weaknesses that modern hash functions were designed to eliminate.</p>
+      <h2 class="section-title">SHA-256 is <span class="title-weak">showing its age</span></h2>
+      <p class="weaknesses-intro">No one has found collisions — but its <em>architecture</em> has six limitations that modern hash functions were designed to eliminate: two security vulnerabilities, two performance gaps, one design shortcoming, and one universal future risk.</p>
 
       <details class="section-accordion">
         <summary class="section-accordion-toggle">
-          <span class="accordion-label">Show all 6 weaknesses</span>
+          <span class="accordion-label">Show all 6 limitations</span>
           <span class="section-accordion-chevron"></span>
         </summary>
       <div class="weaknesses-grid">
@@ -155,7 +155,7 @@
               </div>
             </div>
           </div>
-          <p class="weakness-real">Real-world exploits: Flickr API (2009), early AWS signature schemes, countless custom MAC constructions using <code>SHA-256(key || msg)</code>.</p>
+          <p class="weakness-real">Real-world exploits: Flickr API (2009) and countless custom MAC constructions using <code>SHA-256(key || msg)</code>.</p>
           <div class="weakness-fix">
             <span class="fix-badge">BLAKE3</span> Uses a finalization flag that seals the output. Structurally immune — no state leaks through the hash.
           </div>
@@ -302,7 +302,7 @@
           </div>
           <p class="weakness-real">128-bit is still strong — but it's half what you thought you were paying for. And quantum computing timelines keep accelerating.</p>
           <div class="weakness-fix">
-            <span class="fix-badge">BLAKE3</span> Also 256-bit (same quantum reduction), but its faster speed means you can affordably use longer outputs when post-quantum margins matter.
+            <span class="fix-badge">BLAKE3</span> Also 256-bit (same quantum reduction to 128-bit). Neither hash function is broken by Grover's — but BLAKE3's speed advantage means less performance cost if future standards require doubling output sizes.
           </div>
           </div>
         </details>
@@ -494,7 +494,7 @@
             <span class="usage-chevron"></span>
           </summary>
           <div class="usage-body">
-            <p>DKIM signs outgoing emails with SHA-256 so recipients can verify the sender. Code signing certificates for macOS, Windows, and Android all use SHA-256. Most modern signed PDFs and verified app updates rely on SHA-256.</p>
+            <p>DKIM signs outgoing emails with SHA-256 so recipients can verify the sender. Code signing certificates for macOS, Windows, and Android all use SHA-256. Most modern signed PDFs and verified app updates use SHA-256.</p>
             <p class="usage-source">Sources: <a href="https://datatracker.ietf.org/doc/html/rfc6376" target="_blank" rel="noopener">RFC 6376 (DKIM)</a>; <a href="https://datatracker.ietf.org/doc/html/rfc8301" target="_blank" rel="noopener">RFC 8301</a> (SHA-1 deprecation for DKIM)</p>
           </div>
         </details>
@@ -518,6 +518,7 @@
 
       <div class="usage-takeaway">
         <p>SHA-256 is everywhere — but most of these use cases don't <em>need</em> SHA-256 specifically. They need a fast, collision-resistant hash. BLAKE3 qualifies, and it's faster in software on every device without dedicated hardware.</p>
+        <p class="usage-counterpoint"><strong>Why it still dominates:</strong> SHA-256 has survived 25 years of the most intense cryptanalysis any hash function has ever faced — with zero practical breaks. It's NIST-standardized, FIPS-certified, and required by regulation in government, finance, and healthcare. Every modern phone and laptop has dedicated SHA-256 hardware instructions. For new projects without compliance requirements, BLAKE3 is the stronger choice. For everything else, SHA-256 isn't going anywhere — and that's not a failure.</p>
       </div>
       </details>
     </div>

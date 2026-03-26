@@ -1771,6 +1771,14 @@ details.usage-card[open] .usage-chevron {
   margin: 0;
 }
 
+.usage-counterpoint {
+  margin-top: 12px !important;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-muted) !important;
+  font-size: 0.82rem !important;
+}
+
 .usage-takeaway em {
   color: var(--text);
   font-style: italic;

@@ -107,10 +107,18 @@ Every factual claim on the site has been [reviewed and sourced](/methodology.htm
 
 - **Benchmark methodology** — algorithms, timing approach, known limitations
 - **Primary sources** — RFCs, NIST publications, protocol specs for each claim
-- **Editorial caveats** — where we make judgment calls (e.g., "more secure" framing)
+- **Editorial caveats** — where we make judgment calls (e.g., "structurally stronger" framing)
 - **Correction log** — errors found and fixed, with dates and explanations
 
-Corrections made after fact-checking (March 2026):
+Corrections made after fact-checking (March 2026, second pass):
+- Hero: "more secure" → "structurally stronger" (same security level; structural advantages, not raw strength)
+- Weaknesses heading: "SHA-256 is Weak" → "SHA-256 is showing its age"; "weaknesses" → "limitations" with categorization
+- SHA-256 card: "can't parallelize" → "can't parallelize a single message"; hardware framing softened
+- Length extension: removed unverified "early AWS signature schemes" claim
+- Quantum: fixed misleading longer-output/post-quantum claim
+- Takeaway: added "Why it still dominates" counterpoint (25yr cryptanalysis, FIPS, hardware ubiquity)
+
+Corrections (March 2026, first pass):
 - TOTP section: default is HMAC-SHA-1, not SHA-256 (per RFC 6238)
 - WPA2: uses PBKDF2-SHA-1, not PBKDF2-SHA-256 (per IEEE 802.11i)
 - Bitcoin: "workaround" softened to "likely a defense" (unconfirmed by Satoshi)

@@ -159,8 +159,8 @@
         <h2>Caveats & editorial choices</h2>
         <p>This site advocates for BLAKE3 adoption. We believe the technical case is strong, but some claims involve editorial judgment. Here's where we draw the line.</p>
 
-        <h3>"More secure"</h3>
-        <p>The hero section calls BLAKE3 "a faster, more secure alternative." BLAKE3 has the same output size and security level (256-bit preimage, 128-bit collision) as SHA-256. "More secure" refers to structural properties: immunity to length extension attacks, built-in domain separation, and avoidance of Merkle-Damgard generic weaknesses. SHA-256 has survived 25 years of intense cryptanalysis with no practical breaks. Reasonable cryptographers may disagree on whether structural advantages outweigh the shorter track record.</p>
+        <h3>"Structurally stronger"</h3>
+        <p>The hero section calls BLAKE3 "a faster, structurally stronger alternative." BLAKE3 has the same output size and security level (256-bit preimage, 128-bit collision) as SHA-256. "Structurally stronger" refers to architectural properties: immunity to length extension attacks, built-in domain separation, and avoidance of Merkle-Damgard generic weaknesses. SHA-256 has survived 25 years of intense cryptanalysis with no practical breaks — the most scrutiny any hash function has ever received. We chose "structurally stronger" over "more secure" because the two functions have equal security levels; BLAKE3's advantages are in design, not in raw cryptographic strength.</p>
 
         <h3>Double-SHA-256 rationale</h3>
         <p>We say Bitcoin's double-SHA-256 is "likely a defense against the length extension attack." This is the most commonly cited explanation, but Satoshi Nakamoto never stated the reason explicitly. It may also be general defense-in-depth.</p>
@@ -178,7 +178,29 @@
         <p>We fact-checked every claim on this site and corrected the errors we found. Transparency matters.</p>
 
         <div class="correction-log">
-          <h4>March 2026</h4>
+          <h4>March 2026 (second pass)</h4>
+          <div class="correction-entry">
+            <strong>Hero section:</strong> Changed "faster, more secure alternative" to "faster, structurally stronger alternative." BLAKE3 and SHA-256 have the same security level (256-bit); "more secure" overstated the case. "Structurally stronger" accurately describes BLAKE3's architectural advantages without implying SHA-256 is insecure.
+          </div>
+          <div class="correction-entry">
+            <strong>Weaknesses section heading:</strong> Changed "SHA-256 is Weak" to "SHA-256 is showing its age" and "six known weaknesses" to "six limitations" with categorization (2 security, 2 performance, 1 design, 1 future risk). The original heading conflated security vulnerabilities with performance gaps and universal properties.
+          </div>
+          <div class="correction-entry">
+            <strong>SHA-256 comparison card:</strong> Changed "can't parallelize" to "can't parallelize a single message" — multiple independent messages can be parallelized, and non-standard tree-hashing wrappers exist. Changed "Needs hardware acceleration to stay fast" to "Relies on hardware acceleration to match modern alternatives" — SHA-256 achieves ~200–500 MB/s in pure software, which is perfectly usable.
+          </div>
+          <div class="correction-entry">
+            <strong>Length extension section:</strong> Removed "early AWS signature schemes" from the list of real-world exploits. AWS Signature V2 used HMAC (immune to length extension), and no confirmed AWS-specific length extension exploit could be sourced.
+          </div>
+          <div class="correction-entry">
+            <strong>Quantum section:</strong> Revised BLAKE3 comparison text. Previously implied that longer BLAKE3 outputs increase preimage resistance post-quantum — this is incorrect, as the 256-bit internal state is the bottleneck regardless of output length. Now accurately frames the speed advantage without a false security claim.
+          </div>
+          <div class="correction-entry">
+            <strong>Everywhere takeaway:</strong> Added "Why it still dominates" counterpoint acknowledging SHA-256's 25-year cryptanalysis track record, NIST/FIPS certification, ubiquitous hardware support, and the rational case for continued use in regulated contexts.
+          </div>
+        </div>
+
+        <div class="correction-log">
+          <h4>March 2026 (first pass)</h4>
           <div class="correction-entry">
             <strong>Two-factor authentication section:</strong> Originally stated TOTP codes use "HMAC-SHA-256." Corrected to "HMAC-SHA-1 by default (RFC 6238), though newer systems increasingly support HMAC-SHA-256." The TOTP standard defaults to SHA-1, not SHA-256.
           </div>

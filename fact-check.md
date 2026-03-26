@@ -21,8 +21,8 @@ Every factual claim on the site, with assessment and sourcing.
 **TRUE.** SHA-256 was published in 2001 (FIPS 180-2). The first iPhone was announced January 2007, released June 2007.
 > NIST FIPS 180-2 (August 2002, describing work from 2001); Apple iPhone announcement (Macworld, Jan 9, 2007)
 
-### 3. There is a faster, more secure alternative (BLAKE3).
-**DEBATABLE.** "Faster" is well-supported — BLAKE3 benchmarks faster than SHA-256 in software across virtually all platforms (the BLAKE3 paper reports 4x+ over SHA-256 on x86). "More secure" is contentious. BLAKE3 and SHA-256 have the same output size (256 bits) and the same collision resistance (128-bit birthday bound). BLAKE3 avoids structural weaknesses (length extension, Merkle-Damgard generic attacks), but SHA-256 has survived 25 years of intense cryptanalysis with no practical attacks. Many cryptographers would say BLAKE3 has *better structural properties* rather than being *more secure* overall. The shorter track record cuts the other way.
+### 3. There is a faster, structurally stronger alternative (BLAKE3).
+**~~DEBATABLE~~ FIXED.** Originally said "more secure." Changed to "structurally stronger." "Faster" is well-supported — BLAKE3 benchmarks faster than SHA-256 in software across virtually all platforms (the BLAKE3 paper reports 4x+ over SHA-256 on x86). "Structurally stronger" accurately describes BLAKE3's architectural advantages (length extension immunity, domain separation, Merkle tree construction) without implying SHA-256 is insecure. SHA-256 has survived 25 years of intense cryptanalysis with no practical attacks.
 > BLAKE3 paper (O'Connor et al., 2020); NIST hash function status reports
 
 ---
@@ -55,12 +55,12 @@ Every factual claim on the site, with assessment and sourcing.
 **TRUE (nuanced).** For hashing a *single message*, this is correct — the sequential dependency chain means one core does all the work. However, you can hash *multiple independent messages* in parallel across cores, and tree-hashing modes built on top of SHA-256 do exist (though they're non-standard).
 > Inherent to Merkle-Damgard; see also SHA-256 tree hashing in various academic proposals
 
-### 10. SHA-256 can't be parallelized.
-**MISLEADING.** For a single message hash, correct — the Merkle-Damgard chain is inherently sequential. But the flat statement "can't parallelize" omits that: (a) multiple independent hashes can run in parallel, and (b) non-standard tree-hashing constructions on top of SHA-256 do exist. The site's context (the architecture diagram) makes it clear this refers to single-message hashing, but the trait list bullet is unqualified.
+### 10. SHA-256 can't parallelize a single message.
+**~~MISLEADING~~ FIXED.** Originally said "can't parallelize" without qualification. Now says "can't parallelize a single message." For a single message hash, correct — the Merkle-Damgard chain is inherently sequential. Multiple independent hashes can run in parallel, and non-standard tree-hashing constructions on top of SHA-256 exist, but neither applies to the single-message case.
 > Merkle-Damgard construction properties
 
-### 11. SHA-256 needs hardware acceleration to stay fast.
-**MISLEADING.** SHA-256 is reasonably fast in pure software — ~200–500 MB/s on modern CPUs without SHA-NI extensions. With Intel SHA-NI or ARM Crypto Extensions, it reaches ~2–4 GB/s. SHA-256 doesn't *need* hardware acceleration to be useful; it needs it to compete with BLAKE3's software speed. The phrasing implies SHA-256 is slow without acceleration, which overstates the case.
+### 11. SHA-256 relies on hardware acceleration to match modern alternatives.
+**~~MISLEADING~~ FIXED.** Originally said "Needs hardware acceleration to stay fast." Now says "Relies on hardware acceleration to match modern alternatives." SHA-256 is reasonably fast in pure software — ~200–500 MB/s on modern CPUs without SHA-NI extensions. With Intel SHA-NI or ARM Crypto Extensions, it reaches ~2–4 GB/s. The revised phrasing accurately describes that hardware is needed to compete with BLAKE3, not to be usable.
 > OpenSSL benchmarks; Intel SHA Extensions documentation; ARM Architecture Reference Manual
 
 ### 12. SHA-256 is vulnerable to length extension attacks.
@@ -115,8 +115,8 @@ Every factual claim on the site, with assessment and sourcing.
 **TRUE.** As of 2026, no collision has been found for full-round SHA-256. The best published attacks are reduced-round attacks (up to ~31 of 64 rounds). SHA-256's collision resistance remains intact.
 > Stevens et al., various reduced-round SHA-256 attacks; NIST hash function status page
 
-### 24. SHA-256's architecture has six known weaknesses.
-**MISLEADING.** The site lists six items, but conflates different categories: two are genuine security weaknesses of Merkle-Damgard (length extension, multicollision/herding), two are performance limitations (sequential processing, no verified streaming), one is a design limitation (no domain separation), and one applies equally to all hash functions (quantum). Calling all six "weaknesses" in SHA-256's "architecture" overstates the case — sequential processing and lack of verified streaming are feature gaps, not security flaws.
+### 24. SHA-256's architecture has six limitations.
+**~~MISLEADING~~ FIXED.** Originally said "six known weaknesses." Now says "six limitations" with explicit categorization: two security vulnerabilities, two performance gaps, one design shortcoming, and one universal future risk. The revised framing no longer conflates security flaws with feature gaps.
 
 ### Weakness 01: Length Extension Attacks
 
@@ -132,7 +132,7 @@ Every factual claim on the site, with assessment and sourcing.
 > Duong & Rizzo, "Flickr's API Signature Forgery Vulnerability" (2009)
 
 ### 28. Real-world exploits: early AWS signature schemes.
-**UNVERIFIED.** AWS Signature Version 2 used HMAC-SHA-256 (or HMAC-SHA-1), which is not vulnerable to length extension. I cannot confirm that any AWS signature scheme was specifically exploited via length extension. This may be conflating AWS with other API providers that used naive H(key||msg) constructions. If a source exists, it should be cited.
+**~~UNVERIFIED~~ FIXED.** Removed from the site. AWS Signature Version 2 used HMAC-SHA-256 (or HMAC-SHA-1), which is not vulnerable to length extension. No confirmed AWS-specific length extension exploit could be sourced.
 
 ### 29. Real-world exploits: custom MAC constructions using SHA-256(key || msg).
 **TRUE.** H(key || message) as a MAC is the canonical textbook example of length extension vulnerability. Numerous real-world implementations have made this mistake.
@@ -234,8 +234,8 @@ Every factual claim on the site, with assessment and sourcing.
 ### 53. BLAKE3 is also 256-bit (same quantum reduction).
 **TRUE.** Both SHA-256 and BLAKE3 produce 256-bit outputs with 256-bit preimage resistance, both reduced to 128-bit under Grover's.
 
-### 54. BLAKE3's faster speed means you can affordably use longer outputs when post-quantum margins matter.
-**MISLEADING.** BLAKE3 is an XOF (extendable output function) and can produce outputs longer than 256 bits. However, longer outputs do *not* increase preimage resistance beyond the 256-bit internal state/chaining value limit. Grover's would still reduce it to 128 bits regardless of output length. The bottleneck is the internal state, not the output size. This claim implies a security benefit that doesn't exist.
+### 54. BLAKE3's speed advantage means less performance cost if future standards require doubling output sizes.
+**~~MISLEADING~~ FIXED.** Originally implied longer BLAKE3 outputs increase preimage resistance post-quantum — incorrect, as the 256-bit internal state is the bottleneck regardless of output length. Revised to accurately frame the speed advantage without a false security claim. Now says: "Neither hash function is broken by Grover's — but BLAKE3's speed advantage means less performance cost if future standards require doubling output sizes."
 > BLAKE3 specification (internal state is 256-bit regardless of output length)
 
 ### Weakness 06: No Verified Streaming
@@ -517,14 +517,17 @@ Every factual claim on the site, with assessment and sourcing.
 |---|---|
 | **TRUE** | 62 |
 | **TRUE (nuanced)** | 34 |
-| **MISLEADING** | 7 |
-| **DEBATABLE** | 4 |
-| **FALSE** | 3 |
-| **UNVERIFIED** | 2 |
-| **PARTIALLY FALSE** | 1 |
+| **~~MISLEADING~~ FIXED** | 5 |
+| **MISLEADING** | 2 |
+| **~~DEBATABLE~~ FIXED** | 1 |
+| **DEBATABLE** | 3 |
+| **~~FALSE~~ FIXED** | 3 |
+| **~~UNVERIFIED~~ FIXED** | 1 |
+| **UNVERIFIED** | 1 |
+| **~~PARTIALLY FALSE~~ FIXED** | 1 |
 | **Total** | **113** |
 
-96 claims require no changes. **17 claims need attention**, sorted below from most to least significant.
+102 claims require no changes. **11 claims were fixed across two passes.** 6 remaining claims need attention (3 DEBATABLE, 2 MISLEADING, 1 UNVERIFIED).
 
 ---
 
@@ -544,31 +547,46 @@ Every factual claim on the site, with assessment and sourcing.
 |---|---|---|---|
 | 103 | Device detection (data.js) | iPhone 8 Plus / 7 Plus = A11 Bionic | Chip now reads "A10 Fusion / A11 Bionic" to cover both models at this resolution |
 
-#### DEBATABLE — Defensible but contestable by experts
+#### ~~DEBATABLE~~ FIXED (second pass)
+
+| # | Section | Claim | Fix Applied |
+|---|---|---|---|
+| 3 | Hero | "more secure alternative" | Changed to "structurally stronger alternative" |
+
+#### DEBATABLE — Defensible but contestable by experts (remaining)
 
 | # | Section | Claim | Issue | Suggested Fix |
 |---|---|---|---|---|
-| 3 | Hero | "more secure alternative" | BLAKE3 has the same security level (256-bit) as SHA-256. Better structural properties != "more secure." SHA-256 has 25 years of cryptanalysis with zero practical breaks. | Consider "a faster, more modern alternative" or "structurally stronger" |
 | 94 | Takeaway | BLAKE3 qualifies as a SHA-256 replacement | BLAKE3 lacks NIST standardization, FIPS certification, and decades of cryptanalysis. Not acceptable in regulated contexts. | Add qualifier: "for non-regulated applications" or "where standards compliance isn't required" |
 | 65 | Bitcoin | Double-SHA-256 is a length extension workaround | Commonly stated but never confirmed by Satoshi. May be defense-in-depth. | Add "likely" or "commonly attributed to" hedging |
 | 52 | Quantum | Quantum computing timelines keep accelerating | Debatable — advances exist alongside significant scaling challenges. | Consider softening to "advancing" or removing the editorializing |
 
-#### UNVERIFIED — Can't confirm, no source found
+#### ~~UNVERIFIED~~ FIXED (second pass)
+
+| # | Section | Claim | Fix Applied |
+|---|---|---|---|
+| 28 | Length extension | Early AWS signature schemes exploited via length extension | Removed from site — no confirmed AWS-specific exploit could be sourced |
+
+#### UNVERIFIED — Can't confirm, no source found (remaining)
 
 | # | Section | Claim | Issue | Suggested Fix |
 |---|---|---|---|---|
-| 28 | Length extension | Early AWS signature schemes exploited via length extension | AWS Sig V2 used HMAC (immune to length extension). No confirmed AWS-specific exploit found. | Remove "early AWS signature schemes" or cite a specific source |
 | 60 | HTTPS | Let's Encrypt issues 10M+ certificates/day | Plausible but unverified against current stats. | Check https://letsencrypt.org/stats/ and update the number |
 
-#### MISLEADING — Contains truth but framing distorts it
+#### ~~MISLEADING~~ FIXED (second pass)
+
+| # | Section | Claim | Fix Applied |
+|---|---|---|---|
+| 54 | Quantum | Longer BLAKE3 outputs help post-quantum | Revised to frame speed advantage without false security claim |
+| 11 | SHA-256 card | "Needs hardware acceleration to stay fast" | Changed to "Relies on hardware acceleration to match modern alternatives" |
+| 24 | Weaknesses intro | "six known weaknesses" | Changed to "six limitations" with categorization (2 security, 2 performance, 1 design, 1 future risk) |
+| 10 | SHA-256 card | "Can't parallelize" | Changed to "can't parallelize a single message" |
+| 87 | Email & signing | "Every signed PDF uses SHA-256" | Already fixed in first pass to "Most modern signed PDFs" |
+
+#### MISLEADING — Contains truth but framing distorts it (remaining)
 
 | # | Section | Claim | Issue | Suggested Fix |
 |---|---|---|---|---|
-| 54 | Quantum | Longer BLAKE3 outputs help post-quantum | BLAKE3's internal state is 256-bit regardless of output length. Longer outputs don't increase preimage resistance beyond that. Grover's still reduces to 128-bit. | Remove this claim or reframe around BLAKE3's XOF flexibility for non-security use cases |
-| 11 | SHA-256 card | "Needs hardware acceleration to stay fast" | SHA-256 does ~200-500 MB/s in pure software — perfectly usable. It needs HW to match BLAKE3, not to "stay fast." | Reword to "Relies on hardware acceleration to match modern alternatives" |
-| 24 | Weaknesses intro | "six known weaknesses" | Conflates security flaws (length extension, M-D attacks), performance limitations (sequential, no streaming), design gaps (no domain separation), and universal properties (quantum). | Consider "six limitations" or separate into security vs. performance categories |
-| 10 | SHA-256 card | "Can't parallelize" | True for single-message hashing, but stated without qualification. Multiple messages can be parallelized; tree-hashing wrappers exist. | Add "for a single message" qualifier |
-| 87 | Email & signing | "Every signed PDF uses SHA-256" | Legacy PDFs may use SHA-1; spec supports SHA-384/512. | Change "Every" to "Most modern" |
 | 115 | Device detection (data.js) | ARMv8.x Crypto Extension version mapping | Labels like "ARMv8.3 Crypto Extensions" imply the SHA-256 instructions changed per version. They've been the same since ARMv8.0. | Change labels to "ARMv8.x-A with Crypto Extensions" |
 
 #### TRUE (nuanced) — Correct but worth noting qualifications
