@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: Why Can't the Government Use BLAKE3?</title>
+  <meta name="description" content="Why BLAKE3 isn't approved for US federal government use — explained like you're five. The bureaucracy, the politics, and what it means in practice.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-green">ELI5</span>
+      <h1 class="hero-title">Why can't the government use BLAKE3?</h1>
+      <p class="hero-sub">It's faster and stronger — but the US government won't touch it. Here's why, and what it would take to change that.</p>
+    </div>
+  </section>
+
+  <!-- The Approval Process -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The bureaucracy</p>
+      <h2 class="section-title reveal">How does a hash function get "approved"?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📋</span>
+        <h3 class="analogy-title">It's like getting a toy on the school's approved list</h3>
+        <p class="analogy-body">Imagine your school has a rule: you can only play with toys on the <strong>Approved Toy List</strong>. Even if you have the coolest, safest toy ever made, you can't bring it to school unless it's on the list. The list is made by a special committee (called <strong>NIST</strong>), and they only add new toys when <strong>they</strong> decide to — you can't just ask.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏗️</span>
+        <h3 class="analogy-title">The approval process takes forever</h3>
+        <p class="analogy-body">When NIST decides to add a new hash function, they hold a big <strong>competition</strong>. Cryptographers from around the world submit their designs. NIST tests them for years — poking, prodding, trying to break them. The last competition took <strong>8 years</strong> from start to finish. And NIST only starts one when they think it's necessary.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number green">1</span>
+          <div class="step-content">
+            <h4>NIST announces a competition</h4>
+            <p>They publish a notice saying "we need a new hash function." This only happens when there's a reason — like worries about existing ones.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number green">2</span>
+          <div class="step-content">
+            <h4>Cryptographers submit designs</h4>
+            <p>For SHA-3, 64 designs were submitted from all over the world. Each one gets tested and attacked by other experts.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number green">3</span>
+          <div class="step-content">
+            <h4>Years of elimination rounds</h4>
+            <p>64 became 14, then 5 finalists, then 1 winner. The whole process took from 2007 to 2015.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number green">4</span>
+          <div class="step-content">
+            <h4>The winner becomes a "FIPS" standard</h4>
+            <p>NIST publishes it as an official Federal Information Processing Standard. Only then can government systems use it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The approved list today</p>
+        <p>Right now, the only FIPS-approved hash functions are <strong>SHA-2</strong> (including SHA-256) and <strong>SHA-3</strong> (Keccak). That's it. No BLAKE variant has ever been on this list — not BLAKE, not BLAKE2, not BLAKE3.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Political Story -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The politics</p>
+      <h2 class="section-title reveal">BLAKE almost made it once</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏆</span>
+        <h3 class="analogy-title">BLAKE2 was a finalist — and many thought it should've won</h3>
+        <p class="analogy-body">When NIST held the SHA-3 competition, BLAKE's parent (called <strong>BLAKE</strong>, the original) was one of the <strong>5 finalists</strong> out of 64 submissions. Experts rated it among the best for both security and speed. Many cryptographers publicly said BLAKE was the stronger overall candidate.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🎨</span>
+        <h3 class="analogy-title">But NIST wanted something different — literally</h3>
+        <p class="analogy-body">Here's the twist: BLAKE's design is <strong>similar</strong> to SHA-256 under the hood. They're like cousins. NIST wanted SHA-3 to be a <strong>completely different kind</strong> of algorithm — so that if someone found a flaw in the SHA-256 family's approach, SHA-3 wouldn't have the same flaw. They picked <strong>Keccak</strong>, which uses a radically different "sponge" design. BLAKE lost not because it was worse, but because it was <strong>too similar to what they already had</strong>.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔑</span>
+        <h3 class="analogy-title">Who designs these things, anyway?</h3>
+        <p class="analogy-body"><strong>SHA-256</strong> was designed by the <strong>NSA</strong> (yes, the spy agency) and published by NIST. That's the official record — not a conspiracy theory. <strong>SHA-3</strong> was designed by a European team through an open competition. <strong>BLAKE3</strong> was designed by independent cryptographers with no government involvement. Some people trust government-designed algorithms less after the NSA was caught hiding a <strong>backdoor</strong> in a different NIST-approved tool in 2013.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The backdoor scandal</p>
+        <p>In 2013, leaked documents revealed the NSA had secretly placed a backdoor in a NIST-approved random number generator called Dual_EC_DRBG — and paid RSA Security $10 million to make it the default in their products. NIST withdrew the algorithm, but the damage to trust was done. This is important context for why some experts prefer algorithms designed outside government influence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Consequences -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The consequences</p>
+      <h2 class="section-title reveal">What happens in practice?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🚫</span>
+        <h3 class="analogy-title">It's not just "not recommended" — it's blocked</h3>
+        <p class="analogy-body">When a government computer runs in <strong>FIPS mode</strong>, any software that tries to use BLAKE3 is <strong>literally stopped from working</strong>. The system won't run it. It's like a bouncer checking your ID against the approved list — if you're not on it, you don't get in. Period.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number orange">1</span>
+          <div class="step-content">
+            <h4>WireGuard VPN breaks</h4>
+            <p>WireGuard — one of the most popular modern VPN tools — uses BLAKE3 internally. On government systems in FIPS mode, WireGuard simply cannot run. Red Hat's official documentation says: disable FIPS mode to use WireGuard.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">2</span>
+          <div class="step-content">
+            <h4>Modern filesystems break</h4>
+            <p>The btrfs and OpenZFS filesystems use BLAKE for data integrity. In FIPS mode, these filesystem operations fail. Government systems are stuck with older filesystem technology.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">3</span>
+          <div class="step-content">
+            <h4>It's not just the government</h4>
+            <p>Banks, hospitals, defense contractors, and cloud providers serving federal agencies all need FIPS compliance. If you sell software to the government, you can't use BLAKE3 anywhere in your cryptographic stack.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">4</span>
+          <div class="step-content">
+            <h4>Non-compliance has real teeth</h4>
+            <p>Using non-approved algorithms can mean lost contracts, failed audits, penalties, and expensive recertification. Companies choose slower, older algorithms specifically to stay compliant.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-table reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Sector</th>
+              <th>Why they need FIPS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Federal agencies</td>
+              <td>Required by law (FISMA)</td>
+            </tr>
+            <tr>
+              <td>Defense / DoD</td>
+              <td>Mandatory for all systems</td>
+            </tr>
+            <tr>
+              <td>Cloud (FedRAMP)</td>
+              <td>Required to serve gov clients</td>
+            </tr>
+            <tr>
+              <td>Healthcare</td>
+              <td>HIPAA encryption standards</td>
+            </tr>
+            <tr>
+              <td>Finance</td>
+              <td>PCI DSS references NIST</td>
+            </tr>
+            <tr>
+              <td>Gov contractors</td>
+              <td>Contract requirements</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Can it change? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The future</p>
+      <h2 class="section-title reveal">Could BLAKE3 ever get approved?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🐌</span>
+        <h3 class="analogy-title">It's possible — but don't hold your breath</h3>
+        <p class="analogy-body">In 2023, a Linux developer formally asked NIST to consider approving BLAKE, pointing out that FIPS mode breaks real software like WireGuard and modern filesystems. <strong>NIST didn't act on it.</strong> Their current focus is on post-quantum cryptography — preparing for the day quantum computers can break today's encryption. Hash functions aren't on their radar right now.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📝</span>
+        <h3 class="analogy-title">The BLAKE3 team tried a different door</h3>
+        <p class="analogy-body">In July 2024, the BLAKE3 creators submitted a draft to the <strong>IETF</strong> (the group that manages internet standards, separate from NIST). But it expired in January 2025 without advancing — and even if it had, an IETF standard doesn't equal FIPS approval. They're different clubs with different membership lists.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The Catch-22</p>
+        <p>BLAKE3 can't get approved without NIST starting a process. NIST won't start a process unless they see a need. SHA-256 isn't broken. So the fastest, most modern hash function in the world sits outside the approved list — not because anything is wrong with it, but because nothing is wrong enough with what's already there.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <h4>Could NIST open a new competition?</h4>
+            <p>Possible, but there's no sign of it. Their plate is full with post-quantum cryptography through at least 2027.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <h4>Could NIST just add it to the list?</h4>
+            <p>Theoretically, but they've never added an externally-designed algorithm without a formal competition. It would be unprecedented.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <h4>How long would it take?</h4>
+            <p>Even if NIST started tomorrow: minimum 3-5 years for the standardization process alone. If they held a full competition first, add another 5-8 years.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">So what's the deal?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏛️</span>
+        <h3 class="analogy-title">Better technology doesn't automatically mean approved technology</h3>
+        <p class="analogy-body">BLAKE3 is faster, structurally stronger, and free of government influence in its design. But the US government's approval system moves on its own schedule, for its own reasons. Until NIST decides to act — and right now, they have no plans to — <strong>BLAKE3 remains the best hash function you're not allowed to use</strong> if you work with the federal government.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/blake3.html">&larr; BLAKE3</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/eli5/sha-256.html">SHA-256 &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-tagline">Making cryptography approachable.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
+    </div>
+  </footer>
+
+  <script src="/eli5/eli5.js"></script>
+</body>
+</html>

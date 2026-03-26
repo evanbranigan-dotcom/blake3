@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: Who's Actually Using BLAKE3?</title>
+  <meta name="description" content="Which projects have adopted BLAKE3 and which are stuck on SHA-256 — explained simply. Real-world adoption, from Linux to gaming to cloud storage.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-green">ELI5</span>
+      <h1 class="hero-title">Who's actually using BLAKE3?</h1>
+      <p class="hero-sub">It's faster and stronger — but is anyone using it in the real world? More than you'd think.</p>
+    </div>
+  </section>
+
+  <!-- The Movers -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Already switched</p>
+      <h2 class="section-title reveal">Projects that use BLAKE3 today</h2>
+      <p class="section-intro reveal">These aren't experiments — they're production systems used by millions of people every day.</p>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🐧</span>
+        <h3 class="analogy-title">Linux kernel</h3>
+        <p class="analogy-body">The operating system that runs most of the world's servers, Android phones, and cloud infrastructure added BLAKE3 support in 2025. When the Linux kernel adopts something, the rest of the ecosystem follows.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔒</span>
+        <h3 class="analogy-title">WireGuard VPN</h3>
+        <p class="analogy-body">One of the most respected VPN protocols uses BLAKE3 for key derivation. It's built into millions of devices and is the default VPN in many Linux distributions. (This is also why it <a href="/eli5/compliance.html">breaks on government systems</a> — BLAKE3 isn't FIPS-approved.)</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">💾</span>
+        <h3 class="analogy-title">btrfs & OpenZFS</h3>
+        <p class="analogy-body">Two major filesystems — the ones that actually store your files on disk — use BLAKE3 for data integrity checks. Every time you save a file, BLAKE3 creates a fingerprint to make sure nothing got corrupted. Faster hashing means faster file operations.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📦</span>
+        <h3 class="analogy-title">Rust & Cargo</h3>
+        <p class="analogy-body">The Rust programming language's package manager uses BLAKE3 to verify that downloaded code hasn't been tampered with. When developers install a library, BLAKE3 checks the fingerprint in milliseconds instead of seconds.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🎮</span>
+        <h3 class="analogy-title">Unreal Engine (UEFN)</h3>
+        <p class="analogy-body">Epic Games uses BLAKE3 in Unreal Editor for Fortnite's content pipeline. When game creators upload assets, BLAKE3 verifies everything is intact — fast enough to not slow down the creative process.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">☁️</span>
+        <h3 class="analogy-title">Cloudflare</h3>
+        <p class="analogy-body">One of the internet's biggest infrastructure companies uses BLAKE3 internally. When a company that handles ~20% of the world's web traffic picks your hash function, that's a strong vote of confidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Still on SHA-256 -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Still on SHA-256</p>
+      <h2 class="section-title reveal">Who hasn't switched (and why)</h2>
+      <p class="section-intro reveal">These aren't behind — they have real reasons for staying put.</p>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number orange">1</span>
+          <div class="step-content">
+            <h4>Bitcoin & cryptocurrency</h4>
+            <p>SHA-256 is baked into Bitcoin's core design. Changing it would require every miner, every wallet, and every exchange to upgrade simultaneously. It's not happening — and it doesn't need to. SHA-256 works fine for this.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">2</span>
+          <div class="step-content">
+            <h4>TLS / HTTPS (your browser)</h4>
+            <p>Every secure website uses SHA-256 in its certificate chain. The entire PKI (public key infrastructure) is built around it. Switching would take a decade of coordination across every browser, server, and certificate authority on Earth.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">3</span>
+          <div class="step-content">
+            <h4>Git & GitHub</h4>
+            <p>Git is migrating — but to SHA-256 (from SHA-1), not to BLAKE3. Why? Compatibility. Every git repository in the world uses SHA-1 object IDs. They chose the most widely supported upgrade path.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">4</span>
+          <div class="step-content">
+            <h4>Banking & healthcare</h4>
+            <p>Regulatory compliance (FIPS, PCI DSS, HIPAA) mandates government-approved algorithms. Even if a bank wanted BLAKE3, their auditors would say no. <a href="/eli5/compliance.html">More on this &rarr;</a></p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">5</span>
+          <div class="step-content">
+            <h4>AWS, Azure, Google Cloud</h4>
+            <p>Cloud providers need FIPS compliance to serve government clients. Their cryptographic libraries default to SHA-256 everywhere. BLAKE3 would mean maintaining two code paths — added complexity for unclear benefit.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Pattern -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The pattern</p>
+      <h2 class="section-title reveal">Where BLAKE3 wins vs. where SHA-256 stays</h2>
+
+      <div class="reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Uses BLAKE3</th>
+              <th>Uses SHA-256</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New open-source tools</td>
+              <td>WireGuard, Cargo, rclone</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>Filesystems</td>
+              <td>btrfs, OpenZFS</td>
+              <td>ext4 (no hashing)</td>
+            </tr>
+            <tr>
+              <td>OS kernels</td>
+              <td>Linux (2025)</td>
+              <td>Windows, macOS</td>
+            </tr>
+            <tr>
+              <td>Gaming / creative</td>
+              <td>Unreal Engine</td>
+              <td>Most game DRM</td>
+            </tr>
+            <tr>
+              <td>Web infrastructure</td>
+              <td>Cloudflare (internal)</td>
+              <td>TLS, certificates</td>
+            </tr>
+            <tr>
+              <td>Cryptocurrency</td>
+              <td>—</td>
+              <td>Bitcoin, Ethereum (Keccak)</td>
+            </tr>
+            <tr>
+              <td>Regulated industries</td>
+              <td>—</td>
+              <td>Banking, healthcare, gov</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🗺️</span>
+        <h3 class="analogy-title">The dividing line is clear</h3>
+        <p class="analogy-body">Projects that can <strong>choose freely</strong> — open-source tools, new infrastructure, gaming — are adopting BLAKE3. Projects <strong>locked into standards</strong> — banking, government, legacy protocols — stay on SHA-256. It's not about which is better. It's about who gets to decide.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What's next -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">What's next</p>
+      <h2 class="section-title reveal">Where is adoption heading?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📈</span>
+        <h3 class="analogy-title">BLAKE3 is on the growth curve</h3>
+        <p class="analogy-body">Every year, more projects adopt BLAKE3. The Linux kernel adoption in 2025 was a major tipping point — it signals to the rest of the ecosystem that BLAKE3 is mature, trusted, and production-ready. But the regulated world won't follow until <a href="/eli5/compliance.html">NIST acts</a>.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The two-speed world</p>
+        <p>We're heading toward a split: the open-source world running BLAKE3, and the regulated world running SHA-256 — not because of technical merit, but because of bureaucratic process. The technology has moved on. The paperwork hasn't.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">💡</span>
+        <h3 class="analogy-title">You can try it right now</h3>
+        <p class="analogy-body">Want to see how BLAKE3 performs on <strong>your</strong> device? The benchmark on this site runs both algorithms head-to-head, right in your browser. No downloads, no installs — just real numbers from your actual hardware.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/">Try the Benchmark &rarr;</a>
+        <a href="/eli5/blake3.html">&larr; What is BLAKE3?</a>
+        <a href="/eli5/">All topics</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-tagline">Making cryptography approachable.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
+    </div>
+  </footer>
+
+  <script src="/eli5/eli5.js"></script>
+</body>
+</html>

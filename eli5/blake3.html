@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: BLAKE3 — The Faster, Modern Hash Function</title>
+  <meta name="description" content="BLAKE3 explained like you're five. Learn why this modern hash function is faster than SHA-256 on every device — no special hardware needed.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-blue">ELI5</span>
+      <h1 class="hero-title">BLAKE3</h1>
+      <p class="hero-sub">The modern hash function that's faster on every device — without needing special hardware to get there.</p>
+    </div>
+  </section>
+
+  <!-- What is it? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The big idea</p>
+      <h2 class="section-title reveal">What is BLAKE3?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">A newer, faster fingerprint machine</h3>
+        <p class="analogy-body">Remember SHA-256 — the magic factory that turns anything into a 64-character code? BLAKE3 does the <strong>same job</strong>, but it was built in 2020 with modern ideas. It's like the difference between a flip phone and a smartphone — same purpose, completely different design.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">👨‍👩‍👧‍👦</span>
+        <h3 class="analogy-title">It comes from a good family</h3>
+        <p class="analogy-body">BLAKE3's grandparent, <strong>BLAKE2</strong>, was one of the finalists to become the next big government-approved hash function (called SHA-3). It didn't win the title, but everyone agreed it was excellent. BLAKE3 took everything great about that design and made it even faster.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>BLAKE3 was created by a team of four cryptographers and released as open-source in 2020. Anyone can look at the code, test it, or use it for free.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How is it different? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">What makes it special</p>
+      <h2 class="section-title reveal">Why is BLAKE3 faster?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🌳</span>
+        <h3 class="analogy-title">A tree, not a chain</h3>
+        <p class="analogy-body">SHA-256 works like a <strong>chain</strong> — each piece has to wait for the one before it. BLAKE3 works like a <strong>tree</strong>. It splits your data into pieces and works on lots of them at the same time. Then it combines the results, like branches joining into a trunk. More workers, less waiting.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">SHA-256: A chain (one at a time)</p>
+        <div class="chain-visual">
+          <div class="chain-block sha">1</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">2</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">3</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">4</div>
+        </div>
+        <p class="visual-caption">Each block waits. Only one worker can help.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">BLAKE3: A tree (all at once)</p>
+        <div class="tree-visual">
+          <div class="tree-row">
+            <div class="tree-node">Root</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">A+B</div>
+            <div class="tree-node">C+D</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">A</div>
+            <div class="tree-node">B</div>
+            <div class="tree-node">C</div>
+            <div class="tree-node">D</div>
+          </div>
+        </div>
+        <p class="visual-caption">All pieces at the bottom work at the same time. Results flow up like branches.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏊</span>
+        <h3 class="analogy-title">Like relay vs. freestyle</h3>
+        <p class="analogy-body">SHA-256 is like a relay race — each swimmer waits for the last one to finish. BLAKE3 is like having all the swimmers <strong>jump in at once</strong>, each taking a different lane. When they all finish, you combine their times. More lanes = faster results.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What else? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">More than just speed</p>
+      <h2 class="section-title reveal">What else is better?</h2>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <h4>No special hardware needed</h4>
+            <p>SHA-256 needs a special chip in your phone to be fast. BLAKE3 is fast in plain software — it works great on any device, even cheap ones without fancy hardware.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <h4>No "length extension" trick</h4>
+            <p>SHA-256 has a quirk where an attacker can sometimes add data to a hash without knowing the original input. BLAKE3 was designed from scratch without this weakness.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <h4>Verify pieces, not the whole thing</h4>
+            <p>Because BLAKE3 uses a tree, you can check if a small piece of a file is correct without downloading the entire file first. SHA-256 makes you download everything before you can check anything.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <div class="step-content">
+            <h4>One tool for many jobs</h4>
+            <p>BLAKE3 can be a hash, an encryption key generator, a message authenticator, and more — all from one algorithm. SHA-256 needs different helper tools for each job.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Side by side</p>
+      <h2 class="section-title reveal">BLAKE3 vs SHA-256</h2>
+
+      <div class="reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>SHA-256</th>
+              <th>BLAKE3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Born</td>
+              <td>2001</td>
+              <td>2020</td>
+            </tr>
+            <tr>
+              <td>Design</td>
+              <td>Chain (one at a time)</td>
+              <td>Tree (all at once)</td>
+            </tr>
+            <tr>
+              <td>Speed (software)</td>
+              <td>Slower</td>
+              <td>Much faster</td>
+            </tr>
+            <tr>
+              <td>Needs special chip?</td>
+              <td>Yes, to be competitive</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>Length extension attack?</td>
+              <td>Vulnerable</td>
+              <td>Immune</td>
+            </tr>
+            <tr>
+              <td>Government approved?</td>
+              <td>Yes</td>
+              <td>Not yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">So why isn't everyone using it?</p>
+        <p>Switching is hard. SHA-256 is built into standards, regulations, and billions of devices. It's not broken — so there's no emergency to replace it. BLAKE3 is gaining ground in new projects, but replacing 25 years of infrastructure takes time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">So what's the deal with BLAKE3?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🚀</span>
+        <h3 class="analogy-title">The better tool the world hasn't switched to yet</h3>
+        <p class="analogy-body">BLAKE3 is like a <strong>faster, smarter lock</strong> that doesn't need a special door to work. It's stronger in some ways, faster in every way, and free for anyone to use. The only thing it doesn't have is 25 years of history and a government stamp of approval. For new projects, it's the better choice. For the internet's existing plumbing, SHA-256 isn't going anywhere soon.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/sha-256.html">&larr; SHA-256</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/">Try the Benchmark &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-tagline">Making cryptography approachable.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
+    </div>
+  </footer>
+
+  <script src="/eli5/eli5.js"></script>
+</body>
+</html>

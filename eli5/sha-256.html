@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: SHA-256 — The Hash Function That Runs the Internet</title>
+  <meta name="description" content="SHA-256 explained like you're five. Simple analogies for the hash function behind passwords, Bitcoin, and every website you visit.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-orange">ELI5</span>
+      <h1 class="hero-title">SHA-256</h1>
+      <p class="hero-sub">The 25-year-old recipe that your phone, your bank, and the entire internet still use every single day.</p>
+    </div>
+  </section>
+
+  <!-- What is it? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The big idea</p>
+      <h2 class="section-title reveal">What is SHA-256?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏭</span>
+        <h3 class="analogy-title">A magic factory with one rule</h3>
+        <p class="analogy-body">Imagine a factory. You can throw <strong>anything</strong> into it — a letter, a book, a whole movie. It always spits out a code that's exactly <strong>64 characters</strong> long. Always the same length, no matter what you put in. And the same thing in always gives you the same code out.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔍</span>
+        <h3 class="analogy-title">A detective's best friend</h3>
+        <p class="analogy-body">Say your friend sends you a photo. How do you know nobody changed it along the way? You both run it through the factory. If you get the <strong>same 64-character code</strong>, the photo is exactly what your friend sent. If even one pixel changed, the code would be <strong>completely different</strong>.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>SHA stands for "Secure Hash Algorithm." The 256 means it makes a code that's 256 bits long — that's the 64 characters. It was created in 2001 by mathematicians working with the US government.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How does it work? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title reveal">What happens inside?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🧩</span>
+        <h3 class="analogy-title">Chop, mix, repeat</h3>
+        <p class="analogy-body">SHA-256 takes your data and chops it into small pieces — like cutting a long piece of paper into equal strips. Then it takes the first strip, <strong>scrambles</strong> it with a secret recipe of math, and passes the result to the next strip. That strip gets scrambled with the result from the first one. And so on, one after another, like a chain.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">How SHA-256 processes data</p>
+        <div class="chain-visual">
+          <div class="chain-block sha">1</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">2</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">3</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">4</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">5</div>
+        </div>
+        <p class="visual-caption">Each block waits for the one before it. One at a time, like a chain — no shortcuts.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⛓️</span>
+        <h3 class="analogy-title">The chain problem</h3>
+        <p class="analogy-body">Because each piece depends on the one before it, SHA-256 can only work on <strong>one piece at a time</strong>. Even if your phone has 6 super-fast workers (cores), only one of them can do the hashing. The others just sit and wait. This made sense in 2001 when phones had one core. Today, it's a bottleneck.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Where is it used? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Where you'll find it</p>
+      <h2 class="section-title reveal">SHA-256 is everywhere</h2>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number orange">1</span>
+          <div class="step-content">
+            <h4>Every website you visit</h4>
+            <p>See the lock icon in your browser? That's SHA-256 checking that the website is real and nobody tampered with the connection.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">2</span>
+          <div class="step-content">
+            <h4>Your passwords</h4>
+            <p>When you log in, your phone doesn't send your password — it sends the hash. The website checks if the hash matches. Even if hackers steal the database, they get hashes, not passwords.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">3</span>
+          <div class="step-content">
+            <h4>Bitcoin</h4>
+            <p>Every Bitcoin transaction is verified with SHA-256. Miners around the world do trillions of SHA-256 calculations every second trying to find the next block.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">4</span>
+          <div class="step-content">
+            <h4>Your text messages</h4>
+            <p>iMessage, Signal, and WhatsApp all use SHA-256 to make sure your encrypted messages haven't been changed along the way.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">5</span>
+          <div class="step-content">
+            <h4>App downloads</h4>
+            <p>When you download an app, your phone checks its SHA-256 fingerprint to make sure it's the real thing — not a fake with a virus inside.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>SHA-256 runs trillions of times every single day across all the world's devices. It's probably the most-used algorithm in human history — and it was designed before YouTube existed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Is it safe? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The big question</p>
+      <h2 class="section-title reveal">Is SHA-256 safe?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏰</span>
+        <h3 class="analogy-title">25 years and nobody's broken in</h3>
+        <p class="analogy-body">SHA-256 is like a castle that the world's smartest attackers have been trying to break into for 25 years. <strong>Nobody has succeeded.</strong> Not a single real-world attack. That's incredibly impressive — most security tools show cracks much sooner.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏗️</span>
+        <h3 class="analogy-title">Safe, but showing its age</h3>
+        <p class="analogy-body">The castle is still standing, but the <strong>design</strong> has some quirks. SHA-256 has a weakness called a "length extension attack" — it's like if someone could add extra rooms to your castle without having the key. Modern hash functions like BLAKE3 were designed without this flaw from the start.</p>
+      </div>
+
+      <div class="compare-table reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>SHA-256</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Age</td>
+              <td>25 years (2001)</td>
+            </tr>
+            <tr>
+              <td>Broken?</td>
+              <td>Never</td>
+            </tr>
+            <tr>
+              <td>Speed</td>
+              <td>Fast with special hardware</td>
+            </tr>
+            <tr>
+              <td>Uses all your cores?</td>
+              <td>No — one at a time</td>
+            </tr>
+            <tr>
+              <td>Government approved?</td>
+              <td>Yes (NIST/FIPS certified)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">So what's the deal with SHA-256?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🗝️</span>
+        <h3 class="analogy-title">Reliable, trusted, everywhere — but old</h3>
+        <p class="analogy-body">SHA-256 is like a <strong>really good lock</strong> that every building in the world uses. Nobody has ever picked it. But newer locks are faster to use, easier to install, and have fewer quirks. The world keeps using SHA-256 because changing every lock on every building is hard — not because it's the best lock available.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/blake3.html">Next: BLAKE3 &rarr;</a>
+        <a href="/eli5/">&larr; All topics</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-tagline">Making cryptography approachable.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
+    </div>
+  </footer>
+
+  <script src="/eli5/eli5.js"></script>
+</body>
+</html>

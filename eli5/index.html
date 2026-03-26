@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5 — Hash Functions Explained Simply</title>
+  <meta name="description" content="Hash functions explained like you're five. Simple analogies for BLAKE3 and SHA-256 — no jargon, just understanding.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-blue">Explain Like I'm 5</span>
+      <h1 class="hero-title">Hash functions,<br>made simple.</h1>
+      <p class="hero-sub">No jargon. No math. Just the ideas behind the technology that keeps your phone, your passwords, and your files safe.</p>
+    </div>
+  </section>
+
+  <!-- Topic Cards -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Pick a topic</p>
+      <h2 class="section-title">What do you want to understand?</h2>
+
+      <div class="nav-grid">
+        <a href="/eli5/sha-256.html" class="nav-card reveal">
+          <span class="nav-card-icon">🏛️</span>
+          <span class="nav-card-title">SHA-256</span>
+          <span class="nav-card-desc">The 25-year-old hash function that still runs the internet. Learn why it's everywhere and how it works.</span>
+          <span class="nav-card-arrow">Learn more &rarr;</span>
+        </a>
+
+        <a href="/eli5/blake3.html" class="nav-card reveal">
+          <span class="nav-card-icon">⚡</span>
+          <span class="nav-card-title">BLAKE3</span>
+          <span class="nav-card-desc">The modern replacement that's faster on every device. Learn what makes it different.</span>
+          <span class="nav-card-arrow">Learn more &rarr;</span>
+        </a>
+
+        <a href="/eli5/compliance.html" class="nav-card reveal">
+          <span class="nav-card-icon">🏛️</span>
+          <span class="nav-card-title">Why Can't the Gov Use BLAKE3?</span>
+          <span class="nav-card-desc">It's faster and stronger — but the US government won't touch it. The bureaucracy, the politics, and the real-world consequences.</span>
+          <span class="nav-card-arrow">Learn more &rarr;</span>
+        </a>
+
+        <a href="/eli5/private-sector.html" class="nav-card reveal">
+          <span class="nav-card-icon">🏢</span>
+          <span class="nav-card-title">Why Doesn't the Private Sector Use BLAKE3?</span>
+          <span class="nav-card-desc">There's no law stopping them. So why do most companies still use SHA-256? Inertia, defaults, and rational caution.</span>
+          <span class="nav-card-arrow">Learn more &rarr;</span>
+        </a>
+
+        <a href="/eli5/adoption.html" class="nav-card reveal">
+          <span class="nav-card-icon">🌍</span>
+          <span class="nav-card-title">Who's Actually Using BLAKE3?</span>
+          <span class="nav-card-desc">From the Linux kernel to WireGuard to gaming — which projects have switched and which are stuck on SHA-256.</span>
+          <span class="nav-card-arrow">Learn more &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is a hash function? -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">But first</p>
+      <h2 class="section-title reveal">What's a hash function?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🎨</span>
+        <h3 class="analogy-title">It's like a fingerprint machine for data</h3>
+        <p class="analogy-body">Imagine a magic machine. You put <strong>anything</strong> in — a photo, a word, an entire movie. It always gives you back a short code, like a fingerprint. The same thing in always makes the same fingerprint. But even a <strong>tiny</strong> change — one letter, one pixel — makes a completely different fingerprint.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🧁</span>
+        <h3 class="analogy-title">You can't un-bake a cupcake</h3>
+        <p class="analogy-body">A hash function is a <strong>one-way</strong> recipe. You can turn flour, eggs, and sugar into a cupcake — but you can't turn a cupcake back into flour, eggs, and sugar. That's what makes it useful for passwords: your phone stores the "cupcake" (the hash), not the recipe (your password).</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>Your phone probably runs a hash function thousands of times before you even finish your morning scroll. Every website you visit, every app you open — they all use hashing behind the scenes.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-tagline">Making cryptography approachable.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
+    </div>
+  </footer>
+
+  <script src="/eli5/eli5.js"></script>
+</body>
+</html>
