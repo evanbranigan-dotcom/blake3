@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: Why Doesn't the Private Sector Use BLAKE3?</title>
+  <meta name="description" content="Companies can use BLAKE3 — there's no law against it. So why don't most of them? The real reasons, explained simply.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-orange">ELI5</span>
+      <h1 class="hero-title">Why doesn't the private sector use BLAKE3?</h1>
+      <p class="hero-sub">There's no law stopping them. No regulation banning it. So why do most companies still use SHA-256 for everything?</p>
+    </div>
+  </section>
+
+  <!-- The Short Answer -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The short answer</p>
+      <h2 class="section-title reveal">They <em>can</em> — they just don't</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔧</span>
+        <h3 class="analogy-title">It's like switching from inches to metric</h3>
+        <p class="analogy-body">Metric is objectively better — cleaner math, used by most of the world. But American companies still use inches. Not because inches are great, but because <strong>every tool, every blueprint, every supplier</strong> already speaks inches. Switching costs real money and creates real risk, even when the alternative is clearly better.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏗️</span>
+        <h3 class="analogy-title">SHA-256 isn't just a function — it's infrastructure</h3>
+        <p class="analogy-body">SHA-256 isn't a line of code you swap out. It's woven into <strong>libraries, protocols, APIs, vendor contracts, compliance frameworks, and audit reports</strong>. Every system that touches cryptography has SHA-256 assumptions baked in. Replacing it means touching everything — and "everything" is expensive.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Real Reasons -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The real reasons</p>
+      <h2 class="section-title reveal">Five things keeping companies on SHA-256</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📋</span>
+        <h3 class="analogy-title">1. "Nobody ever got fired for choosing SHA-256"</h3>
+        <p class="analogy-body">It's the old IBM rule — pick the safe, boring option that everyone else uses. If something goes wrong with SHA-256, you were following best practices. If something goes wrong with BLAKE3, you have to explain why you went off-script. Engineers avoid career risk, even when the technical choice is obvious.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔗</span>
+        <h3 class="analogy-title">2. Libraries and frameworks default to SHA-256</h3>
+        <p class="analogy-body">When you use OpenSSL, AWS SDKs, Azure libraries, or Google Cloud APIs, SHA-256 is the <strong>default</strong>. Developers don't usually choose a hash function — they use whatever the library gives them. And the libraries give them SHA-256 because that's what the standards say. It's defaults all the way down.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🤝</span>
+        <h3 class="analogy-title">3. Interoperability — you have to speak the same language</h3>
+        <p class="analogy-body">Your app talks to other apps. Your API talks to partner APIs. If your payment processor uses SHA-256 for webhook signatures, <strong>you</strong> use SHA-256. If the OAuth standard says SHA-256, your login system uses SHA-256. You can't switch your half of the handshake without the other side switching too.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏦</span>
+        <h3 class="analogy-title">4. Compliance by osmosis</h3>
+        <p class="analogy-body">Even companies that don't <em>need</em> FIPS certification often follow FIPS guidelines anyway. Why? Because their <strong>customers</strong> might need it. A startup selling to banks needs FIPS. A SaaS company eyeing government contracts needs FIPS. So everyone builds for FIPS from day one — just in case. And FIPS means SHA-256.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🤷</span>
+        <h3 class="analogy-title">5. "It's not broken — why fix it?"</h3>
+        <p class="analogy-body">This is the strongest argument, and it's not wrong. SHA-256 has <strong>never been broken</strong>. For most applications, hashing speed isn't the bottleneck — network latency, database queries, and rendering are. If switching hash functions saves 2 milliseconds but takes a month of engineering, most companies will (reasonably) pass.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Where it matters -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Where speed matters</p>
+      <h2 class="section-title reveal">When should companies switch?</h2>
+      <p class="section-intro reveal">BLAKE3 isn't better for everything. But there are specific cases where the speed difference is dramatic.</p>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number green">1</span>
+          <div class="step-content">
+            <h4>Large file processing</h4>
+            <p>Cloud storage, backup services, CI/CD pipelines — anything hashing gigabytes of data. BLAKE3's parallelism means it can use all CPU cores. SHA-256 can only use one. The difference can be 5-15x.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number green">2</span>
+          <div class="step-content">
+            <h4>Content-addressable storage</h4>
+            <p>Systems like Docker, IPFS, or deduplication engines that hash every single chunk of data. When you hash millions of chunks per hour, faster hashing means real cost savings.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number green">3</span>
+          <div class="step-content">
+            <h4>IoT and embedded devices</h4>
+            <p>Cheap microcontrollers don't have SHA-256 hardware acceleration. BLAKE3 is fast in pure software — no special chip needed. For devices where every millisecond of battery life counts, that matters.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number green">4</span>
+          <div class="step-content">
+            <h4>Build systems and package managers</h4>
+            <p>Verifying thousands of files during a software build. Rust's Cargo already switched. Others — npm, pip, Maven — could benefit from the same speedup.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The cost of switching -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The math</p>
+      <h2 class="section-title reveal">What does switching actually cost?</h2>
+
+      <div class="reveal">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Cost</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Code changes</td>
+              <td>Usually small — swap one function call. The hash function itself is a black box.</td>
+            </tr>
+            <tr>
+              <td>Testing</td>
+              <td>Moderate — every system that touches hashes needs regression testing.</td>
+            </tr>
+            <tr>
+              <td>Migration</td>
+              <td>Can be large — if you store hashes (passwords, file checksums), old hashes don't convert to new ones. You need a transition period.</td>
+            </tr>
+            <tr>
+              <td>Compliance</td>
+              <td>Potentially huge — if your auditors expect SHA-256, you need to justify the change.</td>
+            </tr>
+            <tr>
+              <td>Dependencies</td>
+              <td>Variable — if your cloud provider or library doesn't support BLAKE3, you're stuck.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The real blocker</p>
+        <p>For most companies, the issue isn't technical difficulty — it's <strong>organizational inertia</strong>. Nobody owns "hash function strategy." There's no team whose job it is to evaluate better algorithms. SHA-256 works, so it stays. The upgrade has no champion and no deadline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">So what's the deal?</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚖️</span>
+        <h3 class="analogy-title">It's a perfectly rational trap</h3>
+        <p class="analogy-body">Every individual company is making a reasonable choice: SHA-256 works, switching has costs, and nobody is forcing them. But zoom out and the picture is absurd — <strong>billions of devices running a 25-year-old algorithm</strong> when something dramatically faster exists, simply because nobody wants to go first. The private sector isn't blocked by law like the government. It's blocked by inertia, defaults, and the very reasonable human instinct to not fix what isn't broken.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/compliance.html">&larr; Why can't the gov?</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/eli5/adoption.html">Who's using BLAKE3? &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-tagline">Making cryptography approachable.</p>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">Loon Labs</a> experiment</p>
+    </div>
+  </footer>
+
+  <script src="/eli5/eli5.js"></script>
+</body>
+</html>
