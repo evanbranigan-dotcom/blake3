@@ -603,6 +603,210 @@ body {
   color: var(--accent-blue);
 }
 
+/* ── State Matrix (4×4 or 2×4 grid for algorithm internals) ── */
+.state-matrix {
+  display: grid;
+  gap: 6px;
+  padding: 16px 0;
+  justify-content: center;
+}
+
+.state-matrix.cols-4 {
+  grid-template-columns: repeat(4, 52px);
+}
+
+.state-matrix.cols-8 {
+  grid-template-columns: repeat(8, 52px);
+}
+
+.state-cell {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.state-cell.sha {
+  background: var(--accent-orange);
+}
+
+.state-cell.blake {
+  background: var(--accent-blue);
+}
+
+.state-cell.dim {
+  opacity: 0.5;
+}
+
+/* ── Data Flow (vertical pipeline) ── */
+.data-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 16px 0;
+}
+
+.data-flow-stage {
+  background: var(--bg-blue);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 24px;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+}
+
+.data-flow-stage.sha {
+  background: var(--bg-warm);
+}
+
+.data-flow-stage-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-blue);
+  margin-bottom: 4px;
+}
+
+.data-flow-stage.sha .data-flow-stage-label {
+  color: var(--accent-orange);
+}
+
+.data-flow-stage-desc {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.data-flow-arrow {
+  width: 2px;
+  height: 24px;
+  background: var(--border);
+  position: relative;
+}
+
+.data-flow-arrow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -3px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid var(--border);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+/* ── Round Visual (compact bar) ── */
+.round-visual {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 16px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.round-pip {
+  width: 12px;
+  height: 28px;
+  border-radius: 3px;
+  background: var(--accent-blue);
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+
+.round-pip.sha {
+  background: var(--accent-orange);
+}
+
+.round-pip.active {
+  opacity: 1;
+}
+
+.round-pip:hover {
+  opacity: 1;
+}
+
+.round-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* ── XOF Demo (one input, many outputs) ── */
+.xof-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.xof-input {
+  background: var(--accent-blue);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.xof-outputs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+
+.xof-output {
+  height: 28px;
+  border-radius: 4px;
+  background: var(--bg-blue);
+  border: 1px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* ── Go Deeper CTA ── */
+.go-deeper {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  background: var(--bg-blue);
+  border-color: var(--accent-blue);
+}
+
+.go-deeper.sha {
+  background: var(--bg-warm);
+  border-color: var(--accent-orange);
+}
+
+.go-deeper .nav-card-arrow {
+  color: var(--accent-blue);
+}
+
+.go-deeper.sha .nav-card-arrow {
+  color: var(--accent-orange);
+}
+
 /* ── Scroll Reveal ── */
 .reveal {
   opacity: 0;
@@ -627,6 +831,10 @@ body {
   .chain-visual { gap: 5px; }
   .chain-block { width: 40px; height: 40px; font-size: 0.6rem; }
   .bottom-nav { flex-direction: column; }
+  .state-matrix.cols-8 { grid-template-columns: repeat(4, 48px); }
+  .state-cell { width: 48px; height: 48px; font-size: 0.65rem; }
+  .data-flow-stage { padding: 12px 18px; }
+  .round-pip { width: 8px; height: 22px; }
 }
 
 @media (max-width: 480px) {
@@ -636,4 +844,9 @@ body {
   .compare-table th,
   .compare-table td { padding: 10px 14px; font-size: 0.85rem; }
   .nav-card { padding: 24px 20px; }
+  .state-matrix.cols-4 { grid-template-columns: repeat(4, 44px); }
+  .state-matrix.cols-8 { grid-template-columns: repeat(4, 44px); }
+  .state-cell { width: 44px; height: 44px; font-size: 0.6rem; }
+  .round-pip { width: 6px; height: 18px; }
+  .xof-output { font-size: 0.65rem; }
 }

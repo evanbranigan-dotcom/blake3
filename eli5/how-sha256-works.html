@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: How SHA-256 Works Under the Hood</title>
+  <meta name="description" content="Step inside the SHA-256 algorithm. Padding, message schedules, 64 rounds of compression — how it actually turns data into a fingerprint, explained simply.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-orange">ELI5 &mdash; Deep Dive</span>
+      <h1 class="hero-title">How SHA-256<br>actually works</h1>
+      <p class="hero-sub">The real steps inside the algorithm — explained with analogies, not math papers.</p>
+    </div>
+  </section>
+
+  <!-- Step 1: Padding & Parsing -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 1</p>
+      <h2 class="section-title reveal">Padding &amp; parsing</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📦</span>
+        <h3 class="analogy-title">Packing boxes to fill a truck</h3>
+        <p class="analogy-body">SHA-256 can only work on data in <strong>512-bit chunks</strong> — think of those as fixed-size boxes. But your message is almost never exactly the right size. So the first step is <strong>padding</strong>: you add extra filler to the end of your message until it fits perfectly into a whole number of boxes. It's like packing a moving truck — you stuff padding around your furniture so everything fills the space exactly.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Follow the data</p>
+        <div class="data-flow">
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">Your message</p>
+            <p class="data-flow-stage-desc">Any length — could be 3 bytes or 3 gigabytes</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">Padded message</p>
+            <p class="data-flow-stage-desc">A "1" bit, then zeros, then the original length — now a multiple of 512 bits</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">Parsed into blocks</p>
+            <p class="data-flow-stage-desc">Block 1 (512 bits) &rarr; Block 2 &rarr; Block 3 &rarr; ...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Why the original length?</p>
+        <p>The last 64 bits of the padding always store how long your original message was. This prevents an attacker from adding extra data to a padded message and getting the same hash — the length would be wrong.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Message Schedule -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 2</p>
+      <h2 class="section-title reveal">The message schedule</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🃏</span>
+        <h3 class="analogy-title">16 cards become 64</h3>
+        <p class="analogy-body">Each 512-bit block gets split into <strong>16 words</strong> (32 bits each). But the compression function needs <strong>64 words</strong> to do its job. So SHA-256 takes those 16 original words and generates 48 more by mixing, shifting, and combining the ones it already has. It's like dealing 16 cards face-up, then creating 48 more by combining the values on the existing cards.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number orange">1</span>
+          <div class="step-content">
+            <h4>Start with 16 words</h4>
+            <p>The 512-bit block is carved into 16 pieces of 32 bits each — called W<sub>0</sub> through W<sub>15</sub>. These are the raw ingredients from your message.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">2</span>
+          <div class="step-content">
+            <h4>Expand to 64 words</h4>
+            <p>For each new word W<sub>16</sub> through W<sub>63</sub>, SHA-256 picks two earlier words, runs them through small mixing functions (called &sigma;<sub>0</sub> and &sigma;<sub>1</sub>), and adds them together. Each new word depends on words that came before it.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">3</span>
+          <div class="step-content">
+            <h4>Feed into the compression function</h4>
+            <p>These 64 words become the fuel for 64 rounds of mixing. One word per round — like adding one ingredient at a time to a recipe.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>This expansion is what makes SHA-256 so thorough — by the time it's done, every single bit of your original message has influenced every part of the hash. Change one bit, and the whole schedule changes, which cascades through all 64 rounds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: Compression Function -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 3</p>
+      <h2 class="section-title reveal">The compression function</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🫗</span>
+        <h3 class="analogy-title">Eight cups, shuffled 64 times</h3>
+        <p class="analogy-body">Imagine 8 cups labeled <strong>a</strong> through <strong>h</strong>, each holding a number. In every round, the cups get shuffled: some values are mixed together with bitwise math, a word from the schedule is stirred in, and a special constant is added. Then the whole row shifts over. After 64 rounds of this, the original values are unrecognizable.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">The 8 working variables</p>
+        <div class="state-matrix cols-8">
+          <div class="state-cell sha">a</div>
+          <div class="state-cell sha">b</div>
+          <div class="state-cell sha">c</div>
+          <div class="state-cell sha">d</div>
+          <div class="state-cell sha">e</div>
+          <div class="state-cell sha">f</div>
+          <div class="state-cell sha">g</div>
+          <div class="state-cell sha">h</div>
+        </div>
+        <p class="visual-caption">Eight 32-bit values that get scrambled through 64 rounds. Each round mixes in one scheduled word and one constant.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">64 rounds of mixing</p>
+        <div class="round-visual">
+          <div class="round-pip sha active"></div>
+          <div class="round-pip sha active"></div>
+          <div class="round-pip sha active"></div>
+          <div class="round-pip sha active"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha"></div>
+          <div class="round-pip sha active"></div>
+        </div>
+        <p class="round-label">64 rounds &mdash; each one stirs in a word from the schedule and a constant from the primes</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number orange">1</span>
+          <div class="step-content">
+            <h4>Compute two temporary values</h4>
+            <p>T<sub>1</sub> combines the current values of <strong>e</strong>, <strong>f</strong>, <strong>g</strong>, <strong>h</strong>, plus the round constant and the scheduled word. T<sub>2</sub> mixes <strong>a</strong>, <strong>b</strong>, and <strong>c</strong>. These use bitwise operations — rotations, shifts, XOR, AND — that are cheap for hardware but deeply scramble the data.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">2</span>
+          <div class="step-content">
+            <h4>Shift the row</h4>
+            <p>Every variable moves down one position: <strong>g</strong> gets the old <strong>f</strong>, <strong>f</strong> gets the old <strong>e</strong>, and so on. The old <strong>h</strong> is discarded (its contribution is already baked into T<sub>1</sub>).</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">3</span>
+          <div class="step-content">
+            <h4>Inject the new values</h4>
+            <p><strong>a</strong> gets T<sub>1</sub> + T<sub>2</sub>, and <strong>e</strong> gets the old <strong>d</strong> + T<sub>1</sub>. These two injection points ensure every round changes multiple variables at once.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">4</span>
+          <div class="step-content">
+            <h4>Repeat 64 times</h4>
+            <p>After 64 rounds, the 8 variables are thoroughly mixed. Each output bit depends on every input bit — this is the "avalanche effect" that makes hashing work.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Where do the constants come from?</p>
+        <p>The 8 initial values come from the square roots of the first 8 prime numbers (2, 3, 5, 7, 11, 13, 17, 19). The 64 round constants come from the cube roots of the first 64 primes. Using irrational numbers means there's no hidden pattern an attacker could exploit — it's a "nothing up my sleeve" design.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 4: Merkle-Damgard Chain -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 4</p>
+      <h2 class="section-title reveal">The Merkle-Damg&aring;rd chain</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏃</span>
+        <h3 class="analogy-title">A relay race with batons</h3>
+        <p class="analogy-body">After the compression function finishes one block, its output becomes the <strong>starting state</strong> for the next block. It's like a relay race: the first runner hands a baton to the second, who hands it to the third. Each runner (block) changes the baton (state). The final runner's baton is the hash.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Each block feeds into the next</p>
+        <div class="chain-visual">
+          <div class="chain-block sha">IV</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">B1</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">B2</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">B3</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">H</div>
+        </div>
+        <p class="visual-caption">IV (initial values) &rarr; compress block 1 &rarr; compress block 2 &rarr; ... &rarr; final hash. Strictly sequential — no shortcuts.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🚪</span>
+        <h3 class="analogy-title">The length extension problem</h3>
+        <p class="analogy-body">Here's the design quirk: the final hash output <strong>is</strong> the internal state. That means if you know the hash of a message, you know the exact state the algorithm ended in — and you can <strong>keep going</strong>, compressing more blocks as if they were part of the original message. This is called a <strong>length extension attack</strong>. Modern hash functions like BLAKE3 fix this by processing the final block differently.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>The Merkle-Damg&aring;rd construction is named after Ralph Merkle and Ivan Damg&aring;rd, who independently proved it secure in 1979 and 1989. It's a brilliant design that has one job: make it possible to hash data of any length using a fixed-size compression function. SHA-256, SHA-1, and MD5 all use it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 5: Final Hash -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 5</p>
+      <h2 class="section-title reveal">The final hash</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🧬</span>
+        <h3 class="analogy-title">Eight numbers become your fingerprint</h3>
+        <p class="analogy-body">After the last block is compressed, the 8 working variables hold the final state. SHA-256 simply <strong>concatenates</strong> them — lines them up end to end. Eight 32-bit numbers &rarr; one 256-bit hash &rarr; written as 64 hexadecimal characters. That's your fingerprint.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">8 &times; 32 bits = 256 bits</p>
+        <div class="data-flow">
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">8 working variables</p>
+            <p class="data-flow-stage-desc">a &bull; b &bull; c &bull; d &bull; e &bull; f &bull; g &bull; h</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">Concatenate</p>
+            <p class="data-flow-stage-desc">Line them up: a || b || c || d || e || f || g || h</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">256-bit hash</p>
+            <p class="data-flow-stage-desc">e3b0c44298fc1c14...d57816d21d5b202d</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The avalanche effect</p>
+        <p>Change a single bit in the input and, on average, half the bits in the output will flip. After 64 rounds of mixing per block, plus the message schedule expansion, every output bit depends on every input bit. That's what makes SHA-256 a good hash function — even though the algorithm is completely deterministic, the output looks random.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Takeaway -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">The whole picture</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔗</span>
+        <h3 class="analogy-title">Clever, thorough, but sequential</h3>
+        <p class="analogy-body">SHA-256 is an elegantly simple machine: pad your data, expand each block into 64 words, crush it through 64 rounds of mixing, chain the result into the next block, and concatenate the final state. The design is <strong>proven and reliable</strong> — but it's a chain. Every block must wait for the one before it. On modern hardware with many cores, that's the bottleneck that BLAKE3 was built to solve.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/sha-256.html">&larr; SHA-256 Intro</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/eli5/how-blake3-works.html">How BLAKE3 Works &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">LoonLabs</a> project</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/eli5/eli5.js"></script>
+</body>
+</html>

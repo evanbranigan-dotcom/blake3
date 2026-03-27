@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: How BLAKE3 Works Under the Hood</title>
+  <meta name="description" content="Step inside the BLAKE3 algorithm. Chunks, Merkle trees, the 4x4 state matrix — how it actually hashes data in parallel, explained simply.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-blue">ELI5 &mdash; Deep Dive</span>
+      <h1 class="hero-title">How BLAKE3<br>actually works</h1>
+      <p class="hero-sub">The internal machinery of the modern hash function — chunks, trees, and a 4&times;4 grid of mixing.</p>
+    </div>
+  </section>
+
+  <!-- Step 1: Chunking -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 1</p>
+      <h2 class="section-title reveal">Split into chunks</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📜</span>
+        <h3 class="analogy-title">Slicing a scroll into pages</h3>
+        <p class="analogy-body">Instead of processing data one block at a time like SHA-256, BLAKE3 starts by slicing your entire input into <strong>1 KB chunks</strong> (1,024 bytes each). Think of it as taking a long scroll and cutting it into uniform pages. Each page can be processed <strong>independently</strong> — you don't need to wait for page 1 to finish before starting page 2.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Follow the data</p>
+        <div class="data-flow">
+          <div class="data-flow-stage">
+            <p class="data-flow-stage-label">Your message</p>
+            <p class="data-flow-stage-desc">Any length — could be a tweet or a movie file</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage">
+            <p class="data-flow-stage-label">Split into 1 KB chunks</p>
+            <p class="data-flow-stage-desc">Chunk 0 &bull; Chunk 1 &bull; Chunk 2 &bull; Chunk 3 &bull; ...</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage">
+            <p class="data-flow-stage-label">Compress each independently</p>
+            <p class="data-flow-stage-desc">All chunks can run at the same time on different cores</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Why 1 KB?</p>
+        <p>It's a sweet spot. Too small (like SHA-256's 64-byte blocks) and you spend too much time on overhead. Too large and you lose parallelism for small files. At 1 KB, even a 16 KB file gets split into 16 chunks that can run on 16 cores simultaneously.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Compression Function -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 2</p>
+      <h2 class="section-title reveal">The compression function</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🎛️</span>
+        <h3 class="analogy-title">A 4&times;4 grid, stirred two ways</h3>
+        <p class="analogy-body">Inside each chunk, BLAKE3 sets up a <strong>4&times;4 grid</strong> of 32-bit values — 16 "cups" arranged in rows and columns. Each round, the algorithm stirs them in two patterns: first down the <strong>columns</strong>, then along the <strong>diagonals</strong>. This ensures every value mixes with every other value quickly. It only needs <strong>7 rounds</strong> because the mixing function (called G) is powerful enough to do in 7 what SHA-256 needs 64 rounds to achieve.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">The 4&times;4 state matrix</p>
+        <div class="state-matrix cols-4">
+          <div class="state-cell blake">v0</div>
+          <div class="state-cell blake">v1</div>
+          <div class="state-cell blake">v2</div>
+          <div class="state-cell blake">v3</div>
+          <div class="state-cell blake">v4</div>
+          <div class="state-cell blake">v5</div>
+          <div class="state-cell blake">v6</div>
+          <div class="state-cell blake">v7</div>
+          <div class="state-cell blake">v8</div>
+          <div class="state-cell blake">v9</div>
+          <div class="state-cell blake">v10</div>
+          <div class="state-cell blake">v11</div>
+          <div class="state-cell blake">v12</div>
+          <div class="state-cell blake">v13</div>
+          <div class="state-cell blake">v14</div>
+          <div class="state-cell blake">v15</div>
+        </div>
+        <p class="visual-caption">Row 1: chaining values. Row 2: chaining values. Row 3: constants. Row 4: counter, block length, flags.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">7 rounds of mixing</p>
+        <div class="round-visual">
+          <div class="round-pip active"></div>
+          <div class="round-pip active"></div>
+          <div class="round-pip active"></div>
+          <div class="round-pip active"></div>
+          <div class="round-pip active"></div>
+          <div class="round-pip active"></div>
+          <div class="round-pip active"></div>
+        </div>
+        <p class="round-label">7 rounds &mdash; each one mixes columns, then diagonals</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <h4>Column mixing</h4>
+            <p>Apply the G function to each of the 4 columns: (v0, v4, v8, v12), (v1, v5, v9, v13), (v2, v6, v10, v14), (v3, v7, v11, v15). Each column gets two message words mixed in.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <h4>Diagonal mixing</h4>
+            <p>Apply G to the 4 diagonals: (v0, v5, v10, v15), (v1, v6, v11, v12), (v2, v7, v8, v13), (v3, v4, v9, v14). This cross-cuts the columns so every value influences every other.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <h4>Permute the message</h4>
+            <p>Before the next round, the 16 message words are shuffled into a new order. This means each round mixes in different words at different positions — maximizing diffusion.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <div class="step-content">
+            <h4>Output the chaining value</h4>
+            <p>After 7 rounds, the top two rows of the matrix (v0-v7) are XORed with the bottom two rows (v8-v15). The result is the 256-bit chaining value for this chunk.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Why only 7 rounds?</p>
+        <p>The G function inside BLAKE3 does more work per round than SHA-256's compression step. It uses addition, XOR, and bitwise rotation — three different operations that interact in ways that spread changes faster. Cryptographers have analyzed this and confirmed that 7 rounds provides a strong security margin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: Merkle Tree -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 3</p>
+      <h2 class="section-title reveal">The Merkle tree</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏆</span>
+        <h3 class="analogy-title">A tournament bracket</h3>
+        <p class="analogy-body">After each chunk is compressed into a chaining value, BLAKE3 combines them in pairs — like a <strong>sports tournament bracket</strong>. Chunk 0's output pairs with chunk 1's. Chunk 2 pairs with chunk 3. The winners pair up again, and again, until there's one <strong>root hash</strong> at the top. Any branch of the tree can be computed independently.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Chunk outputs combine upward</p>
+        <div class="tree-visual">
+          <div class="tree-row">
+            <div class="tree-node">Root</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">P01</div>
+            <div class="tree-node">P23</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">P0</div>
+            <div class="tree-node">P1</div>
+            <div class="tree-node">P2</div>
+            <div class="tree-node">P3</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">C0</div>
+            <div class="tree-node">C1</div>
+            <div class="tree-node">C2</div>
+            <div class="tree-node">C3</div>
+            <div class="tree-node">C4</div>
+            <div class="tree-node">C5</div>
+            <div class="tree-node">C6</div>
+            <div class="tree-node">C7</div>
+          </div>
+        </div>
+        <p class="visual-caption">8 chunks &rarr; 4 parent nodes &rarr; 2 parent nodes &rarr; 1 root hash. Each level can be computed in parallel.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">Why trees beat chains</h3>
+        <p class="analogy-body">In SHA-256's chain, block 10 must wait for blocks 1-9 to finish. In BLAKE3's tree, chunks 0 and 1 are independent, chunks 2 and 3 are independent — <strong>every pair is independent</strong>. This is why BLAKE3 scales linearly with the number of cores: 4 cores &asymp; 4&times; faster, 16 cores &asymp; 16&times; faster.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>The parent node compression uses the same compression function as the leaf chunks — but with a PARENT flag so BLAKE3 knows it's combining two chaining values, not raw data. One function does everything.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 4: Counter & Flags -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 4</p>
+      <h2 class="section-title reveal">Counter &amp; flags</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📬</span>
+        <h3 class="analogy-title">Every page has a stamp</h3>
+        <p class="analogy-body">Since chunks are processed out of order and in parallel, BLAKE3 needs a way to tell them apart. Each chunk gets a <strong>counter</strong> (its position in the input) and <strong>flags</strong> (its role). These are baked into the bottom row of the 4&times;4 state matrix before compression, so even identical data at different positions produces different outputs.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <h4>Counter</h4>
+            <p>A 64-bit number that counts which chunk this is: chunk 0, chunk 1, chunk 2, and so on. It goes into v12 and v13 in the state matrix. This means the same data at position 5 hashes differently than the same data at position 9.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <h4>CHUNK_START / CHUNK_END</h4>
+            <p>The first block of a chunk gets a CHUNK_START flag. The last block gets CHUNK_END. If a chunk is only one block, it gets both. This tells the compression function where boundaries are.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <h4>PARENT</h4>
+            <p>When combining two chaining values in the Merkle tree, the PARENT flag is set. This distinguishes tree-internal operations from leaf-level chunk processing.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <div class="step-content">
+            <h4>ROOT</h4>
+            <p>The very last compression — whether it's a single chunk or the top of a tree — gets the ROOT flag. This is what prevents length extension attacks: only the root node produces the final output, and it's processed differently.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">5</span>
+          <div class="step-content">
+            <h4>Mode flags</h4>
+            <p>KEYED_HASH, DERIVE_KEY_CONTEXT, and DERIVE_KEY_MATERIAL flags activate BLAKE3's other modes. Same compression function, different flag — different purpose.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Fun fact</p>
+        <p>The counter is why BLAKE3 doesn't need the padding that SHA-256 requires. Since every chunk knows its position and length, there's no ambiguity about where the message ends — the CHUNK_END flag and the block length field handle it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 5: XOF / Multi-Purpose -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Step 5</p>
+      <h2 class="section-title reveal">One algorithm, many jobs</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🛠️</span>
+        <h3 class="analogy-title">The Swiss Army knife of hashing</h3>
+        <p class="analogy-body">Most hash functions do one thing: hash. SHA-256 gives you 256 bits, always. BLAKE3 can be a <strong>hash</strong>, a <strong>keyed hash</strong> (MAC), a <strong>key derivation function</strong> (KDF), and an <strong>extendable output function</strong> (XOF) — all from the same core. The only difference is which flags are set and what goes into the initial state.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <h4>Hash (default)</h4>
+            <p>Standard mode. Input goes in, a fixed-length (or extendable) hash comes out. The initial state uses the standard IV constants.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <h4>Keyed hash (MAC)</h4>
+            <p>Like a hash, but the initial state is loaded with a <strong>secret key</strong> instead of the IV. This lets you prove that a message is authentic — only someone with the key can produce the same hash. With SHA-256, you need a separate algorithm (HMAC) for this.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <h4>Key derivation (KDF)</h4>
+            <p>Takes a password or master key and derives sub-keys from it. BLAKE3 hashes the context string first (like "my-app-2024-encryption-key"), then uses that as the key to hash the input material. Two separate derive steps ensure domain separation.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <div class="step-content">
+            <h4>Extendable output (XOF)</h4>
+            <p>Most hash functions output a fixed number of bytes. BLAKE3 can output <strong>as many bytes as you want</strong>. It does this by repeatedly running the root compression with an incrementing counter, producing 64 new bytes each time. Need 32 bytes? Take the first 32. Need 1,000? Keep going.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Extendable output: same input, any length</p>
+        <div class="xof-demo">
+          <div class="xof-input">BLAKE3( data )</div>
+          <div class="xof-outputs">
+            <div class="xof-output" style="width: 40%;">32 bytes (default)</div>
+            <div class="xof-output" style="width: 60%;">64 bytes</div>
+            <div class="xof-output" style="width: 80%;">128 bytes</div>
+            <div class="xof-output" style="width: 100%;">any length you want...</div>
+          </div>
+        </div>
+        <p class="visual-caption">The root node can be "squeezed" for as many bytes as needed — no limit.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Why does this matter?</p>
+        <p>With SHA-256, you need different tools for different jobs: SHA-256 for hashing, HMAC-SHA-256 for authentication, HKDF-SHA-256 for key derivation. With BLAKE3, it's all one algorithm with one security proof. Fewer moving parts means fewer things that can go wrong.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Takeaway -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">The whole picture</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🌳</span>
+        <h3 class="analogy-title">Parallel by design</h3>
+        <p class="analogy-body">BLAKE3 was built for the world we live in now — multi-core processors, massive files, and the need for one tool that does many jobs. Split into chunks, compress them all at once, combine with a tree, stamp each piece with its position and role, and squeeze out as many bytes as you need. It's not just a faster SHA-256 — it's a fundamentally <strong>different architecture</strong> for the same problem.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/blake3.html">&larr; BLAKE3 Intro</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/">Try the Benchmark &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">LoonLabs</a> project</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/eli5/eli5.js"></script>
+</body>
+</html>
