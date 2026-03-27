@@ -1,12 +1,17 @@
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000?logo=vercel&logoColor=white)](https://blake3.loonlabs.dev)
+
+
 # BLAKE3 vs SHA-256 Benchmark
 
 > **Alpha / MVP** — This is an early experiment. The benchmark methodology is evolving and results should be treated as directional, not definitive. Contributions and feedback welcome.
 
-A mobile-first webapp that benchmarks BLAKE3 against SHA-256 on your device, with narrative storytelling and real-time results.
+A mobile-first web app that benchmarks BLAKE3 against SHA-256 on your device, with narrative storytelling, real-time results, and an educational ELI5 guide section.
 
-## Hosted version
+**[blake3.loonlabs.dev](https://blake3.loonlabs.dev)** — live on Vercel with HTTPS, so all four benchmark tests run including hardware-accelerated SHA-256.
 
-**[blake3.loonlabs.dev](https://blake3.loonlabs.dev)** — deployed on Vercel with HTTPS, so all four benchmark tests run including hardware-accelerated SHA-256.
+---
 
 ## What it tests
 
@@ -18,6 +23,22 @@ A mobile-first webapp that benchmarks BLAKE3 against SHA-256 on your device, wit
 | SHA-256 (HW) | Web Crypto API | Hardware-accelerated via ARM crypto extensions |
 
 Tests run at 4 data sizes: 1 KB, 100 KB, 1 MB, 10 MB.
+
+## ELI5 Guides
+
+The site includes a growing collection of **Explain Like I'm 5** guides at [`/eli5/`](https://blake3.loonlabs.dev/eli5/):
+
+| Guide | What it covers |
+|-------|---------------|
+| **SHA-256** | What it is, how it works at a high level, where it's used |
+| **How SHA-256 Works Under the Hood** | Padding, message schedules, 64 rounds, Merkle-Damgard chain |
+| **Six Weaknesses of SHA-256** | Length extension, sequential processing, no domain separation, and more |
+| **SHA-256 is Everywhere** | 10 real-world use cases with primary source citations |
+| **BLAKE3** | What it is, tree vs chain, why it's faster |
+| **How BLAKE3 Works Under the Hood** | 1 KB chunks, 4x4 state matrix, Merkle tree, counter/flags, XOF |
+| **Why Can't the Gov Use BLAKE3?** | NIST/FIPS certification, bureaucracy, compliance lock-in |
+| **Why Doesn't the Private Sector Use BLAKE3?** | Inertia, defaults, rational caution |
+| **Who's Actually Using BLAKE3?** | Linux kernel, WireGuard, gaming, and who's stuck on SHA-256 |
 
 ## Running locally
 
@@ -40,7 +61,7 @@ The Web Crypto API (`crypto.subtle`) requires a **secure context** — meaning H
 
 When accessing over HTTP on a local network (e.g. from your phone), the app gracefully falls back to a 3-way comparison without the hardware-accelerated test. A notice is displayed explaining why.
 
-Self-signed HTTPS via Vite's `@vitejs/plugin-basic-ssl` is included as a dev dependency but Safari on iOS rejects self-signed certs at the network level, so the hosted version is the most reliable way to get the full 4-way benchmark on a phone.
+The hosted version is the most reliable way to get the full 4-way benchmark on a phone — Safari on iOS rejects self-signed certs at the network level, so local HTTPS workarounds don't help.
 
 ## Why
 
@@ -52,15 +73,26 @@ BLAKE3's advantages over SHA-256:
 - **Verified streaming** — verify data integrity during download, not after
 - **Hardware independent** — fast everywhere, not just on chips with SHA extensions
 
+## Tech stack
+
+- **Bun** — package manager and runtime
+- **Vite** — build tool
+- **TypeScript** — strict mode, full type annotations across all source files
+- **hash-wasm** — BLAKE3 and SHA-256 via hand-tuned WebAssembly
+- **Web Crypto API** — browser-native hardware-accelerated SHA-256
+- **Web Workers** — parallel BLAKE3 hashing across CPU cores
+- **Vanilla TS + CSS** — no framework, minimal bundle (~21 KB gzipped JS)
+- **Vercel** — hosting (HTTPS, free tier)
+
 ## Bandwidth & hosting
 
 Deployed on the **Vercel Free Plan** (100 GB/month). The site is extremely lean:
 
 | Asset | Gzipped size |
 |-------|-------------|
-| HTML | ~7.3 KB |
-| CSS | ~4.3 KB |
-| JS (hash-wasm + app) | ~20.9 KB |
+| HTML | ~4.2 KB |
+| CSS | ~7.2 KB |
+| JS (hash-wasm + app) | ~20.7 KB |
 | Web Worker (loaded on demand) | ~8 KB |
 | OG image (WebP) | ~69 KB |
 | Favicon (SVG) | ~0.2 KB |
@@ -70,27 +102,9 @@ Deployed on the **Vercel Free Plan** (100 GB/month). The site is extremely lean:
 - Hashed filenames enable long browser caching; repeat visits transfer only ~7 KB (HTML)
 - Approximately **900,000+ unique visits/month** before hitting the free tier limit
 
-## Tech stack
-
-- **Vite** — build tool
-- **hash-wasm** — BLAKE3 and SHA-256 via hand-tuned WebAssembly
-- **Web Crypto API** — browser-native hardware-accelerated SHA-256
-- **Web Workers** — parallel BLAKE3 hashing across CPU cores
-- **TypeScript** — strict mode, full type annotations across all source files
-- **Vanilla TS + CSS** — no framework, minimal bundle (~21 KB gzipped JS)
-- **Vercel** — hosting (HTTPS, free tier)
-
-## Benchmark methodology
-
-- Random data generated via `crypto.getRandomValues()` (chunked to 64 KB for Safari compatibility)
-- Small data sizes use batch timing (many ops per measurement) to overcome browser timer resolution limits (~0.1ms due to Spectre mitigations)
-- Web Crypto API calls use `Promise.all()` batching to avoid per-call async bridge overhead
-- Each algorithm reports median throughput across multiple batches
-- Hash verification proves all implementations compute correct, matching results on the same input data
-
 ## Device detection
 
-The app detects iPhone models via screen dimensions, pixel ratio, and core count, mapping to chip generation and SHA-2 hardware acceleration status. Covers iPhone SE (2nd gen) through iPhone 16 Pro Max. Detection is best-effort — some models share screen characteristics.
+The app detects iPhone models via screen dimensions, pixel ratio, and core count, mapping to chip generation and SHA-2 hardware acceleration status. Covers iPhone SE (2nd gen) through iPhone 16 Pro Max. Android detection uses user agent model strings mapped to chip databases. Detection is best-effort — some models share screen characteristics, and Safari limits hardware fingerprinting for privacy.
 
 ## Future directions
 
@@ -102,30 +116,6 @@ We're exploring expanding the site beyond BLAKE3 vs SHA-256. Three prototype dir
 
 These are UI/UX mockups with hardcoded data, not yet wired to real benchmarks.
 
-## Methodology & fact-checking
-
-Every factual claim on the site has been [reviewed and sourced](/methodology.html). The methodology page documents:
-
-- **Benchmark methodology** — algorithms, timing approach, known limitations
-- **Primary sources** — RFCs, NIST publications, protocol specs for each claim
-- **Editorial caveats** — where we make judgment calls (e.g., "structurally stronger" framing)
-- **Correction log** — errors found and fixed, with dates and explanations
-
-Corrections made after fact-checking (March 2026, second pass):
-- Hero: "more secure" → "structurally stronger" (same security level; structural advantages, not raw strength)
-- Weaknesses heading: "SHA-256 is Weak" → "SHA-256 is showing its age"; "weaknesses" → "limitations" with categorization
-- SHA-256 card: "can't parallelize" → "can't parallelize a single message"; hardware framing softened
-- Length extension: removed unverified "early AWS signature schemes" claim
-- Quantum: fixed misleading longer-output/post-quantum claim
-- Takeaway: added "Why it still dominates" counterpoint (25yr cryptanalysis, FIPS, hardware ubiquity)
-
-Corrections (March 2026, first pass):
-- TOTP section: default is HMAC-SHA-1, not SHA-256 (per RFC 6238)
-- WPA2: uses PBKDF2-SHA-1, not PBKDF2-SHA-256 (per IEEE 802.11i)
-- Bitcoin: "workaround" softened to "likely a defense" (unconfirmed by Satoshi)
-- PDF signing: "every" changed to "most modern"
-- iPhone 7 Plus: chip corrected from A11 to A10 Fusion / A11 Bionic
-
 ## Status
 
 This is an alpha/MVP. Known limitations:
@@ -133,6 +123,49 @@ This is an alpha/MVP. Known limitations:
 - Device detection is approximate (Safari limits hardware fingerprinting for privacy)
 - Benchmark variance can be high on mobile due to thermal throttling and background processes
 - Timer resolution limits affect small-data accuracy despite batch mitigation
+
+<details>
+<summary><strong>Benchmark methodology</strong></summary>
+
+- Random data generated via `crypto.getRandomValues()` (chunked to 64 KB for Safari compatibility)
+- Small data sizes use batch timing (many ops per measurement) to overcome browser timer resolution limits (~0.1ms due to Spectre mitigations)
+- Web Crypto API calls use `Promise.all()` batching to avoid per-call async bridge overhead
+- Each algorithm reports median throughput across multiple batches
+- Hash verification proves all implementations compute correct, matching results on the same input data
+
+</details>
+
+<details>
+<summary><strong>Methodology & fact-checking</strong></summary>
+
+Every factual claim on the site has been [reviewed and sourced](https://blake3.loonlabs.dev/methodology.html). The methodology page documents:
+
+- **Benchmark methodology** — algorithms, timing approach, known limitations
+- **Primary sources** — RFCs, NIST publications, protocol specs for each claim
+- **Editorial caveats** — where we make judgment calls (e.g., "structurally stronger" framing)
+- **Correction log** — errors found and fixed, with dates and explanations
+
+</details>
+
+<details>
+<summary><strong>Correction log</strong></summary>
+
+**March 2026 — second pass:**
+- Hero: "more secure" → "structurally stronger" (same security level; structural advantages, not raw strength)
+- Weaknesses heading: "SHA-256 is Weak" → "SHA-256 is showing its age"; "weaknesses" → "limitations" with categorization
+- SHA-256 card: "can't parallelize" → "can't parallelize a single message"; hardware framing softened
+- Length extension: removed unverified "early AWS signature schemes" claim
+- Quantum: fixed misleading longer-output/post-quantum claim
+- Takeaway: added "Why it still dominates" counterpoint (25yr cryptanalysis, FIPS, hardware ubiquity)
+
+**March 2026 — first pass:**
+- TOTP section: default is HMAC-SHA-1, not SHA-256 (per RFC 6238)
+- WPA2: uses PBKDF2-SHA-1, not PBKDF2-SHA-256 (per IEEE 802.11i)
+- Bitcoin: "workaround" softened to "likely a defense" (unconfirmed by Satoshi)
+- PDF signing: "every" changed to "most modern"
+- iPhone 7 Plus: chip corrected from A11 to A10 Fusion / A11 Bionic
+
+</details>
 
 ---
 
