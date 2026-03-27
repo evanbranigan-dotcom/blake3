@@ -13,12 +13,56 @@ bun run preview # preview production build
 
 ## Tech Stack
 
+- **Bun** — package manager and runtime
 - **Vite** — build tool
-- **Vanilla JS + CSS** — no framework
+- **TypeScript** — strict mode, full type annotations
+- **Vanilla TS + CSS** — no framework
 - **hash-wasm** — BLAKE3 and SHA-256 via WebAssembly
 - **Web Crypto API** — hardware-accelerated SHA-256
 - **Web Workers** — parallel BLAKE3 hashing
 - **Vercel** — hosting
+
+## File Structure
+
+```
+blake3/
+├── index.html              # Main page (narrative + benchmark)
+├── methodology.html        # Methodology, sources, correction log
+├── cryptobench.html        # Prototype: encryption speed test
+├── devicebench.html        # Prototype: device diagnostic tool
+├── hashmeter.html          # Prototype: Speedtest.net of hashing
+├── style.css               # Main page styles
+├── vite.config.ts
+├── tsconfig.json
+├── src/
+│   ├── main.ts             # Entry, scroll reveal, benchmark button
+│   ├── data.ts             # iPhone/Android model lookup tables
+│   ├── device.ts           # Screen-based device detection
+│   ├── benchmark.ts        # Benchmark engine (4 algorithms)
+│   ├── results.ts          # Bar charts, insights, verdict
+│   └── blake3-worker.ts    # Web Worker for parallel BLAKE3
+├── eli5/
+│   ├── index.html          # ELI5 guide hub (9 topic cards)
+│   ├── eli5.ts             # Scroll-reveal animation
+│   ├── eli5.css            # ELI5 shared styles
+│   ├── sha-256.html        # SHA-256 intro
+│   ├── how-sha256-works.html   # SHA-256 algorithm internals
+│   ├── sha256-weaknesses.html  # Six structural limitations
+│   ├── sha256-everywhere.html  # Ten real-world use cases with sources
+│   ├── blake3.html         # BLAKE3 intro
+│   ├── how-blake3-works.html   # BLAKE3 algorithm internals
+│   ├── compliance.html     # Why gov can't use BLAKE3
+│   ├── private-sector.html # Why private sector doesn't use BLAKE3
+│   └── adoption.html       # Who's actually using BLAKE3
+├── public/
+│   ├── favicon.svg
+│   └── og-image.webp       # Open Graph image (69 KB)
+├── fact-check.md           # 116 claims assessed (internal reference)
+├── research.md             # Research notes & Android options
+├── CLAUDE.md               # This file
+├── README.md               # Public repo documentation
+└── docs/session-log.md     # Development session log
+```
 
 ## Deployment
 
@@ -28,21 +72,25 @@ Deployed at [blake3.loonlabs.dev](https://blake3.loonlabs.dev) via Vercel (free 
 
 Total first-visit transfer: ~110 KB gzipped. No external fonts, analytics, tracking, or API calls. All benchmark computation is client-side. Hashed filenames enable long browser caching. Comfortably within Vercel free tier (100 GB/month) for 900K+ unique visits/month. OG image uses WebP format (69 KB, converted from 140 KB PNG).
 
-## Page Sections
+## Main Page Sections
 
 The main page (`index.html`) flows as a narrative:
 
 1. **Hero** — "Is your phone using a hash function from 2001?"
 2. **Two Eras** — Side-by-side SHA-256 vs BLAKE3 comparison cards
-3. **SHA-256 is Weak** — Six structural weaknesses (collapsible accordion)
-4. **SHA-256 is Everywhere** — Ten real-world use cases (collapsible accordion)
-5. **Your Device** — Auto-detected device/chip info
-6. **The Benchmark** — Live BLAKE3 vs SHA-256 benchmark runner
-7. **The Verdict** — Dynamic results summary
-8. **Open Questions** — Research questions (collapsible)
-9. **Future Directions** — Links to prototype mockups
+3. **Your Device** — Auto-detected device/chip info
+4. **The Benchmark** — Live BLAKE3 vs SHA-256 benchmark runner
+5. **The Verdict** — Dynamic results summary
+6. **Open Questions** — Research questions (collapsible)
+7. **Future Directions** — Links to prototype mockups
 
-Sections 3 and 4 use a seam-style `<details>` accordion — a horizontal rule with centered label text that reveals content on click. Inner cards are also individually expandable, with only-one-open behavior via JS.
+The "SHA-256 weaknesses" and "SHA-256 is everywhere" content has been moved to dedicated ELI5 pages.
+
+## ELI5 Guide Section
+
+The `/eli5/` path hosts 9 educational pages explaining hash functions for a general audience. Pages use their own shared CSS (`eli5.css`) and scroll-reveal JS (`eli5.ts`). Component patterns: `analogy-card`, `visual-demo`, `steps`, `fun-fact`, `data-flow`, `state-matrix`, `round-visual`, `xof-demo`.
+
+All ELI5 HTML files must be listed in `vite.config.ts` `rollupOptions.input` to be included in the production build.
 
 ## Responsive Breakpoints
 
@@ -59,11 +107,7 @@ Three breakpoints used throughout:
 - Caveats and editorial choices (e.g., "structurally stronger" framing, BLAKE3 as replacement)
 - Correction log (errors found and fixed via fact-checking)
 
-Linked from the footer and the Open Questions section. Uses the shared `style.css` but overrides `.section { opacity: 1 }` since it doesn't load `main.js` (which provides scroll-reveal animation).
-
-## Inline Source Citations
-
-Each of the 10 use case cards in the "SHA-256 is everywhere" section has a `<p class="usage-source">` with links to primary sources (RFCs, specs, official docs). Styled as subtle muted text with a thin top border.
+Linked from the footer and the Open Questions section. Uses the shared `style.css` but overrides `.section { opacity: 1 }` since it doesn't load `main.ts` (which provides scroll-reveal animation).
 
 ## Fact-Check
 

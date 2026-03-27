@@ -44,45 +44,61 @@ Research saved to `research.md` in repo.
 
 ## 3. Architecture
 
-### App structure (9-section scroll narrative)
+### App structure (7-section scroll narrative)
 
 1. **Hero** — "Is your phone using a hash function from 2001?"
 2. **Two Eras** — Side-by-side SHA-256 (sequential chain) vs BLAKE3 (parallel tree) with CSS diagrams
-3. **SHA-256 is showing its age** — Six architectural limitations (collapsible accordion)
-4. **SHA-256 is everywhere** — Ten real-world use cases with inline sources (collapsible accordion)
-5. **Your Device** — Auto-detect device model via screen dimensions + pixel ratio
-6. **The Benchmark** — 4 algorithms x 4 data sizes with live progress
-7. **The Verdict** — Dynamic results summary
-8. **Open Questions** — Research questions (collapsible)
-9. **Future Directions** — Links to prototype mockups
+3. **Your Device** — Auto-detect device model via screen dimensions + pixel ratio
+4. **The Benchmark** — 4 algorithms x 4 data sizes with live progress
+5. **The Verdict** — Dynamic results summary
+6. **Open Questions** — Research questions (collapsible)
+7. **Future Directions** — Links to prototype mockups
+
+> **Note:** Sections "SHA-256 is showing its age" (6 weaknesses) and "SHA-256 is everywhere" (10 use cases) were moved to dedicated ELI5 pages in March 2026.
 
 ### File structure
 
 ```
 blake3/
-├── index.html            # Main page (narrative + benchmark)
-├── methodology.html      # Methodology, sources, correction log
-├── cryptobench.html      # Prototype: encryption speed test
-├── devicebench.html      # Prototype: device diagnostic tool
-├── hashmeter.html        # Prototype: Speedtest.net of hashing
-├── style.css             # Shared styles
-├── vite.config.js
+├── index.html              # Main page (narrative + benchmark)
+├── methodology.html        # Methodology, sources, correction log
+├── cryptobench.html        # Prototype: encryption speed test
+├── devicebench.html        # Prototype: device diagnostic tool
+├── hashmeter.html          # Prototype: Speedtest.net of hashing
+├── style.css               # Main page styles
+├── vite.config.ts
+├── tsconfig.json
 ├── src/
-│   ├── main.js           # Entry, scroll reveal, benchmark button
-│   ├── data.js           # iPhone/Android model lookup table
-│   ├── device.js         # Screen-based device detection
-│   ├── benchmark.js      # Benchmark engine (4 algorithms)
-│   ├── results.js        # Bar charts, insights, verdict
-│   └── blake3-worker.js  # Web Worker for parallel BLAKE3
+│   ├── main.ts             # Entry, scroll reveal, benchmark button
+│   ├── data.ts             # iPhone/Android model lookup tables
+│   ├── device.ts           # Screen-based device detection
+│   ├── benchmark.ts        # Benchmark engine (4 algorithms)
+│   ├── results.ts          # Bar charts, insights, verdict
+│   └── blake3-worker.ts    # Web Worker for parallel BLAKE3
+├── eli5/
+│   ├── index.html          # ELI5 guide hub (9 topic cards)
+│   ├── eli5.ts             # Scroll-reveal animation
+│   ├── eli5.css            # ELI5 shared styles
+│   ├── sha-256.html        # SHA-256 intro
+│   ├── how-sha256-works.html   # SHA-256 algorithm internals
+│   ├── sha256-weaknesses.html  # Six structural limitations
+│   ├── sha256-everywhere.html  # Ten real-world use cases
+│   ├── blake3.html         # BLAKE3 intro
+│   ├── how-blake3-works.html   # BLAKE3 algorithm internals
+│   ├── compliance.html     # Why gov can't use BLAKE3
+│   ├── private-sector.html # Why private sector doesn't use BLAKE3
+│   └── adoption.html       # Who's actually using BLAKE3
 ├── public/
 │   ├── favicon.svg
-│   └── og-image.webp     # Open Graph image (69 KB)
-├── fact-check.md         # 113 claims assessed (internal reference)
-├── research.md           # Research notes & Android options
-├── CLAUDE.md             # Project instructions for Claude Code
-├── README.md             # Public repo documentation
-└── docs/session-log.md   # This file
+│   └── og-image.webp       # Open Graph image (69 KB)
+├── fact-check.md           # 116 claims assessed (internal reference)
+├── research.md             # Research notes & Android options
+├── CLAUDE.md               # Project instructions for Claude Code
+├── README.md               # Public repo documentation
+└── docs/session-log.md     # This file
 ```
+
+> **Note:** Codebase was converted from JavaScript to TypeScript in March 2026. All `.js` files in `src/` and `eli5/` are now `.ts` with strict type checking.
 
 ---
 
@@ -223,7 +239,7 @@ The app doesn't hide SHA-256's wins. Each size group has a contextual insight ex
 
 | Decision | Choice | Why |
 |----------|--------|-----|
-| Framework | Vanilla JS | Minimal bundle (~49KB), fast mobile load |
+| Framework | Vanilla TypeScript | Minimal bundle (~53KB), fast mobile load, strict types |
 | Hash library | hash-wasm | Both BLAKE3 + SHA-256, identical API, hand-tuned WASM |
 | Parallel BLAKE3 | Web Workers | Only browser option; WASM threads limited Safari support |
 | Timing method | Batch timing | Overcomes browser timer resolution (Spectre mitigations) |
