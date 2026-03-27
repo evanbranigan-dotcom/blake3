@@ -16,6 +16,8 @@ export default defineConfig({
         'eli5/how-sha256-works': resolve(__dirname, 'eli5/how-sha256-works.html'),
         'eli5/blake3': resolve(__dirname, 'eli5/blake3.html'),
         'eli5/how-blake3-works': resolve(__dirname, 'eli5/how-blake3-works.html'),
+        'eli5/sha256-weaknesses': resolve(__dirname, 'eli5/sha256-weaknesses.html'),
+        'eli5/sha256-everywhere': resolve(__dirname, 'eli5/sha256-everywhere.html'),
         'eli5/compliance': resolve(__dirname, 'eli5/compliance.html'),
         'eli5/private-sector': resolve(__dirname, 'eli5/private-sector.html'),
         'eli5/adoption': resolve(__dirname, 'eli5/adoption.html'),

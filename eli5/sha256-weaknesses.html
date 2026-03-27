@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: Six Weaknesses of SHA-256</title>
+  <meta name="description" content="SHA-256 has never been broken — but its architecture has six structural limitations that modern hash functions were designed to eliminate.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-orange">ELI5</span>
+      <h1 class="hero-title">SHA-256 is showing its age</h1>
+      <p class="hero-sub">No one has broken it — but its <em>architecture</em> has six limitations that modern hash functions were designed to eliminate.</p>
+    </div>
+  </section>
+
+  <!-- 1. Length Extension -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Weakness 1 &mdash; Exploitable</p>
+      <h2 class="section-title reveal">Length extension attacks</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔓</span>
+        <h3 class="analogy-title">Adding rooms to a castle without the key</h3>
+        <p class="analogy-body">If you know <code>SHA-256(message)</code> and the message length, you can compute <code>SHA-256(message + attacker_data)</code> <strong>without knowing the original message</strong>. It's like being able to add extra rooms to someone's castle just by knowing the floor plan.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">How the attack works</p>
+        <div class="data-flow">
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">What the attacker knows</p>
+            <p class="data-flow-stage-desc">The hash H(msg) and the message length — not the message itself</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">What the attacker can compute</p>
+            <p class="data-flow-stage-desc">H(msg + padding + evil_data) — a valid hash of a forged message</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Real-world exploit</p>
+        <p>The Flickr API was vulnerable to this in 2009. Countless custom MAC constructions using <code>SHA-256(key || msg)</code> are also broken by it. HMAC-SHA-256 is the workaround — two nested hashes because the primitive can't do it alone.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">How BLAKE3 fixes it</h3>
+        <p class="analogy-body">BLAKE3 uses a <strong>finalization flag</strong> that seals the output. The root node is processed differently from internal nodes, so the internal state never leaks through the hash. <strong>Structurally immune</strong> — not a workaround, a fix.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Merkle-Damgard -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Weakness 2 &mdash; Theoretical</p>
+      <h2 class="section-title reveal">Merkle-Damg&aring;rd weaknesses</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⛓️</span>
+        <h3 class="analogy-title">The chain itself is the problem</h3>
+        <p class="analogy-body">SHA-256's underlying construction — the Merkle-Damg&aring;rd chain — has multiple proven theoretical vulnerabilities beyond length extension. The chain feeds each block's output into the next block's input, which creates structural patterns attackers can exploit.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">The Merkle-Damg&aring;rd chain</p>
+        <div class="chain-visual">
+          <div class="chain-block sha">IV</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">f</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">f</div>
+          <div class="chain-arrow"></div>
+          <div class="chain-block sha">H</div>
+        </div>
+        <p class="visual-caption">Multicollisions (Joux '04) &bull; Herding attacks &bull; Long-message 2nd preimage</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">The math</p>
+        <p>Joux showed that finding 2<sup>k</sup> collisions costs only k times more than finding one pair — far less than expected for an ideal hash function. These are theoretical results, not practical breaks, but they reveal the design's limits.</p>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">How BLAKE3 fixes it</h3>
+        <p class="analogy-body">BLAKE3 is built on a <strong>Merkle tree</strong>, not a Merkle-Damg&aring;rd chain. Each node is independent — the construction itself eliminates these entire classes of attacks.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Sequential -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Weakness 3 &mdash; Performance</p>
+      <h2 class="section-title reveal">Sequential-only processing</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🐌</span>
+        <h3 class="analogy-title">Six workers, one job</h3>
+        <p class="analogy-body">Every block depends on the output of the previous block. <strong>One core, always</strong> — no matter how many your device has. Your phone has 6 cores. Your laptop has 8-16. SHA-256 uses exactly one of them. The rest sit idle.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">SHA-256 vs BLAKE3 processing</p>
+        <div class="data-flow">
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">SHA-256</p>
+            <p class="data-flow-stage-desc">Block 1 &rarr; wait &rarr; Block 2 &rarr; wait &rarr; Block 3 &rarr; wait &rarr; Block 4 &bull; <strong>4 units of time</strong></p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage">
+            <p class="data-flow-stage-label">BLAKE3</p>
+            <p class="data-flow-stage-desc">Chunk 1 + Chunk 2 + Chunk 3 + Chunk 4 (all at once) &bull; <strong>1 unit of time</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">How BLAKE3 fixes it</h3>
+        <p class="analogy-body">Tree structure means all chunks process simultaneously. More cores = proportionally faster. <strong>Linearly.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. No Domain Separation -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Weakness 4 &mdash; Exploitable</p>
+      <h2 class="section-title reveal">No built-in domain separation</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔀</span>
+        <h3 class="analogy-title">One key for every lock</h3>
+        <p class="analogy-body">SHA-256 uses the <strong>same algorithm regardless of purpose</strong>. A hash used as a MAC, KDF, or PRF all look identical — making misuse easy and dangerous. Using <code>SHA-256(key || message)</code> as a MAC? Broken by length extension.</p>
+      </div>
+
+      <div class="steps reveal">
+        <div class="step">
+          <span class="step-number orange">1</span>
+          <div class="step-content">
+            <h4>MAC (message authentication)</h4>
+            <p>SHA-256 needs HMAC — two nested hashes — because the primitive can't safely authenticate on its own.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">2</span>
+          <div class="step-content">
+            <h4>KDF (key derivation)</h4>
+            <p>SHA-256 needs HKDF — a separate construction — to safely derive keys from a master secret.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number orange">3</span>
+          <div class="step-content">
+            <h4>PRF (pseudorandom function)</h4>
+            <p>Same underlying function, no isolation between contexts. Cross-protocol attacks are possible if domains overlap.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">How BLAKE3 fixes it</h3>
+        <p class="analogy-body">Built-in keyed hashing, KDF, and PRF modes with <strong>domain separation flags</strong>. One primitive, safe in every context — no wrappers needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Quantum -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Weakness 5 &mdash; Future risk</p>
+      <h2 class="section-title reveal">Quantum vulnerability</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔮</span>
+        <h3 class="analogy-title">Half the security you thought</h3>
+        <p class="analogy-body">Grover's algorithm halves the effective security of any hash function. SHA-256 drops from <strong>256-bit to 128-bit</strong> preimage resistance against a quantum computer. That's still strong — but it's half what you thought you were paying for.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Security level: today vs post-quantum</p>
+        <div class="data-flow">
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">Today</p>
+            <p class="data-flow-stage-desc">256-bit preimage resistance</p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">Post-quantum (Grover's)</p>
+            <p class="data-flow-stage-desc">128-bit preimage resistance</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Context</p>
+        <p>128-bit is still strong — but quantum computing timelines keep accelerating. BLAKE3 has the same 256-bit to 128-bit reduction, but its speed advantage means less performance cost if future standards require doubling output sizes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. No Verified Streaming -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Weakness 6 &mdash; Performance</p>
+      <h2 class="section-title reveal">No verified streaming</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📥</span>
+        <h3 class="analogy-title">Download everything before checking anything</h3>
+        <p class="analogy-body">With SHA-256, you must download the <strong>entire file</strong> before verifying integrity. If it's corrupted or tampered with, you don't know until the end. Downloading a 2 GB file over a flaky connection? SHA-256 makes you wait until byte 2,147,483,648 to tell you byte 7 was corrupted.</p>
+      </div>
+
+      <div class="visual-demo reveal">
+        <p class="visual-demo-title">Verification timing</p>
+        <div class="data-flow">
+          <div class="data-flow-stage sha">
+            <p class="data-flow-stage-label">SHA-256</p>
+            <p class="data-flow-stage-desc">chunk &rarr; chunk &rarr; chunk &rarr; <strong>verify (only at the end)</strong></p>
+          </div>
+          <div class="data-flow-arrow"></div>
+          <div class="data-flow-stage">
+            <p class="data-flow-stage-label">BLAKE3</p>
+            <p class="data-flow-stage-desc"><strong>verify</strong> &rarr; <strong>verify</strong> &rarr; <strong>verify</strong> &rarr; <strong>verify</strong> (each chunk independently)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⚡</span>
+        <h3 class="analogy-title">How BLAKE3 fixes it</h3>
+        <p class="analogy-body">Tree structure enables <strong>verified streaming</strong> — verify each chunk independently as it arrives. Reject bad data immediately, don't wait for the whole file.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Takeaway -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">Still standing, but showing cracks</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🏰</span>
+        <h3 class="analogy-title">Two security flaws, two performance gaps, one design shortcoming, one future risk</h3>
+        <p class="analogy-body">SHA-256 has never been <em>broken</em> — nobody has found collisions. But its architecture has structural limitations that modern hash functions were designed to eliminate. BLAKE3 addresses all six, not through workarounds, but through fundamentally better design choices.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/sha-256.html">&larr; SHA-256 Intro</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/eli5/sha256-everywhere.html">SHA-256 is Everywhere &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">LoonLabs</a> project</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/eli5/eli5.js"></script>
+</body>
+</html>

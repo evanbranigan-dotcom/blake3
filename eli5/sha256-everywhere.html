@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ELI5: SHA-256 is Everywhere</title>
+  <meta name="description" content="Trillions of calls per day — across your phone, your browser, and the infrastructure behind both. Ten real-world places SHA-256 runs right now.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/eli5/eli5.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <div class="container top-bar-inner">
+      <span class="top-bar-brand"><a href="/eli5/">ELI5</a></span>
+      <a href="/" class="top-bar-link">Back to Benchmark</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-badge hero-badge-orange">ELI5</span>
+      <h1 class="hero-title">SHA-256 is everywhere</h1>
+      <p class="hero-sub">Trillions of calls per day — across your phone, your browser, and the infrastructure behind both.</p>
+    </div>
+  </section>
+
+  <!-- 1. HTTPS -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 1 &mdash; Trillions/day</p>
+      <h2 class="section-title reveal">Every HTTPS connection</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔒</span>
+        <h3 class="analogy-title">The lock icon in your browser</h3>
+        <p class="analogy-body">Every TLS/SSL certificate uses SHA-256. Every time you see the lock icon in your browser, SHA-256 verifies the certificate is authentic and untampered. <strong>Let's Encrypt alone issues 10+ million certificates per day</strong> — all SHA-256.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://cabforum.org/baseline-requirements/" target="_blank" rel="noopener">CA/Browser Forum Baseline Requirements</a>; <a href="https://letsencrypt.org/stats/" target="_blank" rel="noopener">Let's Encrypt Stats</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Cell -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 2 &mdash; Billions of devices</p>
+      <h2 class="section-title reveal">Your phone's cell connection</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📱</span>
+        <h3 class="analogy-title">Every call, every data packet</h3>
+        <p class="analogy-body">Every time your phone connects to a cell tower, <strong>HMAC-SHA-256 derives the encryption keys</strong> securing your call and data. It's the mandatory key derivation function in both 4G LTE and 5G networks (3GPP standard).</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://www.3gpp.org/specifications" target="_blank" rel="noopener">3GPP TS 33.401</a> (LTE); <a href="https://www.3gpp.org/specifications" target="_blank" rel="noopener">3GPP TS 33.501</a> (5G)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Bitcoin -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 3 &mdash; ~600 EH/s</p>
+      <h2 class="section-title reveal">Bitcoin &amp; cryptocurrency</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">⛓</span>
+        <h3 class="analogy-title">The backbone of blockchain</h3>
+        <p class="analogy-body">Bitcoin uses <strong>double-SHA-256</strong> for block hashing, transaction verification, and proof-of-work mining. The "double" part? Likely a defense against the length extension attack — a weakness BLAKE3 doesn't have. The entire network performs ~600 exahashes per second of SHA-256.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">Bitcoin whitepaper (Nakamoto, 2008)</a>; <a href="https://mempool.space" target="_blank" rel="noopener">mempool.space</a> (live hashrate)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Docker -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 4 &mdash; Every deploy</p>
+      <h2 class="section-title reveal">Docker &amp; software packages</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📦</span>
+        <h3 class="analogy-title">The fingerprint for every container</h3>
+        <p class="analogy-body">Every Docker image is identified by its SHA-256 digest — an immutable fingerprint for each layer. Linux package managers (apt, dpkg) verify packages with SHA-256 checksums. Apple's App Store uses it to verify every app download. <strong>Git is migrating from SHA-1 to SHA-256.</strong></p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://github.com/opencontainers/image-spec" target="_blank" rel="noopener">OCI Image Spec</a>; <a href="https://git-scm.com/docs/hash-function-transition" target="_blank" rel="noopener">Git SHA-256 transition</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Messaging -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 5 &mdash; Billions of messages</p>
+      <h2 class="section-title reveal">iMessage, Signal &amp; WhatsApp</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">💬</span>
+        <h3 class="analogy-title">Your encrypted chats depend on it</h3>
+        <p class="analogy-body">iMessage uses HMAC-SHA-256 for message authentication and key derivation. The Signal Protocol — powering both Signal and WhatsApp — uses SHA-256 in its key derivation chain. <strong>Your encrypted chats depend on it.</strong></p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://support.apple.com/guide/security/" target="_blank" rel="noopener">Apple Platform Security Guide</a>; <a href="https://signal.org/docs/" target="_blank" rel="noopener">Signal Protocol specs</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Cloud -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 6 &mdash; Every API call</p>
+      <h2 class="section-title reveal">Cloud infrastructure</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">☁️</span>
+        <h3 class="analogy-title">Every request, signed and verified</h3>
+        <p class="analogy-body">AWS Signature Version 4 signs every API request with SHA-256 — every S3 upload, every Lambda invocation, every DynamoDB query. <strong>Google Cloud and Azure use similar SHA-256-based authentication</strong> for service accounts.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Source</p>
+        <p><a href="https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html" target="_blank" rel="noopener">AWS Signature Version 4 docs</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 2FA -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 7 &mdash; Every 30 seconds</p>
+      <h2 class="section-title reveal">Two-factor authentication</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔑</span>
+        <h3 class="analogy-title">The code on your authenticator app</h3>
+        <p class="analogy-body">Authenticator apps generate 6-digit TOTP codes using HMAC-SHA-1 by default (RFC 6238), though newer systems increasingly support HMAC-SHA-256. Every 30 seconds, your phone computes a new hash-based code. <strong>Microsoft Entra ID, Google, and most enterprise 2FA</strong> systems support both.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://datatracker.ietf.org/doc/html/rfc6238" target="_blank" rel="noopener">RFC 6238 (TOTP)</a>; <a href="https://datatracker.ietf.org/doc/html/rfc4226" target="_blank" rel="noopener">RFC 4226 (HOTP)</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Passwords -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 8 &mdash; Every login</p>
+      <h2 class="section-title reveal">Passwords &amp; WiFi</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🔐</span>
+        <h3 class="analogy-title">The workaround is the point</h3>
+        <p class="analogy-body">SHA-256 alone is too fast for password hashing — so <strong>PBKDF2 iterates it thousands of times</strong> to slow attackers down. WPA2 WiFi uses PBKDF2-SHA-1, while macOS FileVault and many enterprise login systems use PBKDF2-SHA-256. SHA-256 wasn't designed for this — the workaround is the point.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener">NIST SP 800-63B</a>; <a href="https://standards.ieee.org/ieee/802.11i/3127/" target="_blank" rel="noopener">IEEE 802.11i (WPA2)</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Email & Code Signing -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 9 &mdash; Every email sent</p>
+      <h2 class="section-title reveal">Email &amp; code signing</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">✉️</span>
+        <h3 class="analogy-title">Proving who sent it</h3>
+        <p class="analogy-body">DKIM signs outgoing emails with SHA-256 so recipients can verify the sender. <strong>Code signing certificates for macOS, Windows, and Android all use SHA-256.</strong> Most modern signed PDFs and verified app updates use SHA-256.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Sources</p>
+        <p><a href="https://datatracker.ietf.org/doc/html/rfc6376" target="_blank" rel="noopener">RFC 6376 (DKIM)</a>; <a href="https://datatracker.ietf.org/doc/html/rfc8301" target="_blank" rel="noopener">RFC 8301</a> (SHA-1 deprecation for DKIM)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. File Integrity -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Use case 10 &mdash; Every download</p>
+      <h2 class="section-title reveal">File integrity &amp; downloads</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">📁</span>
+        <h3 class="analogy-title">Trust, but verify</h3>
+        <p class="analogy-body">Software distributors provide SHA-256 checksums for downloads. macOS Gatekeeper and Windows Authenticode verify executables with SHA-256. Backup systems use it for deduplication and corruption detection. But you must download the <strong>entire file before you can verify</strong> — BLAKE3's tree structure lets you verify chunks as they arrive.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Source</p>
+        <p><a href="https://csrc.nist.gov/publications/detail/fips/180/4/final" target="_blank" rel="noopener">NIST FIPS 180-4</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Takeaway -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The takeaway</p>
+      <h2 class="section-title reveal">Everywhere, but not irreplaceable</h2>
+
+      <div class="analogy-card reveal">
+        <span class="analogy-icon">🌐</span>
+        <h3 class="analogy-title">SHA-256 is everywhere — but most of these don't need it specifically</h3>
+        <p class="analogy-body">They need a fast, collision-resistant hash. BLAKE3 qualifies, and it's faster in software on every device without dedicated hardware.</p>
+      </div>
+
+      <div class="fun-fact reveal">
+        <p class="fun-fact-label">Why it still dominates</p>
+        <p>SHA-256 has survived 25 years of the most intense cryptanalysis any hash function has ever faced — with zero practical breaks. It's NIST-standardized, FIPS-certified, and required by regulation in government, finance, and healthcare. Every modern phone and laptop has dedicated SHA-256 hardware instructions. For new projects without compliance requirements, BLAKE3 is the stronger choice. For everything else, SHA-256 isn't going anywhere — and that's not a failure.</p>
+      </div>
+
+      <div class="bottom-nav reveal">
+        <a href="/eli5/sha256-weaknesses.html">&larr; SHA-256 Weaknesses</a>
+        <a href="/eli5/">All topics</a>
+        <a href="/eli5/blake3.html">BLAKE3 &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Benchmark</a>
+        <span class="footer-dot"></span>
+        <a href="/methodology.html">Methodology</a>
+        <span class="footer-dot"></span>
+        <a href="/eli5/">ELI5 Guides</a>
+      </div>
+      <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">LoonLabs</a> project</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/eli5/eli5.js"></script>
+</body>
+</html>
