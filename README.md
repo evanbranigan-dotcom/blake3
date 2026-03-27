@@ -76,7 +76,8 @@ Deployed on the **Vercel Free Plan** (100 GB/month). The site is extremely lean:
 - **hash-wasm** — BLAKE3 and SHA-256 via hand-tuned WebAssembly
 - **Web Crypto API** — browser-native hardware-accelerated SHA-256
 - **Web Workers** — parallel BLAKE3 hashing across CPU cores
-- **Vanilla JS + CSS** — no framework, minimal bundle (~21 KB gzipped JS)
+- **TypeScript** — strict mode, full type annotations across all source files
+- **Vanilla TS + CSS** — no framework, minimal bundle (~21 KB gzipped JS)
 - **Vercel** — hosting (HTTPS, free tier)
 
 ## Benchmark methodology
