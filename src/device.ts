@@ -1,13 +1,26 @@
-import { IPHONE_MODELS, ANDROID_MODELS } from './data.js'
+import { IPHONE_MODELS, ANDROID_MODELS } from './data'
+
+export interface DeviceInfo {
+  isIPhone: boolean
+  isAndroid?: boolean
+  raw: { width: number; height: number; dpr: number; cores: number | string; ua: string }
+  model: string | null
+  modelAlt?: string[]
+  chip: string | null
+  cores: number | string
+  shaHW: boolean
+  deviceLabel: string
+  memory?: number
+}
 
 // Extract device model from Android Chrome user agent
 // Format: "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/..."
-function parseAndroidModel(ua) {
+function parseAndroidModel(ua: string): string | null {
   const match = ua.match(/Android\s[\d.]+;\s*(.+?)(?:\s*Build\/|\))/)
   return match ? match[1].trim() : null
 }
 
-export function detectDevice() {
+export function detectDevice(): DeviceInfo {
   const ua = navigator.userAgent
   const isIPhone = /iPhone/.test(ua)
   const isIPad = /iPad/.test(ua)
@@ -17,14 +30,14 @@ export function detectDevice() {
   const width = window.screen.width
   const height = window.screen.height
   const dpr = window.devicePixelRatio
-  const cores = navigator.hardwareConcurrency || 'unknown'
+  const cores: number | string = navigator.hardwareConcurrency || 'unknown'
 
   // Normalize to portrait orientation
   const w = Math.min(width, height)
   const h = Math.max(width, height)
   const key = `${w}x${h}@${dpr}`
 
-  const result = {
+  const result: DeviceInfo = {
     isIPhone,
     raw: { width: w, height: h, dpr, cores, ua },
     model: null,
@@ -62,10 +75,10 @@ export function detectDevice() {
   } else if (isAndroid) {
     const androidModel = parseAndroidModel(ua)
     const match = androidModel ? ANDROID_MODELS[androidModel] : null
-    const memory = navigator.deviceMemory // Chrome-only, RAM in GB
+    const memory = (navigator as { deviceMemory?: number }).deviceMemory // Chrome-only, RAM in GB
 
     if (match) {
-      const displayName = match.marketing || androidModel
+      const displayName = match.marketing || androidModel || 'Android device'
       result.model = androidModel
       result.chip = match.chip
       result.shaHW = match.shaHW
@@ -90,7 +103,7 @@ export function detectDevice() {
   return result
 }
 
-export function renderDeviceCard(device) {
+export function renderDeviceCard(device: DeviceInfo): void {
   const section = document.getElementById('device-info')
   if (!section) return
 
@@ -111,7 +124,7 @@ export function renderDeviceCard(device) {
   const icon = isMobile ? '📱' : '💻'
 
   // Detection method note
-  let detectionNote
+  let detectionNote: string
   if (device.isAndroid && device.chip) {
     detectionNote = `Detected via user agent model identifier`
   } else if (device.isAndroid) {

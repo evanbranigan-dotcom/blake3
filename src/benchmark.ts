@@ -1,6 +1,49 @@
 import { blake3, sha256 } from 'hash-wasm'
 
-const SIZES = [
+export interface BenchConfig {
+  batchSize: number
+  batches: number
+}
+
+export interface BenchStats {
+  median: number
+  mean: number
+  throughputMBps: number
+  opsPerSec: number
+  samples: number
+  totalOps: number
+  batchSize: number
+  batches: number
+  workers?: number
+}
+
+export interface Verification {
+  blake3: string
+  sha256wasm: string
+  sha256crypto?: string
+  dataSize: number
+  sha256Match: boolean
+}
+
+export interface SizeResult {
+  label: string
+  bytes: number
+  algorithms: {
+    blake3: BenchStats
+    blake3parallel: BenchStats
+    sha256wasm: BenchStats
+    sha256crypto?: BenchStats
+  }
+  verification?: Verification
+}
+
+export interface ProgressInfo {
+  step: number
+  totalSteps: number
+  current: string
+}
+
+const SIZES: { label: string; bytes: number }[] = [
   { label: '1 KB', bytes: 1024 },
   { label: '100 KB', bytes: 100 * 1024 },
   { label: '1 MB', bytes: 1024 * 1024 },
@@ -10,14 +53,14 @@ const SIZES = [
 // Target ~2 seconds of benchmarking per algorithm per size
 // For small data: run large batches timed together to overcome timer resolution
 // For large data: time individual ops
-const BENCH_CONFIG = {
+const BENCH_CONFIG: Record<number, BenchConfig> = {
   1024:     { batchSize: 500, batches: 10 },   // 500 ops per timing, 10 timings
   102400:   { batchSize: 50,  batches: 10 },   // 50 ops per timing, 10 timings
   1048576:  { batchSize: 1,   batches: 30 },   // individual ops, 30 timings
   10485760: { batchSize: 1,   batches: 10 },   // individual ops, 10 timings
 }
 
-function generateData(bytes) {
+function generateData(bytes: number): Uint8Array {
   const data = new Uint8Array(bytes)
   // Safari limits crypto.getRandomValues() to 65536 bytes per call
   const chunk = 65536
@@ -31,7 +74,7 @@ function generateData(bytes) {
 // Run a hash function in batches to overcome timer resolution limits.
 // Times a batch of `batchSize` ops together, repeats `batches` times.
 // Returns per-op median time in ms.
-async function runBatched(fn, data, { batchSize, batches }) {
+async function runBatched(fn: (data: Uint8Array) => Promise<unknown>, data: Uint8Array, { batchSize, batches }: BenchConfig): Promise<number[]> {
   // Warm-up
   await fn(data)
   await fn(data)
@@ -52,7 +95,7 @@ async function runBatched(fn, data, { batchSize, batches }) {
 
 // Parallel batch runner for Web Crypto — fires all ops concurrently via Promise.all
 // This avoids per-call async overhead that unfairly penalizes the native API
-async function runBatchedParallel(fn, data, { batchSize, batches }) {
+async function runBatchedParallel(fn: (data: Uint8Array) => Promise<unknown>, data: Uint8Array, { batchSize, batches }: BenchConfig): Promise<number[]> {
   // Warm-up
   await fn(data)
   await fn(data)
@@ -73,7 +116,7 @@ async function runBatchedParallel(fn, data, { batchSize, batches }) {
   return perOpTimes
 }
 
-function computeStats(times, bytes, cfg) {
+function computeStats(times: number[], bytes: number, cfg: BenchConfig): BenchStats {
   const sorted = [...times].sort((a, b) => a - b)
   const median = sorted[Math.floor(sorted.length / 2)]
   const mean = times.reduce((a, b) => a + b, 0) / times.length
@@ -85,25 +128,24 @@ function computeStats(times, bytes, cfg) {
 }
 
 // Convert ArrayBuffer to hex string
-function bufToHex(buf) {
+function bufToHex(buf: ArrayBuffer): string {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
 // Verify all algorithms produce correct hashes on the same data
-async function verifyHashes(data) {
+async function verifyHashes(data: Uint8Array): Promise<Verification> {
   const b3Hash = await blake3(data)
   const sha256WasmHash = await sha256(data)
 
-  const verification = {
+  const verification: Verification = {
     blake3: b3Hash.slice(0, 16) + '...',
     sha256wasm: sha256WasmHash.slice(0, 16) + '...',
     dataSize: data.length,
-    // SHA-256 results should match between WASM and Web Crypto
     sha256Match: true,
   }
 
   if (hasWebCrypto) {
-    const cryptoBuf = await crypto.subtle.digest('SHA-256', data)
+    const cryptoBuf = await crypto.subtle.digest('SHA-256', data as unknown as BufferSource)
     const sha256CryptoHash = bufToHex(cryptoBuf)
     verification.sha256crypto = sha256CryptoHash.slice(0, 16) + '...'
     verification.sha256Match = sha256WasmHash === sha256CryptoHash
@@ -119,14 +161,14 @@ const hasWebCrypto = typeof crypto !== 'undefined' && typeof crypto.subtle !== '
 const NUM_WORKERS = navigator.hardwareConcurrency || 4
 
 // Create a pool of BLAKE3 workers
-function createWorkerPool(count) {
+function createWorkerPool(count: number): Worker[] {
   return Array.from({ length: count }, () =>
-    new Worker(new URL('./blake3-worker.js', import.meta.url), { type: 'module' })
+    new Worker(new URL('./blake3-worker.ts', import.meta.url), { type: 'module' })
   )
 }
 
 // Hash data in parallel: split into chunks, one per worker
-function parallelBlake3(workers, data) {
+function parallelBlake3(workers: Worker[], data: Uint8Array): Promise<string[]> {
   return new Promise((resolve) => {
     const chunkSize = Math.ceil(data.length / workers.length)
     const results = new Array(workers.length)
@@ -151,7 +193,7 @@ function parallelBlake3(workers, data) {
 }
 
 // Benchmark parallel BLAKE3 — only meaningful for larger data sizes
-async function runParallelBatched(workers, data, { batchSize, batches }) {
+async function runParallelBatched(workers: Worker[], data: Uint8Array, { batchSize, batches }: BenchConfig): Promise<number[]> {
   // Warm-up
   await parallelBlake3(workers, data)
   await parallelBlake3(workers, data)
@@ -170,8 +212,8 @@ async function runParallelBatched(workers, data, { batchSize, batches }) {
   return perOpTimes
 }
 
-export async function runBenchmark(onProgress) {
-  const results = []
+export async function runBenchmark(onProgress?: (info: ProgressInfo) => void): Promise<SizeResult[]> {
+  const results: SizeResult[] = []
   const algCount = hasWebCrypto ? 4 : 3  // +1 for parallel BLAKE3
   const totalSteps = SIZES.length * algCount
   let step = 0
@@ -182,7 +224,7 @@ export async function runBenchmark(onProgress) {
   for (const size of SIZES) {
     const data = generateData(size.bytes)
     const cfg = BENCH_CONFIG[size.bytes]
-    const sizeResults = { label: size.label, bytes: size.bytes, algorithms: {} }
+    const sizeResults: SizeResult = { label: size.label, bytes: size.bytes, algorithms: {} as SizeResult['algorithms'] }
 
     // Verify hashes match before benchmarking
     sizeResults.verification = await verifyHashes(data)
@@ -206,7 +248,7 @@ export async function runBenchmark(onProgress) {
     // SHA-256 (Web Crypto) — only available on HTTPS or localhost
     if (hasWebCrypto) {
       onProgress?.({ step: ++step, totalSteps, current: `SHA-256 WebCrypto @ ${size.label}` })
-      const sha256CryptoTimes = await runBatchedParallel((d) => crypto.subtle.digest('SHA-256', d), data, cfg)
+      const sha256CryptoTimes = await runBatchedParallel((d) => crypto.subtle.digest('SHA-256', d as unknown as BufferSource), data, cfg)
       sizeResults.algorithms.sha256crypto = computeStats(sha256CryptoTimes, size.bytes, cfg)
     }
 

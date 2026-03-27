@@ -1,8 +1,28 @@
+export interface IPhoneModel {
+  models: string[]
+  chip: string
+  chipGen: string
+  cores: number
+  shaHW: boolean
+}
+
+export interface AndroidModel {
+  chip: string
+  shaHW: boolean
+  marketing?: string
+}
+
+export interface ChipInfo {
+  year: number
+  nm: string
+  shaAccel: string
+}
+
 // iPhone model detection lookup table
 // Key format: "{width}x{height}@{pixelRatio}" using screen.width/height (CSS points)
 // Multiple models may share the same screen signature — we list the most likely
 
-export const IPHONE_MODELS = {
+export const IPHONE_MODELS: Record<string, IPhoneModel | null> = {
   // iPhone SE (2nd gen, 2020) / iPhone 8 / iPhone 7 / iPhone 6s
   '375x667@2': {
     models: ['iPhone SE (2nd gen)', 'iPhone 8', 'iPhone 7'],
@@ -116,7 +136,7 @@ export const IPHONE_MODELS = {
 // Key: model string extracted from user agent (e.g., "Pixel 8 Pro", "SM-S928B")
 // Android Chrome UA format: "... Android 14; Pixel 8 Pro) ..."
 // We match against both marketing names and model numbers
-export const ANDROID_MODELS = {
+export const ANDROID_MODELS: Record<string, AndroidModel> = {
   // Google Pixel — Tensor chips
   'Pixel 9 Pro XL':   { chip: 'Tensor G4', shaHW: true },
   'Pixel 9 Pro':      { chip: 'Tensor G4', shaHW: true },
@@ -176,7 +196,7 @@ export const ANDROID_MODELS = {
 }
 
 // Chip details for the verdict section
-export const CHIP_INFO = {
+export const CHIP_INFO: Record<string, ChipInfo> = {
   A11: { year: 2017, nm: '10nm', shaAccel: 'ARMv8.2 Crypto Extensions' },
   A12: { year: 2018, nm: '7nm', shaAccel: 'ARMv8.3 Crypto Extensions' },
   A13: { year: 2019, nm: '7nm', shaAccel: 'ARMv8.3 Crypto Extensions' },

@@ -1,23 +1,32 @@
-const ALGO_CONFIG = {
+import type { SizeResult } from './benchmark'
+import type { DeviceInfo } from './device'
+
+interface AlgoConfig {
+  label: string
+  color: string
+  class: string
+}
+
+const ALGO_CONFIG: Record<string, AlgoConfig> = {
   blake3: { label: 'BLAKE3', color: '#00ff88', class: 'bar-blake3' },
   blake3parallel: { label: 'BLAKE3 (multi-core)', color: '#bf5af2', class: 'bar-blake3-parallel' },
   sha256wasm: { label: 'SHA-256 (WASM)', color: '#ff8800', class: 'bar-sha256wasm' },
   sha256crypto: { label: 'SHA-256 (HW)', color: '#4488ff', class: 'bar-sha256crypto' },
 }
 
-function formatThroughput(mbps) {
+function formatThroughput(mbps: number): string {
   if (mbps >= 1000) return `${(mbps / 1000).toFixed(1)} GB/s`
   if (mbps >= 1) return `${mbps.toFixed(1)} MB/s`
   return `${(mbps * 1024).toFixed(0)} KB/s`
 }
 
-function formatTime(ms) {
+function formatTime(ms: number): string {
   if (ms < 0.01) return `${(ms * 1000).toFixed(1)} us`
   if (ms < 1) return `${ms.toFixed(2)} ms`
   return `${ms.toFixed(0)} ms`
 }
 
-function renderInsight(sizeResult) {
+function renderInsight(sizeResult: SizeResult): string {
   const algos = sizeResult.algorithms
   const b3 = algos.blake3.throughputMBps
   const b3p = algos.blake3parallel?.throughputMBps || 0
@@ -63,7 +72,7 @@ function renderInsight(sizeResult) {
   return `<div class="result-insight">${text}</div>`
 }
 
-export function renderResults(results) {
+export function renderResults(results: SizeResult[]): void {
   const container = document.getElementById('results-container')
   if (!container) return
 
@@ -125,22 +134,22 @@ export function renderResults(results) {
   // Trigger bar animations after DOM update
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      container.querySelectorAll('[data-animate]').forEach(bar => {
+      container.querySelectorAll<HTMLElement>('[data-animate]').forEach(bar => {
         bar.style.width = bar.style.getPropertyValue('--target-width')
       })
     })
   })
 }
 
-export function renderVerdict(results, device) {
+export function renderVerdict(results: SizeResult[], device: DeviceInfo): void {
   const verdict = document.getElementById('verdict-content')
   if (!verdict) return
 
   // Compute average speedups across all sizes
-  let blake3VsSha256Wasm = 0
-  let blake3VsSha256Crypto = 0
-  let parallelVsSha256Crypto = 0
-  let parallelVsBlake3 = 0
+  let blake3VsSha256WasmSum = 0
+  let blake3VsSha256CryptoSum = 0
+  let parallelVsSha256CryptoSum = 0
+  let parallelVsBlake3Sum = 0
   let cryptoCount = 0
   let count = 0
 
@@ -148,28 +157,26 @@ export function renderVerdict(results, device) {
     const b3 = r.algorithms.blake3.throughputMBps
     const b3p = r.algorithms.blake3parallel?.throughputMBps || b3
     const sw = r.algorithms.sha256wasm.throughputMBps
-    blake3VsSha256Wasm += b3 / sw
-    parallelVsBlake3 += b3p / b3
+    blake3VsSha256WasmSum += b3 / sw
+    parallelVsBlake3Sum += b3p / b3
     count++
     if (r.algorithms.sha256crypto) {
-      blake3VsSha256Crypto += b3 / r.algorithms.sha256crypto.throughputMBps
-      parallelVsSha256Crypto += b3p / r.algorithms.sha256crypto.throughputMBps
+      blake3VsSha256CryptoSum += b3 / r.algorithms.sha256crypto.throughputMBps
+      parallelVsSha256CryptoSum += b3p / r.algorithms.sha256crypto.throughputMBps
       cryptoCount++
     }
   }
 
-  blake3VsSha256Wasm = (blake3VsSha256Wasm / count).toFixed(1)
-  parallelVsBlake3 = (parallelVsBlake3 / count).toFixed(1)
+  const blake3VsSha256Wasm = (blake3VsSha256WasmSum / count).toFixed(1)
+  const parallelVsBlake3 = (parallelVsBlake3Sum / count).toFixed(1)
   const hasCryptoResults = cryptoCount > 0
-  if (hasCryptoResults) {
-    blake3VsSha256Crypto = (blake3VsSha256Crypto / cryptoCount).toFixed(1)
-    parallelVsSha256Crypto = (parallelVsSha256Crypto / cryptoCount).toFixed(1)
-  }
+  const blake3VsSha256Crypto = hasCryptoResults ? (blake3VsSha256CryptoSum / cryptoCount).toFixed(1) : '0'
+  const parallelVsSha256Crypto = hasCryptoResults ? (parallelVsSha256CryptoSum / cryptoCount).toFixed(1) : '0'
 
-  const blake3Faster = hasCryptoResults ? blake3VsSha256Crypto > 1 : true
+  const blake3Faster = hasCryptoResults ? parseFloat(blake3VsSha256Crypto) > 1 : true
   const numWorkers = results[0]?.algorithms.blake3parallel?.workers || '?'
 
-  let deviceNote
+  let deviceNote: string
   if (device.isIPhone && device.chip) {
     deviceNote = `Your ${device.deviceLabel} has <strong>${device.chip}</strong> with dedicated SHA-2 hardware acceleration — giving SHA-256 every possible advantage.`
   } else if (device.isAndroid && device.chip) {

@@ -1,6 +1,6 @@
-import { detectDevice, renderDeviceCard } from './device.js'
-import { runBenchmark, hasWebCrypto } from './benchmark.js'
-import { renderResults, renderVerdict } from './results.js'
+import { detectDevice, renderDeviceCard } from './device'
+import { runBenchmark, hasWebCrypto } from './benchmark'
+import { renderResults, renderVerdict } from './results'
 
 // Detect device on load
 const device = detectDevice()
@@ -31,8 +31,8 @@ if (!hasWebCrypto) {
 }
 
 // Accordion: only one item open at a time within each group
-function setupAccordion(selector) {
-  const items = document.querySelectorAll(selector)
+function setupAccordion(selector: string): void {
+  const items = document.querySelectorAll<HTMLDetailsElement>(selector)
   items.forEach((item) => {
     item.addEventListener('toggle', () => {
       if (item.open) {
@@ -43,15 +43,13 @@ function setupAccordion(selector) {
     })
   })
 }
-setupAccordion('details.weakness-card')
-setupAccordion('details.usage-card')
 setupAccordion('details.question-card')
 
 // Section accordion: toggle "Show" / "Hide" text
-document.querySelectorAll('.section-accordion').forEach((accordion) => {
+document.querySelectorAll<HTMLDetailsElement>('.section-accordion').forEach((accordion) => {
   const toggle = accordion.querySelector('.section-accordion-toggle span:first-child')
   if (!toggle) return
-  const showText = toggle.textContent
+  const showText = toggle.textContent ?? ''
   const hideText = showText.replace('Show', 'Hide')
   accordion.addEventListener('toggle', () => {
     toggle.textContent = accordion.open ? hideText : showText
@@ -59,14 +57,14 @@ document.querySelectorAll('.section-accordion').forEach((accordion) => {
 })
 
 // Benchmark
-const runBtn = document.getElementById('run-btn')
-const progressEl = document.getElementById('benchmark-progress')
-const progressFill = document.getElementById('progress-fill')
-const progressLabel = document.getElementById('progress-label')
+const runBtn = document.getElementById('run-btn') as HTMLButtonElement
+const progressEl = document.getElementById('benchmark-progress')!
+const progressFill = document.getElementById('progress-fill') as HTMLElement
+const progressLabel = document.getElementById('progress-label')!
 
 runBtn.addEventListener('click', async () => {
   runBtn.disabled = true
-  runBtn.querySelector('.run-text').textContent = 'Running...'
+  runBtn.querySelector('.run-text')!.textContent = 'Running...'
   progressEl.classList.remove('hidden')
 
   try {
@@ -77,18 +75,18 @@ runBtn.addEventListener('click', async () => {
     })
 
     progressEl.classList.add('hidden')
-    runBtn.querySelector('.run-text').textContent = 'Run again'
+    runBtn.querySelector('.run-text')!.textContent = 'Run again'
     runBtn.disabled = false
 
     renderResults(results)
     renderVerdict(results, device)
 
     // Scroll to results
-    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   } catch (err) {
     console.error('Benchmark failed:', err)
-    progressLabel.textContent = `Error: ${err.message}`
-    runBtn.querySelector('.run-text').textContent = 'Try again'
+    progressLabel.textContent = `Error: ${err instanceof Error ? err.message : String(err)}`
+    runBtn.querySelector('.run-text')!.textContent = 'Try again'
     runBtn.disabled = false
   }
 })
