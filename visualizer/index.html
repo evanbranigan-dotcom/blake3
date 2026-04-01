@@ -98,9 +98,68 @@
     <kbd>Space</kbd> play/pause &nbsp; <kbd>→</kbd> step &nbsp; <kbd>R</kbd> reset &nbsp; <kbd>1</kbd>-<kbd>4</kbd> speed
   </div>
 
+  <!-- Layer 2: Input-Size Scaling -->
+  <section class="scaling-section">
+    <div class="scaling-divider"></div>
+    <h2 class="scaling-title">What happens when data grows?</h2>
+    <p class="scaling-subtitle">SHA-256 processes blocks one at a time. BLAKE3 processes chunks in parallel. Drag the slider to see the difference.</p>
+
+    <div class="size-slider-area">
+      <input type="range" id="size-slider" min="0" max="6" value="0" step="1" aria-label="Input size">
+      <div class="size-labels">
+        <span>1 B</span><span>64 B</span><span>1 KB</span><span>8 KB</span><span>64 KB</span><span>256 KB</span><span>1 MB</span>
+      </div>
+      <div id="size-display" class="size-display mono">1 B</div>
+    </div>
+
+    <div class="scaling-layout">
+      <div class="scaling-panel scaling-sha256">
+        <div class="scaling-panel-header">
+          <span class="algo-name sha256-name">SHA-256</span>
+          <span id="sha256-block-count" class="block-count-badge">1 block</span>
+        </div>
+        <div class="grid-container">
+          <canvas id="sha256-grid" class="block-grid"></canvas>
+        </div>
+        <div id="sha256-scale-stats" class="scale-stats">1 × 64 = <em>64</em> rounds · sequential</div>
+      </div>
+
+      <div class="scaling-panel scaling-blake3">
+        <div class="scaling-panel-header">
+          <span class="algo-name blake3-name">BLAKE3</span>
+          <span id="blake3-chunk-count" class="block-count-badge">1 chunk</span>
+        </div>
+        <div class="grid-container">
+          <canvas id="blake3-grid" class="block-grid"></canvas>
+        </div>
+        <div id="blake3-scale-stats" class="scale-stats">1 × 7 = <em>7</em> rounds · parallel</div>
+      </div>
+    </div>
+
+    <div class="timeline-area">
+      <button id="btn-animate" class="btn btn-race" disabled>▶ Animate</button>
+      <div class="timeline-tracks">
+        <div class="timeline-row">
+          <span class="timeline-label sha256-name">SHA-256</span>
+          <div class="timeline-track"><div id="timeline-sha" class="timeline-fill timeline-fill-sha"></div></div>
+        </div>
+        <div class="timeline-row">
+          <span class="timeline-label blake3-name">BLAKE3</span>
+          <div class="timeline-track"><div id="timeline-blake" class="timeline-fill timeline-fill-blake"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scaling-insight" class="insight-bar" aria-live="polite">
+      At <em>1 B</em>, both process a single block. Similar speed.
+    </div>
+  </section>
+
   <script type="module">
     import { initVisualizer } from '/src/visualizer/renderer.ts';
+    import { initScaling } from '/src/visualizer/scaling.ts';
     initVisualizer();
+    initScaling();
   </script>
 
 </body>
