@@ -8,6 +8,7 @@ import { sha256Trace } from './sha256-state';
 import type { Sha256Trace, Sha256Registers } from './sha256-state';
 import { blake3Trace } from './blake3-state';
 import type { Blake3Trace } from './blake3-state';
+import { easeOutQuad, autoplayWithDelay, prefersReducedMotion } from './animation-utils';
 
 // DOM references
 let inputField: HTMLInputElement;
@@ -39,6 +40,9 @@ let currentBlake3Round = -1;
 let playing = false;
 let playTimer: ReturnType<typeof setTimeout> | null = null;
 let speed = 300;
+let cancelAutoplay: (() => void) | null = null;
+let raceCompleted = false;
+let blake3JustFinished = false;
 
 function toHex(n: number): string {
   return (n >>> 0).toString(16).padStart(8, '0');
@@ -308,11 +312,33 @@ function tick(): void {
   if (!playing) return;
   step();
 
-  if (currentSha256Round >= 63 && currentBlake3Round >= 13) {
+  const sha256Done = currentSha256Round >= 63;
+  const blake3Done = currentBlake3Round >= 13;
+
+  if (sha256Done && blake3Done) {
     pause();
+    raceCompleted = true;
+    updateControls();
     return;
   }
-  playTimer = setTimeout(tick, speed);
+
+  // BLAKE3 just finished — hold for 200ms dramatic pause, then pulse panel
+  if (blake3Done && !blake3JustFinished) {
+    blake3JustFinished = true;
+    blake3Panel.classList.add('finish-pulse');
+    playTimer = setTimeout(tick, 200);
+    return;
+  }
+
+  // Easing: BLAKE3 uses easeOutQuad (decelerating), SHA-256 stays linear
+  let nextDelay = speed;
+  if (!blake3Done) {
+    const progress = (currentBlake3Round + 1) / 14;
+    const easedDelay = speed * (0.6 + 0.8 * easeOutQuad(progress));
+    nextDelay = Math.max(nextDelay, easedDelay);
+  }
+
+  playTimer = setTimeout(tick, nextDelay);
 }
 
 function pause(): void {
@@ -328,6 +354,9 @@ function reset(): void {
   pause();
   currentSha256Round = -1;
   currentBlake3Round = -1;
+  raceCompleted = false;
+  blake3JustFinished = false;
+  blake3Panel.classList.remove('finish-pulse');
   renderAll();
 }
 
@@ -342,10 +371,15 @@ function updateControls(): void {
   const allDone = currentSha256Round >= 63 && currentBlake3Round >= 13;
   const notStarted = currentSha256Round < 0;
 
-  btnPlay.disabled = allDone;
-  btnPlay.textContent = playing ? '⏸ Pause' : (allDone ? '✓ Done' : (notStarted ? '▶ Race!' : '▶ Resume'));
+  if (raceCompleted) {
+    btnPlay.disabled = false;
+    btnPlay.textContent = '↺ Race again';
+  } else {
+    btnPlay.disabled = allDone;
+    btnPlay.textContent = playing ? '⏸ Pause' : (notStarted ? '▶ Race!' : '▶ Resume');
+  }
 
-  btnReset.disabled = notStarted;
+  btnReset.disabled = notStarted && !raceCompleted;
 }
 
 function handleKeyboard(e: KeyboardEvent): void {
@@ -419,8 +453,20 @@ export function initVisualizer(): void {
   buildSha256Registers(sha256Regs);
   buildBlake3Matrix(blake3Matrix);
 
-  inputField.addEventListener('input', () => { pause(); computeTraces(); });
-  btnPlay.addEventListener('click', () => playing ? pause() : play());
+  inputField.addEventListener('input', () => {
+    pause();
+    if (cancelAutoplay) { cancelAutoplay(); cancelAutoplay = null; }
+    computeTraces();
+  });
+  btnPlay.addEventListener('click', () => {
+    if (cancelAutoplay) { cancelAutoplay(); cancelAutoplay = null; }
+    if (raceCompleted) {
+      reset();
+      play();
+    } else {
+      playing ? pause() : play();
+    }
+  });
   btnReset.addEventListener('click', reset);
 
   speedButtons.forEach(btn => {
@@ -429,4 +475,21 @@ export function initVisualizer(): void {
 
   document.addEventListener('keydown', handleKeyboard);
   computeTraces();
+
+  // Autoplay: 2.5s delay for hero section, suppressed if user focuses input or clicks Race
+  cancelAutoplay = autoplayWithDelay(
+    2500,
+    (instant) => {
+      if (instant) {
+        // Reduced motion: skip to final state
+        currentSha256Round = 63;
+        currentBlake3Round = 13;
+        raceCompleted = true;
+        renderAll();
+      } else {
+        play();
+      }
+    },
+    inputField
+  );
 }
