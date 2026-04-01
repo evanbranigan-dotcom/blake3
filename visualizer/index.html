@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Hash Visualizer — SHA-256 vs BLAKE3 Race</title>
+  <meta name="description" content="The first interactive BLAKE3 visualizer. Watch SHA-256 and BLAKE3 race through the same input. See why BLAKE3 is faster — visually.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/src/visualizer/visualizer.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <a href="/">← Back to Benchmark</a>
+  </nav>
+
+  <header class="header">
+    <h1>Hash Race</h1>
+    <p>Same input. Same security. Watch the architectural difference.</p>
+  </header>
+
+  <div class="input-area">
+    <input
+      id="viz-input"
+      class="input-field mono"
+      type="text"
+      value="hello"
+      placeholder="Type text to hash..."
+      maxlength="55"
+      spellcheck="false"
+      autocomplete="off"
+      aria-label="Text to hash"
+    >
+  </div>
+
+  <div class="controls" role="toolbar" aria-label="Race controls">
+    <button id="btn-play" class="btn btn-race" aria-label="Start race">▶ Race!</button>
+    <button id="btn-reset" class="btn" disabled aria-label="Reset">↺ Reset</button>
+    <div class="speed-group">
+      <span class="speed-label">Speed:</span>
+      <button class="speed-btn active" data-speed="300">1×</button>
+      <button class="speed-btn" data-speed="150">2×</button>
+      <button class="speed-btn" data-speed="60">5×</button>
+      <button class="speed-btn" data-speed="20">10×</button>
+    </div>
+  </div>
+
+  <div class="race-layout">
+
+    <!-- SHA-256 Panel -->
+    <section class="algo-panel sha256-panel" aria-label="SHA-256">
+      <div class="algo-header">
+        <span class="algo-name sha256-name">SHA-256</span>
+        <span id="sha256-round" class="round-badge">Round <span class="mono">0</span> / 64</span>
+      </div>
+      <div class="progress-track"><div id="sha256-progress" class="progress-fill"></div></div>
+      <div class="state-label">Working Variables (8 registers)</div>
+      <div id="sha256-registers"></div>
+      <div id="sha256-annotation" class="annotation"></div>
+      <div id="sha256-done" class="done-overlay"></div>
+    </section>
+
+    <!-- Round Towers — visual height comparison -->
+    <div class="towers">
+      <div class="tower-column">
+        <div class="tower-label sha-label">64 rounds</div>
+        <div id="sha256-tower" class="tower sha-tower"></div>
+      </div>
+      <div class="tower-column">
+        <div class="tower-label blake-label">7 rounds</div>
+        <div id="blake3-tower" class="tower blake-tower"></div>
+      </div>
+    </div>
+
+    <!-- BLAKE3 Panel -->
+    <section class="algo-panel blake3-panel" aria-label="BLAKE3">
+      <div class="algo-header">
+        <span class="algo-name blake3-name">BLAKE3</span>
+        <span>
+          <span id="blake3-round" class="round-badge">Round <span class="mono">0</span> / 7</span>
+          <span id="blake3-phase" class="phase-badge"></span>
+        </span>
+      </div>
+      <div class="progress-track"><div id="blake3-progress" class="progress-fill"></div></div>
+      <div class="state-label">State Matrix (4×4 = 16 words)</div>
+      <div id="blake3-matrix"></div>
+      <div id="blake3-annotation" class="annotation"></div>
+      <div id="blake3-done" class="done-overlay"></div>
+    </section>
+
+  </div>
+
+  <div id="insight-bar" class="insight-bar" aria-live="polite">
+    Press <em>Race!</em> to start both algorithms simultaneously.
+  </div>
+
+  <div class="keyboard-hint">
+    <kbd>Space</kbd> play/pause &nbsp; <kbd>→</kbd> step &nbsp; <kbd>R</kbd> reset &nbsp; <kbd>1</kbd>-<kbd>4</kbd> speed
+  </div>
+
+  <script type="module">
+    import { initVisualizer } from '/src/visualizer/renderer.ts';
+    initVisualizer();
+  </script>
+
+</body>
+</html>
