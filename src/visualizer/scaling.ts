@@ -19,6 +19,9 @@ const PRESETS: SizePreset[] = [
   { bytes: 65536, label: '64 KB', sha256Blocks: 1024, blake3Chunks: 64 },
   { bytes: 262144, label: '256 KB', sha256Blocks: 4096, blake3Chunks: 256 },
   { bytes: 1048576, label: '1 MB', sha256Blocks: 16384, blake3Chunks: 1024 },
+  { bytes: 10485760, label: '10 MB', sha256Blocks: 163840, blake3Chunks: 10240 },
+  { bytes: 104857600, label: '100 MB', sha256Blocks: 1638400, blake3Chunks: 102400 },
+  { bytes: 1073741824, label: '1 GB', sha256Blocks: 16777216, blake3Chunks: 1048576 },
 ];
 
 // Colors
