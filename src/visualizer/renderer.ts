@@ -343,7 +343,7 @@ function updateControls(): void {
   const notStarted = currentSha256Round < 0;
 
   btnPlay.disabled = allDone;
-  btnPlay.textContent = playing ? '⏸ Pause' : (notStarted ? '▶ Race!' : '▶ Resume');
+  btnPlay.textContent = playing ? '⏸ Pause' : (allDone ? '✓ Done' : (notStarted ? '▶ Race!' : '▶ Resume'));
 
   btnReset.disabled = notStarted;
 }
