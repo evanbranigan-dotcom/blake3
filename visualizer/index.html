@@ -155,11 +155,55 @@
     </div>
   </section>
 
+  <!-- Layer 3: Tree Visualization -->
+  <section class="tree-section">
+    <div class="scaling-divider"></div>
+    <h2 class="scaling-title">Architecture: chain vs tree</h2>
+    <p class="scaling-subtitle">SHA-256 feeds each block into the next (Merkle-Damgård). BLAKE3 builds a binary tree — all leaves process in parallel, then merge upward.</p>
+
+    <div class="tree-presets">
+      <span class="speed-label">Blocks:</span>
+      <button class="tree-preset-btn speed-btn" data-count="4">4</button>
+      <button class="tree-preset-btn speed-btn active" data-count="8">8</button>
+      <button class="tree-preset-btn speed-btn" data-count="16">16</button>
+      <button class="tree-preset-btn speed-btn" data-count="32">32</button>
+    </div>
+
+    <div class="scaling-layout">
+      <div class="scaling-panel scaling-sha256">
+        <div class="scaling-panel-header">
+          <span class="algo-name sha256-name">SHA-256</span>
+          <span class="block-count-badge">Merkle-Damgård chain</span>
+        </div>
+        <div class="grid-container">
+          <canvas id="sha256-chain" class="tree-canvas"></canvas>
+        </div>
+      </div>
+      <div class="scaling-panel scaling-blake3">
+        <div class="scaling-panel-header">
+          <span class="algo-name blake3-name">BLAKE3</span>
+          <span class="block-count-badge">Merkle tree</span>
+        </div>
+        <div class="grid-container">
+          <canvas id="blake3-tree" class="tree-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="tree-controls">
+      <button id="btn-tree-animate" class="btn btn-race">▶ Animate</button>
+    </div>
+
+    <div id="tree-insight" class="insight-bar" aria-live="polite"></div>
+  </section>
+
   <script type="module">
     import { initVisualizer } from '/src/visualizer/renderer.ts';
     import { initScaling } from '/src/visualizer/scaling.ts';
+    import { initTree } from '/src/visualizer/tree.ts';
     initVisualizer();
     initScaling();
+    initTree();
   </script>
 
 </body>
