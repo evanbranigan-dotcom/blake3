@@ -3,8 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Hash Visualizer — SHA-256 vs BLAKE3 Race</title>
-  <meta name="description" content="The first interactive BLAKE3 visualizer. Watch SHA-256 and BLAKE3 race through the same input. See why BLAKE3 is faster — visually.">
+  <title>Hash Race — Watch BLAKE3 vs SHA-256 Side by Side</title>
+  <meta name="description" content="The first interactive BLAKE3 visualizer. See why BLAKE3 finishes in 7 rounds while SHA-256 needs 64.">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://blake3.loonlabs.dev/visualizer/">
+  <meta property="og:title" content="Hash Race — Watch BLAKE3 vs SHA-256 Side by Side">
+  <meta property="og:description" content="The first interactive BLAKE3 visualizer. See why BLAKE3 finishes in 7 rounds while SHA-256 needs 64.">
+  <meta property="og:image" content="https://blake3.loonlabs.dev/og-image.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hash Race — Watch BLAKE3 vs SHA-256 Side by Side">
+  <meta name="twitter:description" content="The first interactive BLAKE3 visualizer. See why BLAKE3 finishes in 7 rounds while SHA-256 needs 64.">
+  <meta name="twitter:image" content="https://blake3.loonlabs.dev/og-image.webp">
+
+  <link rel="canonical" href="https://blake3.loonlabs.dev/visualizer/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/src/visualizer/visualizer.css">
 </head>
@@ -213,9 +230,12 @@
     import { initVisualizer } from '/src/visualizer/renderer.ts';
     import { initScaling } from '/src/visualizer/scaling.ts';
     import { initTree } from '/src/visualizer/tree.ts';
+    import { fadeInOnScroll } from '/src/visualizer/animation-utils.ts';
     initVisualizer();
     initScaling();
     initTree();
+    // Fade in section titles on scroll
+    fadeInOnScroll(Array.from(document.querySelectorAll('.scaling-title, .scaling-subtitle')));
   </script>
 
 </body>

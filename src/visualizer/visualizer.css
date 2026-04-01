@@ -526,6 +526,43 @@ body {
   margin-bottom: 16px;
 }
 
+/* ===== FINISH PULSE ===== */
+@keyframes finishPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.008); }
+  100% { transform: scale(1); }
+}
+.algo-panel.finish-pulse {
+  animation: finishPulse 400ms ease-out;
+  border-color: var(--green-border);
+}
+
+/* ===== TOWER REFINEMENTS ===== */
+.tower-block-sha.completed { background: rgba(245, 158, 11, 0.6); }
+.tower-block-sha.current {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber-glow);
+}
+.tower-block-blake.completed { background: rgba(124, 58, 237, 0.6); }
+.tower-block-blake.current {
+  background: var(--purple-bright);
+  box-shadow: 0 0 8px var(--purple-glow);
+}
+
+/* ===== DONE OVERLAY ENTRANCE ===== */
+@keyframes doneSlam {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.done-overlay.visible .done-text {
+  animation: doneSlam 400ms ease-out;
+}
+
+/* ===== SECTION HIERARCHY ===== */
+.scaling-title { font-size: 18px; }
+.tree-section .scaling-title { font-size: 18px; }
+
 /* Responsive */
 @media (max-width: 900px) {
   .race-layout { grid-template-columns: 1fr; }
@@ -539,14 +576,18 @@ body {
 @media (max-width: 480px) {
   body { padding: 12px; }
   .header h1 { font-size: 20px; }
-  .matrix-cell { font-size: 9px; padding: 6px 1px; }
-  .reg-value { font-size: 11px; }
+  /* Hide registers and matrix on mobile — race drama preserved via progress bars + towers */
+  .registers { display: none; }
+  .matrix { display: none; }
+  .state-label { display: none; }
+  .annotation { font-size: 10px; }
   .scaling-layout { grid-template-columns: 1fr; }
-  .scaling-title { font-size: 18px; }
+  .scaling-title { font-size: 16px; }
   .size-display { font-size: 24px; }
   .block-grid { height: 160px; }
   .timeline-area { flex-direction: column; }
   .timeline-area .btn { width: 100%; }
   .tree-canvas { height: 200px; }
   .tree-controls { margin-bottom: 12px; }
+  .core-selector { flex-wrap: wrap; }
 }
