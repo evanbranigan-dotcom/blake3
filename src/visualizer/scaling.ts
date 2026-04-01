@@ -1,7 +1,14 @@
 /**
  * Input-Size Scaling Visualizer (Layer 2)
  * Canvas-based visualization showing how SHA-256 and BLAKE3 handle growing data.
- * SHA-256: sequential block processing. BLAKE3: parallel chunks + Merkle tree.
+ * Includes a core count selector for realistic device modeling.
+ *
+ * Throughput model:
+ *   SHA-256: ~4 GB/s single-threaded (ARM SHA2 hardware acceleration)
+ *   BLAKE3:  ~1.5 GB/s per core (no hardware accel, but parallelizable)
+ *
+ * At 1 core, SHA-256 wins. At 6+ cores, BLAKE3 pulls ahead.
+ * At ∞ cores, BLAKE3 is architecturally instant.
  */
 
 interface SizePreset {
@@ -24,11 +31,13 @@ const PRESETS: SizePreset[] = [
   { bytes: 1073741824, label: '1 GB', sha256Blocks: 16777216, blake3Chunks: 1048576 },
 ];
 
+// Throughput in bytes per second
+const SHA256_GBps = 4;   // ~4 GB/s with hardware accel (ARM SHA2, Apple Silicon)
+const BLAKE3_GBps = 1.5; // ~1.5 GB/s per core (no hardware accel)
+
 // Colors
 const AMBER = '#f59e0b';
-const AMBER_DIM = '#1a1610';
 const PURPLE = '#a78bfa';
-const PURPLE_DIM = '#14101e';
 const CELL_BG = '#111118';
 
 // DOM refs
@@ -44,9 +53,11 @@ let timelineBlake: HTMLElement;
 let scalingInsight: HTMLElement;
 let sha256CountEl: HTMLElement;
 let blake3CountEl: HTMLElement;
+let coreBtns: HTMLButtonElement[];
 
 // State
 let currentPreset = 0;
+let currentCores = 0; // 0 = infinity (theoretical)
 let animating = false;
 let animFrame: number | null = null;
 
@@ -67,7 +78,6 @@ function computeGrid(count: number, w: number, h: number): GridLayout {
   let cols = Math.max(1, Math.ceil(Math.sqrt(count * aspect)));
   let rows = Math.max(1, Math.ceil(count / cols));
 
-  // Minimize empty cells
   while (cols > 1 && (cols - 1) * rows >= count) cols--;
   rows = Math.ceil(count / cols);
 
@@ -130,8 +140,29 @@ function sizeCanvas(canvas: HTMLCanvasElement): void {
   canvas.height = rect.height * dpr;
 }
 
-function formatNum(n: number): string {
+function fmt(n: number): string {
   return n.toLocaleString();
+}
+
+function fmtTime(seconds: number): string {
+  if (seconds < 0.001) return '<1 ms';
+  if (seconds < 1) return `${Math.round(seconds * 1000)} ms`;
+  return `${seconds.toFixed(2)}s`;
+}
+
+/** Compute wall-clock time in seconds for SHA-256 (always single-threaded) */
+function sha256Time(bytes: number): number {
+  return bytes / (SHA256_GBps * 1024 * 1024 * 1024);
+}
+
+/** Compute wall-clock time in seconds for BLAKE3 with N cores */
+function blake3Time(bytes: number, cores: number, chunks: number): number {
+  const effectiveCores = Math.min(cores, chunks);
+  return bytes / (BLAKE3_GBps * 1024 * 1024 * 1024 * effectiveCores);
+}
+
+function isInfinite(): boolean {
+  return currentCores === 0;
 }
 
 function updateDisplay(): void {
@@ -142,15 +173,27 @@ function updateDisplay(): void {
   const blake3Rounds = p.blake3Chunks * 7;
   const treeLevels = p.blake3Chunks > 1 ? Math.ceil(Math.log2(p.blake3Chunks)) : 0;
 
-  sha256CountEl.textContent = `${formatNum(p.sha256Blocks)} block${p.sha256Blocks !== 1 ? 's' : ''}`;
-  blake3CountEl.textContent = `${formatNum(p.blake3Chunks)} chunk${p.blake3Chunks !== 1 ? 's' : ''}`;
+  sha256CountEl.textContent = `${fmt(p.sha256Blocks)} block${p.sha256Blocks !== 1 ? 's' : ''}`;
+  blake3CountEl.textContent = `${fmt(p.blake3Chunks)} chunk${p.blake3Chunks !== 1 ? 's' : ''}`;
 
-  sha256Stats.innerHTML =
-    `${formatNum(p.sha256Blocks)} × 64 = <em>${formatNum(sha256Rounds)}</em> rounds · sequential`;
+  if (isInfinite()) {
+    // Theoretical / architectural mode
+    sha256Stats.innerHTML =
+      `${fmt(p.sha256Blocks)} × 64 = <em>${fmt(sha256Rounds)}</em> rounds · sequential`;
+    blake3Stats.innerHTML =
+      `${fmt(p.blake3Chunks)} × 7 = <em>${fmt(blake3Rounds)}</em> rounds · parallel` +
+      (treeLevels > 0 ? ` + ${treeLevels} tree levels` : '');
+  } else {
+    // Realistic mode with core count
+    const effCores = Math.min(currentCores, p.blake3Chunks);
+    const shaT = sha256Time(p.bytes);
+    const blakeT = blake3Time(p.bytes, currentCores, p.blake3Chunks);
 
-  blake3Stats.innerHTML =
-    `${formatNum(p.blake3Chunks)} × 7 = <em>${formatNum(blake3Rounds)}</em> rounds · parallel` +
-    (treeLevels > 0 ? ` + ${treeLevels} tree levels` : '');
+    sha256Stats.innerHTML =
+      `<em>${fmtTime(shaT)}</em> · single-threaded · ~${SHA256_GBps} GB/s (hardware accel)`;
+    blake3Stats.innerHTML =
+      `<em>${fmtTime(blakeT)}</em> · ${effCores} core${effCores !== 1 ? 's' : ''} · ~${(BLAKE3_GBps * effCores).toFixed(1)} GB/s effective`;
+  }
 
   // Draw full grids (all lit)
   drawGrid(sha256Canvas, p.sha256Blocks, p.sha256Blocks, AMBER, CELL_BG);
@@ -160,28 +203,50 @@ function updateDisplay(): void {
   timelineSha.style.width = '0%';
   timelineBlake.style.width = '0%';
 
-  updateInsight(p, -1);
+  updateInsight(p);
 
-  // Enable/disable animate button
   btnAnimate.disabled = (p.sha256Blocks <= 1 && p.blake3Chunks <= 1);
+
+  // Update active core button
+  coreBtns.forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.cores || '0') === currentCores);
+  });
 }
 
-function updateInsight(p: SizePreset, phase: number): void {
-  if (phase === -1) {
-    // Static state
-    if (p.sha256Blocks === 1 && p.blake3Chunks === 1) {
-      scalingInsight.innerHTML =
-        `At <em>${p.label}</em>, both process a single block. Similar speed.`;
-    } else {
-      const treeLevels = p.blake3Chunks > 1 ? Math.ceil(Math.log2(p.blake3Chunks)) : 0;
-      const seqWork = p.sha256Blocks * 64;
-      const parWork = 7 + treeLevels;
-      const speedup = Math.round(seqWork / parWork);
-      scalingInsight.innerHTML =
-        `At <em>${p.label}</em>: SHA-256 grinds through <em>${formatNum(p.sha256Blocks)}</em> blocks one by one. ` +
-        `BLAKE3 runs <em>${formatNum(p.blake3Chunks)}</em> chunks simultaneously. ` +
-        `With full parallelism: <em>~${formatNum(speedup)}×</em> architectural advantage.`;
-    }
+function updateInsight(p: SizePreset): void {
+  if (p.sha256Blocks === 1 && p.blake3Chunks === 1) {
+    scalingInsight.innerHTML =
+      `At <em>${p.label}</em>, both process a single block. Similar speed.`;
+    return;
+  }
+
+  if (isInfinite()) {
+    const treeLevels = p.blake3Chunks > 1 ? Math.ceil(Math.log2(p.blake3Chunks)) : 0;
+    const seqWork = p.sha256Blocks * 64;
+    const parWork = 7 + treeLevels;
+    const speedup = Math.round(seqWork / parWork);
+    scalingInsight.innerHTML =
+      `<em>∞ cores (theoretical):</em> SHA-256 grinds through <em>${fmt(p.sha256Blocks)}</em> blocks sequentially. ` +
+      `BLAKE3 runs <em>${fmt(p.blake3Chunks)}</em> chunks simultaneously. ` +
+      `Architectural advantage: <em>~${fmt(speedup)}×</em>.`;
+    return;
+  }
+
+  const shaT = sha256Time(p.bytes);
+  const blakeT = blake3Time(p.bytes, currentCores, p.blake3Chunks);
+  const ratio = shaT / blakeT;
+
+  if (ratio >= 1) {
+    scalingInsight.innerHTML =
+      `<em>${currentCores} core${currentCores !== 1 ? 's' : ''}:</em> BLAKE3 is <em>${ratio.toFixed(1)}×</em> faster. ` +
+      `SHA-256: ${fmtTime(shaT)} (single-threaded, hardware accel). ` +
+      `BLAKE3: ${fmtTime(blakeT)} (${Math.min(currentCores, p.blake3Chunks)} cores).`;
+  } else {
+    const invRatio = blakeT / shaT;
+    scalingInsight.innerHTML =
+      `<em>${currentCores} core${currentCores !== 1 ? 's' : ''}:</em> SHA-256 is <em>${invRatio.toFixed(1)}×</em> faster here. ` +
+      `Hardware acceleration (ARM SHA2) beats BLAKE3's single-core throughput. ` +
+      `Add more cores to see BLAKE3 pull ahead.`;
   }
 }
 
@@ -198,41 +263,64 @@ function startAnimation(): void {
   animating = true;
   btnAnimate.textContent = '⏹ Stop';
 
-  const treeLevels = p.blake3Chunks > 1 ? Math.ceil(Math.log2(p.blake3Chunks)) : 0;
-  const blake3FinishTick = 1 + treeLevels; // 1 parallel pass + tree merge
-  const sha256TotalTicks = p.sha256Blocks; // 1 tick per block
-
-  // Animation runs for ~8 seconds
   const duration = 8000;
   const startTime = performance.now();
-  let blake3DoneNotified = false;
+  let winnerNotified = false;
+
+  // Compute relative speeds
+  let shaFraction: number; // fraction of duration SHA-256 takes
+  let blakeFraction: number; // fraction of duration BLAKE3 takes
+
+  if (isInfinite()) {
+    // Theoretical: BLAKE3 nearly instant
+    const treeLevels = p.blake3Chunks > 1 ? Math.ceil(Math.log2(p.blake3Chunks)) : 0;
+    const blake3Ticks = 1 + treeLevels;
+    shaFraction = 1; // SHA-256 takes full duration
+    blakeFraction = blake3Ticks / p.sha256Blocks;
+  } else {
+    // Realistic: based on throughput
+    const shaT = sha256Time(p.bytes);
+    const blakeT = blake3Time(p.bytes, currentCores, p.blake3Chunks);
+    const maxT = Math.max(shaT, blakeT);
+    shaFraction = shaT / maxT;
+    blakeFraction = blakeT / maxT;
+  }
 
   function frame(now: number): void {
     const elapsed = now - startTime;
     const t = Math.min(1, elapsed / duration);
 
-    // SHA-256: linear sequential progress
-    const sha256Lit = Math.min(p.sha256Blocks, Math.floor(t * p.sha256Blocks));
+    // SHA-256 progress
+    const shaProgress = Math.min(1, t / shaFraction);
+    const sha256Lit = Math.min(p.sha256Blocks, Math.floor(shaProgress * p.sha256Blocks));
     drawGrid(sha256Canvas, p.sha256Blocks, sha256Lit, AMBER, CELL_BG);
-    timelineSha.style.width = `${t * 100}%`;
+    timelineSha.style.width = `${shaProgress * 100}%`;
 
-    // BLAKE3: nearly instant (proportional to blake3FinishTick / sha256TotalTicks)
-    const blake3Fraction = blake3FinishTick / sha256TotalTicks;
-    const blake3T = Math.min(1, t / blake3Fraction);
-    // Chunks all light up at once after the first proportional tick
-    const blake3ChunkT = 1 / blake3FinishTick; // fraction where chunks are done
-    const blake3Lit = (blake3T >= blake3ChunkT) ? p.blake3Chunks : 0;
+    // BLAKE3 progress
+    const blakeProgress = Math.min(1, t / blakeFraction);
+    let blake3Lit: number;
+    if (isInfinite()) {
+      // Theoretical: all chunks light up at once early on
+      const treeLevels = p.blake3Chunks > 1 ? Math.ceil(Math.log2(p.blake3Chunks)) : 0;
+      const chunkFrac = 1 / (1 + treeLevels);
+      blake3Lit = blakeProgress >= chunkFrac ? p.blake3Chunks : 0;
+    } else {
+      // Realistic: chunks fill linearly (N at a time)
+      blake3Lit = Math.min(p.blake3Chunks, Math.floor(blakeProgress * p.blake3Chunks));
+    }
     drawGrid(blake3Canvas, p.blake3Chunks, blake3Lit, PURPLE, CELL_BG);
-    timelineBlake.style.width = `${Math.min(100, blake3T * 100)}%`;
+    timelineBlake.style.width = `${blakeProgress * 100}%`;
 
-    // Insight update when BLAKE3 finishes
-    if (!blake3DoneNotified && blake3T >= 1) {
-      blake3DoneNotified = true;
-      const sha256Pct = Math.round(t * 100);
-      const remaining = p.sha256Blocks - sha256Lit;
+    // Notify when the winner finishes
+    if (!winnerNotified && (shaProgress >= 1 || blakeProgress >= 1)) {
+      winnerNotified = true;
+      const loserProgress = shaProgress >= 1
+        ? Math.round(blakeProgress * 100)
+        : Math.round(shaProgress * 100);
+      const winner = shaProgress >= 1 ? 'SHA-256' : 'BLAKE3';
+      const loser = shaProgress >= 1 ? 'BLAKE3' : 'SHA-256';
       scalingInsight.innerHTML =
-        `<em>BLAKE3 is done.</em> SHA-256 is at ${sha256Pct}% — ` +
-        `<em>${formatNum(remaining)}</em> blocks still to go.`;
+        `<em>${winner} done.</em> ${loser}: ${loserProgress}%.`;
     }
 
     if (t < 1) {
@@ -240,11 +328,26 @@ function startAnimation(): void {
     } else {
       animating = false;
       btnAnimate.textContent = '▶ Animate';
-      const blake3Ms = (blake3Fraction * duration / 1000);
-      scalingInsight.innerHTML =
-        `<em>Race over.</em> BLAKE3 finished in <em>${blake3Ms < 0.1 ? '<0.1' : blake3Ms.toFixed(1)}s</em> (proportional). ` +
-        `SHA-256 took the full <em>${(duration / 1000).toFixed(0)}s</em>. ` +
-        `That's the difference between sequential and parallel.`;
+
+      if (isInfinite()) {
+        const blake3Ms = blakeFraction * duration / 1000;
+        scalingInsight.innerHTML =
+          `<em>Race over.</em> BLAKE3 finished in <em>${blake3Ms < 0.1 ? '<0.1' : blake3Ms.toFixed(1)}s</em> (proportional). ` +
+          `SHA-256 took the full <em>${(duration / 1000).toFixed(0)}s</em>.`;
+      } else {
+        const shaT = sha256Time(p.bytes);
+        const blakeT = blake3Time(p.bytes, currentCores, p.blake3Chunks);
+        const ratio = shaT / blakeT;
+        if (ratio >= 1) {
+          scalingInsight.innerHTML =
+            `<em>Done.</em> BLAKE3 won — <em>${ratio.toFixed(1)}× faster</em> ` +
+            `(${fmtTime(blakeT)} vs ${fmtTime(shaT)}).`;
+        } else {
+          scalingInsight.innerHTML =
+            `<em>Done.</em> SHA-256 won — <em>${(1 / ratio).toFixed(1)}× faster</em> ` +
+            `(${fmtTime(shaT)} vs ${fmtTime(blakeT)}). Hardware acceleration beats single-core BLAKE3.`;
+        }
+      }
     }
   }
 
@@ -273,8 +376,8 @@ export function initScaling(): void {
   timelineSha = document.getElementById('timeline-sha') as HTMLElement;
   timelineBlake = document.getElementById('timeline-blake') as HTMLElement;
   scalingInsight = document.getElementById('scaling-insight') as HTMLElement;
+  coreBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.core-btn'));
 
-  // Size canvases for DPI
   sizeCanvas(sha256Canvas);
   sizeCanvas(blake3Canvas);
 
@@ -284,9 +387,16 @@ export function initScaling(): void {
     updateDisplay();
   });
 
+  coreBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentCores = parseInt(btn.dataset.cores || '0');
+      stopAnimation();
+      updateDisplay();
+    });
+  });
+
   btnAnimate.addEventListener('click', startAnimation);
 
-  // Handle resize
   let resizeTimer: ReturnType<typeof setTimeout>;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);

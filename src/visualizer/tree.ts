@@ -3,6 +3,9 @@
  * Canvas rendering of SHA-256's Merkle-Damgård chain vs BLAKE3's Merkle tree.
  * Shows WHY parallelism matters: a chain has sequential dependency,
  * a tree collapses in log(N) steps.
+ *
+ * Visual design: BLAKE3 tree nodes scale up from leaves to root,
+ * showing hierarchy through size. The root is 2.5× larger than leaves.
  */
 
 interface Point { x: number; y: number }
@@ -31,17 +34,36 @@ let count = 8;
 let animating = false;
 let animFrame: number | null = null;
 
-function nodeRadius(n: number): number {
+/** Base radius for chain nodes (uniform size) */
+function chainRadius(n: number): number {
   if (n <= 4) return 14;
   if (n <= 8) return 10;
   if (n <= 16) return 7;
   return 5;
 }
 
+/** Leaf radius for tree (smallest nodes) */
+function leafRadius(n: number): number {
+  if (n <= 4) return 10;
+  if (n <= 8) return 7;
+  if (n <= 16) return 5;
+  if (n <= 64) return 4;
+  return 3;
+}
+
+/** Tree node radius for a given level. Leaves = level 0, root = maxLevel. */
+function treeNodeRadius(level: number, maxLevel: number, baseLeafR: number): number {
+  if (maxLevel === 0) return baseLeafR * 2.5;
+  const t = level / maxLevel; // 0 at leaves, 1 at root
+  // Ease-in curve so upper levels grow faster
+  const scale = 1 + t * t * 1.5; // 1× at leaves, 2.5× at root
+  return baseLeafR * scale;
+}
+
 // ── SHA-256 chain layout (snake pattern) ──
 
 function buildChain(n: number, w: number, h: number, pad: number): Point[] {
-  const r = nodeRadius(n);
+  const r = chainRadius(n);
   const minGap = r * 3;
   const perRow = Math.min(n, Math.max(1, Math.floor((w - 2 * pad) / minGap)));
   const rows = Math.ceil(n / perRow);
@@ -52,7 +74,6 @@ function buildChain(n: number, w: number, h: number, pad: number): Point[] {
   for (let i = 0; i < n; i++) {
     const row = Math.floor(i / perRow);
     const col = i % perRow;
-    // Snake: even rows L→R, odd rows R→L
     const xCol = row % 2 === 0 ? col : perRow - 1 - col;
     pts.push({
       x: pad + xCol * colGap,
@@ -63,6 +84,7 @@ function buildChain(n: number, w: number, h: number, pad: number): Point[] {
 }
 
 // ── BLAKE3 tree layout (leaves at bottom, root at top) ──
+// Extra vertical padding at top so the large root node fits
 
 function buildTree(numLeaves: number, w: number, h: number, pad: number): Point[][] {
   const counts: number[] = [];
@@ -74,14 +96,21 @@ function buildTree(numLeaves: number, w: number, h: number, pad: number): Point[
   }
 
   const numLevels = counts.length;
-  const levelH = numLevels > 1 ? (h - 2 * pad) / (numLevels - 1) : 0;
+  const maxLevel = numLevels - 1;
+  const baseR = leafRadius(numLeaves);
+  const rootR = treeNodeRadius(maxLevel, maxLevel, baseR);
+
+  // Extra top padding for the larger root node
+  const topPad = pad + rootR;
+  const botPad = pad;
+  const levelH = numLevels > 1 ? (h - topPad - botPad) / (numLevels - 1) : 0;
   const levels: Point[][] = [];
 
   // Level 0 = leaves (bottom)
   levels[0] = [];
   const leafGap = numLeaves > 1 ? (w - 2 * pad) / (numLeaves - 1) : 0;
   for (let i = 0; i < numLeaves; i++) {
-    levels[0].push({ x: pad + i * leafGap, y: h - pad });
+    levels[0].push({ x: pad + i * leafGap, y: h - botPad });
   }
 
   // Internal levels (bottom-up, x = avg of children)
@@ -92,7 +121,7 @@ function buildTree(numLeaves: number, w: number, h: number, pad: number): Point[
       const c2 = levels[l - 1][i * 2 + 1];
       levels[l].push({
         x: c2 ? (c1.x + c2.x) / 2 : c1.x,
-        y: h - pad - l * levelH,
+        y: h - botPad - l * levelH,
       });
     }
   }
@@ -111,7 +140,7 @@ function drawChain(chain: Point[], litCount: number): void {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
 
-  const r = nodeRadius(count);
+  const r = chainRadius(count);
 
   // Connections
   ctx.lineWidth = 1.5;
@@ -123,7 +152,7 @@ function drawChain(chain: Point[], litCount: number): void {
     ctx.stroke();
   }
 
-  // Nodes
+  // Nodes (uniform size)
   for (let i = 0; i < chain.length; i++) {
     const lit = i < litCount;
     ctx.beginPath();
@@ -155,10 +184,10 @@ function drawTree(levels: Point[][], litLevel: number): void {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
 
-  const r = nodeRadius(count);
+  const maxLevel = levels.length - 1;
+  const baseR = leafRadius(count);
 
   // Connections (parent → children)
-  ctx.lineWidth = 1.5;
   for (let l = 1; l < levels.length; l++) {
     for (let i = 0; i < levels[l].length; i++) {
       const parent = levels[l][i];
@@ -166,7 +195,10 @@ function drawTree(levels: Point[][], litLevel: number): void {
       const c2 = levels[l - 1][i * 2 + 1];
       const lit = l <= litLevel && (l - 1) <= litLevel;
 
+      // Line width scales with level (thicker near root)
+      ctx.lineWidth = 1 + (l / maxLevel) * 1.5;
       ctx.strokeStyle = lit ? PURPLE_LINE_LIT : PURPLE_LINE;
+
       ctx.beginPath();
       ctx.moveTo(parent.x, parent.y);
       ctx.lineTo(c1.x, c1.y);
@@ -181,11 +213,21 @@ function drawTree(levels: Point[][], litLevel: number): void {
     }
   }
 
-  // Nodes (level by level)
+  // Nodes (level by level, size increases toward root)
   for (let l = 0; l < levels.length; l++) {
     const lit = l <= litLevel;
-    const isRoot = l === levels.length - 1;
+    const isRoot = l === maxLevel;
+    const r = treeNodeRadius(l, maxLevel, baseR);
+
     for (const p of levels[l]) {
+      // Glow for root when lit
+      if (isRoot && lit) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r + 6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.15)';
+        ctx.fill();
+      }
+
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
       ctx.fillStyle = lit ? (isRoot ? GREEN : PURPLE) : NODE_BG;
@@ -200,9 +242,10 @@ function drawTree(levels: Point[][], litLevel: number): void {
   ctx.fillStyle = TEXT_DIM;
   ctx.font = '9px -apple-system, BlinkMacSystemFont, sans-serif';
   ctx.textAlign = 'center';
-  const root = levels[levels.length - 1][0];
-  ctx.fillText('root', root.x, root.y - r - 5);
-  ctx.fillText('chunks (parallel)', w / 2, levels[0][0].y + r + 12);
+  const root = levels[maxLevel][0];
+  const rootR = treeNodeRadius(maxLevel, maxLevel, baseR);
+  ctx.fillText('root', root.x, root.y - rootR - 5);
+  ctx.fillText('chunks (parallel)', w / 2, levels[0][0].y + baseR + 12);
 
   ctx.restore();
 }
@@ -271,11 +314,9 @@ function animate(): void {
   function frame(now: number): void {
     const t = Math.min(1, (now - start) / duration);
 
-    // SHA-256: sequential, one node per tick
     const shaLit = Math.min(count, Math.ceil(t * count));
     drawChain(chain, shaLit);
 
-    // BLAKE3: proportionally faster (treeLevels steps vs count steps)
     const blake3Frac = treeLevels / count;
     const blake3T = Math.min(1, t / blake3Frac);
     const litLevel = Math.min(treeLevels - 1, Math.floor(blake3T * treeLevels));
