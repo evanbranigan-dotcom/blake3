@@ -11,6 +11,8 @@
  * At ∞ cores, BLAKE3 is architecturally instant.
  */
 
+import { sizeCanvas, drawWatermark, autoplayOnScroll, prefersReducedMotion } from './animation-utils';
+
 interface SizePreset {
   bytes: number;
   label: string;
@@ -130,14 +132,8 @@ function drawGrid(
       ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
     }
   }
+  drawWatermark(ctx, w, h);
   ctx.restore();
-}
-
-function sizeCanvas(canvas: HTMLCanvasElement): void {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
 }
 
 function fmt(n: number): string {
@@ -408,4 +404,23 @@ export function initScaling(): void {
   });
 
   updateDisplay();
+
+  // Autoplay: trigger first animation when section scrolls into view
+  const scalingSection = document.querySelector('.scaling-section') as HTMLElement;
+  if (scalingSection) {
+    autoplayOnScroll(scalingSection, (instant) => {
+      if (instant) {
+        // Reduced motion: show final state directly
+        currentPreset = 4; // 64 KB — interesting comparison
+        slider.value = '4';
+        updateDisplay();
+      } else {
+        // Animate from a preset that shows the difference
+        currentPreset = 4;
+        slider.value = '4';
+        updateDisplay();
+        startAnimation();
+      }
+    });
+  }
 }

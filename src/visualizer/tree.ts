@@ -8,6 +8,8 @@
  * showing hierarchy through size. The root is 2.5× larger than leaves.
  */
 
+import { sizeCanvas, drawWatermark, autoplayOnScroll, easeOutBack, prefersReducedMotion } from './animation-utils';
+
 interface Point { x: number; y: number }
 
 // Colors
@@ -172,6 +174,7 @@ function drawChain(chain: Point[], litCount: number): void {
   const last = chain[chain.length - 1];
   ctx.fillText('hash', last.x, last.y + r + 12);
 
+  drawWatermark(ctx, w, h);
   ctx.restore();
 }
 
@@ -247,16 +250,8 @@ function drawTree(levels: Point[][], litLevel: number): void {
   ctx.fillText('root', root.x, root.y - rootR - 5);
   ctx.fillText('chunks (parallel)', w / 2, levels[0][0].y + baseR + 12);
 
+  drawWatermark(ctx, w, h);
   ctx.restore();
-}
-
-// ── Canvas sizing ──
-
-function sizeCanvas(canvas: HTMLCanvasElement): void {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
 }
 
 // ── Update & animate ──
@@ -377,4 +372,17 @@ export function initTree(): void {
   });
 
   update();
+
+  // Autoplay: trigger tree animation when section scrolls into view
+  const treeSection = document.querySelector('.tree-section') as HTMLElement;
+  if (treeSection) {
+    autoplayOnScroll(treeSection, (instant) => {
+      if (instant) {
+        // Reduced motion: show final state
+        update();
+      } else {
+        animate();
+      }
+    });
+  }
 }
