@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Hash Race — BLAKE3 vs SHA-256 on YOUR Device</title>
+  <meta name="description" content="Watch BLAKE3 and SHA-256 race in real time on your device. Real data, real throughput, live results.">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://blake3.loonlabs.dev/race/">
+  <meta property="og:title" content="Hash Race — BLAKE3 vs SHA-256 on YOUR Device">
+  <meta property="og:description" content="Watch BLAKE3 and SHA-256 race in real time on your device. Real data, real throughput, live results.">
+  <meta property="og:image" content="https://blake3.loonlabs.dev/og-image.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hash Race — BLAKE3 vs SHA-256 on YOUR Device">
+  <meta name="twitter:description" content="Watch BLAKE3 and SHA-256 race in real time on your device. Real data, real throughput, live results.">
+  <meta name="twitter:image" content="https://blake3.loonlabs.dev/og-image.webp">
+
+  <link rel="canonical" href="https://blake3.loonlabs.dev/race/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/src/race/race.css">
+</head>
+<body>
+
+  <nav class="top-bar">
+    <a href="/">← blake3.loonlabs.dev</a>
+  </nav>
+
+  <header class="header">
+    <h1>Hash Race</h1>
+    <p>Which is faster on <em>your</em> device?</p>
+  </header>
+
+  <main class="race-page">
+
+    <!-- Size selector -->
+    <div class="size-selector" role="radiogroup" aria-label="Data size">
+      <button class="size-pill" data-bytes="1048576">1 MB</button>
+      <button class="size-pill active" data-bytes="10485760">10 MB</button>
+      <button class="size-pill" data-bytes="104857600">100 MB</button>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="btn-race" class="btn-race">▶ Race!</button>
+    </div>
+
+    <!-- Status (generating data, etc.) -->
+    <div id="race-status" class="race-status" aria-live="polite"></div>
+
+    <!-- Race area -->
+    <div class="race-area" id="race-area">
+
+      <!-- BLAKE3 lane -->
+      <div class="lane">
+        <div class="lane-header">
+          <span class="lane-left">
+            <span class="lane-name blake">BLAKE3</span>
+            <span class="lane-workers" id="blake3-workers"></span>
+            <span class="done-badge" id="blake3-done" hidden>DONE</span>
+          </span>
+          <span class="lane-stats" id="blake3-stats"></span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill blake" id="blake3-bar"></div>
+        </div>
+      </div>
+
+      <!-- SHA-256 lane -->
+      <div class="lane">
+        <div class="lane-header">
+          <span class="lane-left">
+            <span class="lane-name sha">SHA-256</span>
+            <span class="done-badge sha-done" id="sha256-done" hidden>DONE</span>
+          </span>
+          <span class="lane-stats" id="sha256-stats"></span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill sha" id="sha256-bar"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Verdict -->
+    <div class="verdict" id="verdict" hidden>
+      <div class="verdict-number" id="verdict-number"></div>
+      <div class="verdict-label" id="verdict-label"></div>
+    </div>
+
+    <!-- Detail stats -->
+    <div class="stats-row" id="stats-row" hidden>
+      <div class="stat-card">
+        <div class="stat-value blake" id="stat-blake3"></div>
+        <div class="stat-label">BLAKE3 throughput</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value sha" id="stat-sha256"></div>
+        <div class="stat-label">SHA-256 throughput</div>
+      </div>
+    </div>
+
+    <div class="note" id="note" hidden>
+      Both algorithms via WebAssembly (hash-wasm). BLAKE3 uses parallel Web Workers.
+    </div>
+
+    <!-- ── Document Race ── -->
+    <div class="section-divider">
+      <span class="divider-label">or hash something real</span>
+    </div>
+
+    <div class="doc-race-header">
+      <h2>Hash a Famous Document</h2>
+      <p>Same words, same hash. One algorithm just gets there first.</p>
+    </div>
+
+    <!-- Document selector -->
+    <div class="doc-selector" id="doc-selector" role="radiogroup" aria-label="Document">
+    </div>
+
+    <!-- Document controls -->
+    <div class="controls">
+      <button id="btn-doc-race" class="btn-race">▶ Hash it!</button>
+    </div>
+
+    <!-- Document race area -->
+    <div class="doc-race-area" id="doc-race-area">
+
+      <!-- Text viewport — shows the document scrolling through -->
+      <div class="text-viewport" id="text-viewport">
+        <div class="text-scroll" id="text-scroll"></div>
+        <div class="text-fade-top"></div>
+        <div class="text-fade-bottom"></div>
+      </div>
+
+      <!-- Side-by-side hash outputs -->
+      <div class="hash-outputs">
+        <div class="hash-output">
+          <div class="hash-label blake">BLAKE3</div>
+          <div class="hash-value mono" id="doc-blake3-hash">waiting...</div>
+          <div class="hash-time" id="doc-blake3-time"></div>
+        </div>
+        <div class="hash-output">
+          <div class="hash-label sha">SHA-256</div>
+          <div class="hash-value mono" id="doc-sha256-hash">waiting...</div>
+          <div class="hash-time" id="doc-sha256-time"></div>
+        </div>
+      </div>
+
+      <!-- Progress bars -->
+      <div class="doc-lanes">
+        <div class="doc-lane">
+          <span class="lane-name blake">BLAKE3</span>
+          <div class="bar-track bar-track-sm">
+            <div class="bar-fill blake" id="doc-blake3-bar"></div>
+          </div>
+          <span class="done-badge" id="doc-blake3-done" hidden>DONE</span>
+        </div>
+        <div class="doc-lane">
+          <span class="lane-name sha">SHA-256</span>
+          <div class="bar-track bar-track-sm">
+            <div class="bar-fill sha" id="doc-sha256-bar"></div>
+          </div>
+          <span class="done-badge sha-done" id="doc-sha256-done" hidden>DONE</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Document verdict -->
+    <div class="verdict" id="doc-verdict" hidden>
+      <div class="verdict-number" id="doc-verdict-number"></div>
+      <div class="verdict-label" id="doc-verdict-label"></div>
+    </div>
+
+    <div class="doc-meta" id="doc-meta" hidden></div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/">Benchmark</a>
+      <span class="footer-dot"></span>
+      <a href="/visualizer/">Algorithm Deep Dive</a>
+      <span class="footer-dot"></span>
+      <a href="/eli5/">ELI5 Guides</a>
+      <span class="footer-dot"></span>
+      <a href="/methodology.html">Methodology</a>
+    </div>
+    <p class="footer-credit">A <a href="https://loonlabs.dev" target="_blank" rel="noopener">LoonLabs</a> project</p>
+  </footer>
+
+  <script type="module" src="/src/race/race.ts"></script>
+</body>
+</html>

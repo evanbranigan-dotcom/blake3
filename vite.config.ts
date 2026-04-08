@@ -22,6 +22,7 @@ export default defineConfig({
         'eli5/private-sector': resolve(__dirname, 'eli5/private-sector.html'),
         'eli5/adoption': resolve(__dirname, 'eli5/adoption.html'),
         'visualizer/index': resolve(__dirname, 'visualizer/index.html'),
+        'race/index': resolve(__dirname, 'race/index.html'),
       },
     },
   },
